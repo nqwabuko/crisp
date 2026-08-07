@@ -30,11 +30,18 @@ python3 scripts/detell.py < draft.md 2>/dev/null \
 
 # measure only, with ranges: for editors and other programs
 python3 scripts/simplify.py --locate draft.md
+
+# add positioned sentences and paragraphs, for a live indicator
+python3 scripts/simplify.py --locate --spans draft.md
 ```
 
 `--locate` returns every finding with a 1-based `line`/`col`/`end_line`/`end_col`
 range over the unmodified input, plus a `fix` on clutter findings and a `hint` on
 the judgement ones. It is the mode a consumer should build against.
+
+`--spans` adds every sentence and paragraph with the same range shape and its
+word count. The metrics say the longest sentence is 65 words; the spans say
+where it is.
 
 Full usage, including the agent-facing workflow, is in [SKILL.md](SKILL.md). The
 writing rules behind the judgement calls are in

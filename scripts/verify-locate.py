@@ -13,6 +13,8 @@ Also checks the invariants a consumer depends on:
   • findings inside fenced or inline code are never reported
   • findings are sorted by position
   • --locate leaves the input alone (no rewrite on stdout)
+  • every --spans sentence and paragraph range holds the word count it claims
+    (counted from code-masked text, the way the metrics do)
 
 Usage
 -----
@@ -27,8 +29,12 @@ import subprocess
 import sys
 
 
-SCRIPTS_ON_PATH = sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import simplify  # noqa: E402  (path set above)
+SCRIPTS = os.path.dirname(os.path.abspath(__file__))
+TOOLS = ("detell.py", "simplify.py")
+
+sys.path.insert(0, SCRIPTS)
+import detell    # noqa: E402  (path set above)
+import simplify  # noqa: E402
 
 WORD = re.compile(r"[A-Za-z][A-Za-z'’\-]*")
 
@@ -36,9 +42,6 @@ WORD = re.compile(r"[A-Za-z][A-Za-z'’\-]*")
 def count_words(s: str) -> int:
     """Count the way the engine does: markdown normalised away."""
     return len(WORD.findall(simplify._plain(s)))
-
-SCRIPTS = os.path.dirname(os.path.abspath(__file__))
-TOOLS = ("detell.py", "simplify.py")
 
 
 def locate(script: str, path: str) -> dict:
@@ -62,8 +65,6 @@ def slice_at(lines: list[str], f: dict) -> str:
 
 def code_ranges(text: str) -> list[tuple[int, int]]:
     """Absolute offsets of fenced blocks and inline code spans."""
-    sys.path.insert(0, SCRIPTS)
-    import detell
     spans, out, pos = detell.prose_spans(text), [], 0
     for start, span in spans:          # gaps between prose spans are code
         if start > pos:

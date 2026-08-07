@@ -156,6 +156,19 @@ Each finding carries a range that maps onto the caller's buffer:
   Check `end_line`, don't assume it equals `line`.
 - `simplify.py --locate` also returns `metrics`, `scored` and `over_budget`, and
   honours `--check`, so a live scorecard is one call.
+- Add `--spans` for **positioned sentences and paragraphs**, each with its word
+  count. `metrics` tells you the longest sentence is 65 words; this tells you
+  where it is, which is what you need to underline it:
+
+  ```json
+  "spans": {
+    "sentences":  [{ "words": 65, "line": 3, "col": 1, "end_line": 8, "end_col": 34 }],
+    "paragraphs": [{ "words": 65, "line": 3, "col": 1, "end_line": 8, "end_col": 34 }]
+  }
+  ```
+
+  Opt-in, because one entry per sentence is a lot of payload for a caller that
+  only wants findings. Word counts exclude code, matching the metrics.
 - Positions are into the **unmodified** input, which is why this mode skips the
   FIX pass. In the normal pipeline the fixes are applied before flags are
   located, so those offsets would not match a buffer. Never mix the two.

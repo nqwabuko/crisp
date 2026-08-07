@@ -29,6 +29,8 @@ What is pinned, and why each one matters to a consumer:
   metrics         the nine budget numbers     the scorecard and the pass/fail gate
   over_budget     which metrics failed        the gate's verdict
   locate          every finding's range       the ranges ink underlines
+  spans           sentence/paragraph ranges   a live long-sentence indicator
+  spans_consistent  spans agree with metrics  the two segmentations have not drifted
 """
 from __future__ import annotations
 
