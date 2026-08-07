@@ -87,3 +87,31 @@ are the cross-implementation contract: run your port over the corpus and require
 it to reproduce the recorded output. Divergence in a prose linter is worse than
 absence, because a linter that quietly disagrees with the gate teaches the writer
 the wrong lesson.
+
+Three traps in the segmentation, all of which were silent here first. A port will
+meet all three.
+
+**Inline code splits its own sentence.** `prose_spans` returns code-free
+*fragments*, so one `` `code` `` span mid-sentence yields two units. Do not
+remove code to segment: **mask** it, same length, newlines preserved, so
+offsets stay true and the prose stays contiguous. Removing it is still correct
+for counting.
+
+**`**Bold sentence.**` cannot be split.** The terminal `.` is followed by `*`,
+which is not in `_SENT_END`'s trailing class, so the boundary is invisible. Blank
+emphasis for sentence splitting only. Block-unit detection has to keep it, or
+`* ` stops reading as a list marker.
+
+**A greedy link match eats prose.** `\S+` in a URL pattern swallows the closing
+paren of `[text](url)`, leaving `[text](` unclosed. The link rule then runs to the
+next `)` anywhere in the document, replacing everything between with the link
+text. One match here ate 826 characters, and every metric under-reported on
+any document containing a link. Stop URLs before `)`, and forbid the link rule
+from crossing a newline.
+
+The lesson underneath all three: **assert the invariant, not just the output.**
+`check_spans()` requires the positioned segmentation and the aggregate metrics to
+agree on sentence count, paragraph count, max words and total words. It caught
+all three, and two of them survived a seven-document fixture corpus that passed
+clean. It took genuinely messy real prose to break them, so put some in your
+corpus.
