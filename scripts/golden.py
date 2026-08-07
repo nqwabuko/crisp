@@ -94,6 +94,10 @@ def record(text: str) -> dict:
             "detell": ranges(detell.locate_flags(text)),
             "simplify": ranges(simplify.locate(text)),
         },
+        "spans": simplify.spans(text),
+        # Proof, recorded per fixture, that the positioned spans and the
+        # aggregate metrics still describe the same document.
+        "spans_consistent": simplify.check_spans(text) or True,
     }
 
 

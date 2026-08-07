@@ -242,13 +242,21 @@ MIN_WORDS_TO_SCORE = 30    # below this the percentages are noise
 
 # Markdown / URL noise stripped before counting. Block markers go first, so an
 # asterisk bullet is not mistaken for emphasis.
-_URL = re.compile(r"https?://\S+|www\.\S+")
+# Stop the URL before a closing paren. `\S+` used to swallow the `)` that ends a
+# markdown link, leaving `[text](LINK` with no closing paren, so the link rule
+# below then ran on to the NEXT `)` anywhere in the document and replaced
+# everything between with the link text. Observed eating 826 characters of prose
+# in one match, which under-reported words, Flesch and grade on any document
+# containing a link. A truncated bare URL costs nothing: it counts as one word
+# either way.
+_URL = re.compile(r"https?://[^\s)]+|www\.[^\s)]+")
 _MD_INLINE = [
     (re.compile(r"^\s*[-=:|+\s]{3,}\s*$", re.M), ""),         # rules / table seps
     (re.compile(r"^\s{0,3}#{1,6}\s*", re.M), ""),             # headings
     (re.compile(r"^\s{0,3}>\s?", re.M), ""),                  # blockquote
     (re.compile(r"^\s{0,3}(?:[-*+]|\d+[.)])\s+", re.M), ""),  # list markers
-    (re.compile(r"!?\[([^\]]*)\]\([^)]*\)"), r"\1"),          # links / images
+    # Newlines excluded so a stray bracket can never swallow a whole paragraph.
+    (re.compile(r"!?\[([^\]\n]*)\]\([^)\n]*\)"), r"\1"),      # links / images
     (re.compile(r"[*_]{1,3}([^*_\n]+)[*_]{1,3}"), r"\1"),     # bold / italic
     (re.compile(r"\|"), " "),                                 # table pipes
 ]
@@ -442,6 +450,138 @@ class Report:
     def total_flags(self):  return sum(f["count"] for f in self.flags)
 
 
+def _mask_code(text: str) -> str:
+    """Blank out code, preserving length and line structure.
+
+    `_strip_code` *removes* code and concatenates what is left, which is right
+    for measuring but destroys offsets. Worse for segmentation, prose_spans
+    returns fragments, so a single inline `code` span would split its own
+    sentence into two units. Masking keeps every offset identical to the
+    original and keeps the prose contiguous. Newlines survive so a fenced block
+    reads as the paragraph break it already was.
+    """
+    keep = bytearray(len(text))
+    for start, span in prose_spans(text):
+        keep[start:start + len(span)] = b"\x01" * len(span)
+    return "".join(c if keep[i] or c == "\n" else " " for i, c in enumerate(text))
+
+
+def _block_units(masked: str):
+    """(start, end, is_block) for every block unit, in absolute offsets.
+
+    Mirrors `_unwrap`: a hard-wrapped line joins the unit above it, a blank line
+    or a block marker starts a new one. Kept separate from `_unwrap` because that
+    one rebuilds a string and throws positions away, and a live indicator needs
+    to know *where* the 52-word sentence is, not just that one exists.
+    """
+    units = []
+    start = end = None
+    is_block = False
+    off = 0
+    for line in masked.split("\n"):
+        line_start, off = off, off + len(line) + 1
+        stripped = line.strip()
+        if not stripped:
+            if start is not None:
+                units.append((start, end, is_block))
+                start = None
+            continue
+        content_start = line_start + (len(line) - len(line.lstrip()))
+        content_end = line_start + len(line.rstrip())
+        if start is None or _BLOCK_START.match(stripped):
+            if start is not None:
+                units.append((start, end, is_block))
+            start, end = content_start, content_end
+            is_block = bool(_BLOCK_START.match(stripped))
+        else:
+            end = content_end
+    if start is not None:
+        units.append((start, end, is_block))
+    return units
+
+
+# Emphasis markers, blanked only for sentence splitting. `**Lead with it.**`
+# ends in `.` followed by `*`, which is not in _SENT_END's trailing class, so the
+# boundary would be invisible. Blanking is length-preserving, unlike _plain's
+# delete, so offsets survive. Block-unit detection must NOT use this: a `* ` list
+# marker has to stay a marker.
+_EMPHASIS = re.compile(r"[*_]")
+
+
+def _sentence_ranges(text: str, start: int, end: int):
+    """Absolute (start, end) of each sentence inside one unit."""
+    s = text[start:end]
+    # Length-preserving guard, so offsets in `guarded` still index into `s`.
+    guarded = _ABBREV.sub(lambda m: m.group(0).replace(".", "\x00"), s)
+    out, pos = [], 0
+    for m in _SENT_END.finditer(guarded):
+        out.append((pos, m.start()))
+        pos = m.end()
+    out.append((pos, len(s)))
+    ranges = []
+    for a, b in out:
+        piece = s[a:b]
+        if not _WORD.search(piece):
+            continue
+        a += len(piece) - len(piece.lstrip())
+        b = a + len(s[a:b].rstrip())
+        ranges.append((start + a, start + b))
+    return ranges
+
+
+def spans(text: str) -> dict:
+    """Positioned sentences and paragraphs, each with its word count.
+
+    `measure()` answers "the longest sentence is 52 words". This answers "and it
+    runs from line 12 column 4 to line 14 column 22", which is the part an editor
+    needs to underline it. Word counts use the same normalisation as the metrics,
+    and `check_spans()` proves the two agree rather than assuming it.
+    """
+    starts = line_starts(text)
+    masked = _mask_code(text)   # same length, so offsets are the original's
+
+    def entry(a: int, b: int) -> dict:
+        l1, c1 = line_col(starts, a)
+        l2, c2 = line_col(starts, b)
+        return {"words": len(_WORD.findall(_plain(masked[a:b]))),
+                "line": l1, "col": c1, "end_line": l2, "end_col": c2}
+
+    units = _block_units(masked)
+    segmented = _EMPHASIS.sub(" ", masked)   # same length again
+    paragraphs = [entry(a, b) for a, b, _ in units]
+    sentences = [entry(a, b) for u_a, u_b, _ in units
+                 for a, b in _sentence_ranges(segmented, u_a, u_b)]
+    return {"sentences": sentences,
+            "paragraphs": [p for p in paragraphs if p["words"]]}
+
+
+def check_spans(text: str) -> list[str]:
+    """Disagreements between spans() and measure(). Empty list means consistent.
+
+    Two segmentations of the same document is exactly the kind of duplication
+    that drifts, and the failure would be quiet and horrible: an editor
+    underlining a sentence it calls 52 words while the gate reports 51. So the
+    invariant is tested, on every fixture, rather than trusted.
+    """
+    sp, m = spans(text), measure(text)
+    if not m.scored:
+        return []
+    problems = []
+    checks = [
+        ("sentences", len(sp["sentences"]), m.values["sentences"]),
+        ("max_sentence_words", max((s["words"] for s in sp["sentences"]), default=0),
+         m.values["max_sentence_words"]),
+        ("paragraphs", len(sp["paragraphs"]), m.values["paragraphs"]),
+        ("max_paragraph_words", max((p["words"] for p in sp["paragraphs"]), default=0),
+         m.values["max_paragraph_words"]),
+        ("words", sum(s["words"] for s in sp["sentences"]), m.values["words"]),
+    ]
+    for name, from_spans, from_metrics in checks:
+        if from_spans != from_metrics:
+            problems.append(f"{name}: spans says {from_spans}, measure says {from_metrics}")
+    return problems
+
+
 def locate(text: str) -> list[dict]:
     """Every finding in `text` with a 1-based range. Measure-only: no rewrite.
 
@@ -590,6 +730,9 @@ def main(argv=None):
                     help="exit 1 if the text is over the complexity budget")
     ap.add_argument("--locate", action="store_true",
                     help="measure only: JSON findings + metrics on STDOUT, input left alone")
+    ap.add_argument("--spans", action="store_true",
+                    help="with --locate: add positioned sentences and paragraphs "
+                         "(for a live long-sentence indicator)")
     args = ap.parse_args(argv)
 
     text = open(args.file, encoding="utf-8").read() if args.file else sys.stdin.read()
@@ -598,13 +741,18 @@ def main(argv=None):
     # describe the caller's buffer as it stands.
     if args.locate:
         m = measure(text)
-        sys.stdout.write(json.dumps({
+        payload = {
             "coordinates": "1-based line and column over the input; end_col exclusive",
             "findings": locate(text),
             "metrics": m.values,
             "scored": m.scored,
             "over_budget": m.over_budget,
-        }, indent=2) + "\n")
+        }
+        # Opt-in: one entry per sentence is a lot of payload for a caller that
+        # only wants the findings.
+        if args.spans:
+            payload["spans"] = spans(text)
+        sys.stdout.write(json.dumps(payload, indent=2) + "\n")
         return 1 if (args.check and m.over_budget) else 0
 
     cleaned, report = simplify(text)

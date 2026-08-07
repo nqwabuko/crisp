@@ -22,15 +22,28 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import subprocess
 import sys
+
+
+SCRIPTS_ON_PATH = sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import simplify  # noqa: E402  (path set above)
+
+WORD = re.compile(r"[A-Za-z][A-Za-z'’\-]*")
+
+
+def count_words(s: str) -> int:
+    """Count the way the engine does: markdown normalised away."""
+    return len(WORD.findall(simplify._plain(s)))
 
 SCRIPTS = os.path.dirname(os.path.abspath(__file__))
 TOOLS = ("detell.py", "simplify.py")
 
 
 def locate(script: str, path: str) -> dict:
-    r = subprocess.run([sys.executable, os.path.join(SCRIPTS, script), "--locate", path],
+    args = ["--locate"] + (["--spans"] if script == "simplify.py" else [])
+    r = subprocess.run([sys.executable, os.path.join(SCRIPTS, script), *args, path],
                        capture_output=True, text=True)
     if r.returncode not in (0, 1):
         raise SystemExit(f"{script} failed on {path}:\n{r.stderr}")
@@ -88,6 +101,22 @@ def check(path: str) -> int:
                 bad += 1
                 print(f"  UNSORTED {script} {f['rule']} L{f['line']}C{f['col']}")
             prev = (f["line"], f["col"])
+
+        # Positioned sentences and paragraphs: same slicing contract, and the
+        # word count must match what the slice actually contains.
+        # Count from masked lines, because the engine excludes code from word
+        # counts. _mask_code preserves length and newlines, so the coordinates
+        # index it identically.
+        masked_lines = simplify._mask_code(text).split("\n")
+        for kind, items in (d.get("spans") or {}).items():
+            for sp in items:
+                total += 1
+                words = count_words(slice_at(masked_lines, sp))
+                if words != sp["words"]:
+                    bad += 1
+                    print(f"  SPAN     {kind} L{sp['line']}C{sp['col']}: claims "
+                          f"{sp['words']} words, slice holds {words}: "
+                          f"{slice_at(lines, sp)[:60]!r}")
 
         # --locate must not rewrite: its stdout is JSON, never the document.
         if text in json.dumps(d):

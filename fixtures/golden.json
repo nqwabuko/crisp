@@ -307,7 +307,77 @@
         ]
       ],
       "simplify": []
-    }
+    },
+    "spans": {
+      "sentences": [
+        {
+          "words": 1,
+          "line": 1,
+          "col": 1,
+          "end_line": 1,
+          "end_col": 11
+        },
+        {
+          "words": 15,
+          "line": 1,
+          "col": 12,
+          "end_line": 2,
+          "end_col": 22
+        },
+        {
+          "words": 8,
+          "line": 2,
+          "col": 23,
+          "end_line": 2,
+          "end_col": 76
+        },
+        {
+          "words": 9,
+          "line": 4,
+          "col": 1,
+          "end_line": 4,
+          "end_col": 54
+        },
+        {
+          "words": 5,
+          "line": 4,
+          "col": 55,
+          "end_line": 4,
+          "end_col": 78
+        },
+        {
+          "words": 9,
+          "line": 6,
+          "col": 1,
+          "end_line": 6,
+          "end_col": 52
+        }
+      ],
+      "paragraphs": [
+        {
+          "words": 24,
+          "line": 1,
+          "col": 1,
+          "end_line": 2,
+          "end_col": 76
+        },
+        {
+          "words": 14,
+          "line": 4,
+          "col": 1,
+          "end_line": 4,
+          "end_col": 78
+        },
+        {
+          "words": 9,
+          "line": 6,
+          "col": 1,
+          "end_line": 6,
+          "end_col": 52
+        }
+      ]
+    },
+    "spans_consistent": true
   },
   "bloated-insight.md": {
     "detell": {
@@ -673,7 +743,77 @@
           "is required"
         ]
       ]
-    }
+    },
+    "spans": {
+      "sentences": [
+        {
+          "words": 4,
+          "line": 1,
+          "col": 1,
+          "end_line": 1,
+          "end_col": 31
+        },
+        {
+          "words": 65,
+          "line": 3,
+          "col": 1,
+          "end_line": 8,
+          "end_col": 34
+        },
+        {
+          "words": 60,
+          "line": 10,
+          "col": 1,
+          "end_line": 14,
+          "end_col": 44
+        },
+        {
+          "words": 17,
+          "line": 16,
+          "col": 1,
+          "end_line": 17,
+          "end_col": 33
+        },
+        {
+          "words": 13,
+          "line": 17,
+          "col": 34,
+          "end_line": 18,
+          "end_col": 39
+        }
+      ],
+      "paragraphs": [
+        {
+          "words": 4,
+          "line": 1,
+          "col": 1,
+          "end_line": 1,
+          "end_col": 31
+        },
+        {
+          "words": 65,
+          "line": 3,
+          "col": 1,
+          "end_line": 8,
+          "end_col": 34
+        },
+        {
+          "words": 60,
+          "line": 10,
+          "col": 1,
+          "end_line": 14,
+          "end_col": 44
+        },
+        {
+          "words": 30,
+          "line": 16,
+          "col": 1,
+          "end_line": 18,
+          "end_col": 39
+        }
+      ]
+    },
+    "spans_consistent": true
   },
   "code-mixed.md": {
     "detell": {
@@ -729,7 +869,49 @@
           "ascertain"
         ]
       ]
-    }
+    },
+    "spans": {
+      "sentences": [
+        {
+          "words": 6,
+          "line": 1,
+          "col": 1,
+          "end_line": 1,
+          "end_col": 40
+        },
+        {
+          "words": 2,
+          "line": 1,
+          "col": 41,
+          "end_line": 1,
+          "end_col": 83
+        },
+        {
+          "words": 12,
+          "line": 9,
+          "col": 1,
+          "end_line": 9,
+          "end_col": 72
+        }
+      ],
+      "paragraphs": [
+        {
+          "words": 8,
+          "line": 1,
+          "col": 1,
+          "end_line": 1,
+          "end_col": 83
+        },
+        {
+          "words": 12,
+          "line": 9,
+          "col": 1,
+          "end_line": 9,
+          "end_col": 72
+        }
+      ]
+    },
+    "spans_consistent": true
   },
   "hard-wrapped.md": {
     "detell": {
@@ -828,7 +1010,42 @@
           "multiple"
         ]
       ]
-    }
+    },
+    "spans": {
+      "sentences": [
+        {
+          "words": 17,
+          "line": 1,
+          "col": 1,
+          "end_line": 2,
+          "end_col": 36
+        },
+        {
+          "words": 24,
+          "line": 4,
+          "col": 1,
+          "end_line": 7,
+          "end_col": 23
+        }
+      ],
+      "paragraphs": [
+        {
+          "words": 17,
+          "line": 1,
+          "col": 1,
+          "end_line": 2,
+          "end_col": 36
+        },
+        {
+          "words": 24,
+          "line": 4,
+          "col": 1,
+          "end_line": 7,
+          "end_col": 23
+        }
+      ]
+    },
+    "spans_consistent": true
   },
   "plain-rewrite.md": {
     "detell": {
@@ -859,7 +1076,112 @@
     "locate": {
       "detell": [],
       "simplify": []
-    }
+    },
+    "spans": {
+      "sentences": [
+        {
+          "words": 9,
+          "line": 1,
+          "col": 1,
+          "end_line": 1,
+          "end_col": 59
+        },
+        {
+          "words": 9,
+          "line": 3,
+          "col": 1,
+          "end_line": 3,
+          "end_col": 53
+        },
+        {
+          "words": 20,
+          "line": 3,
+          "col": 54,
+          "end_line": 5,
+          "end_col": 18
+        },
+        {
+          "words": 4,
+          "line": 5,
+          "col": 19,
+          "end_line": 5,
+          "end_col": 41
+        },
+        {
+          "words": 11,
+          "line": 5,
+          "col": 42,
+          "end_line": 6,
+          "end_col": 20
+        },
+        {
+          "words": 17,
+          "line": 8,
+          "col": 1,
+          "end_line": 9,
+          "end_col": 15
+        },
+        {
+          "words": 15,
+          "line": 9,
+          "col": 16,
+          "end_line": 10,
+          "end_col": 20
+        },
+        {
+          "words": 6,
+          "line": 10,
+          "col": 21,
+          "end_line": 10,
+          "end_col": 61
+        },
+        {
+          "words": 10,
+          "line": 12,
+          "col": 1,
+          "end_line": 12,
+          "end_col": 63
+        },
+        {
+          "words": 13,
+          "line": 12,
+          "col": 64,
+          "end_line": 13,
+          "end_col": 55
+        }
+      ],
+      "paragraphs": [
+        {
+          "words": 9,
+          "line": 1,
+          "col": 1,
+          "end_line": 1,
+          "end_col": 59
+        },
+        {
+          "words": 44,
+          "line": 3,
+          "col": 1,
+          "end_line": 6,
+          "end_col": 20
+        },
+        {
+          "words": 38,
+          "line": 8,
+          "col": 1,
+          "end_line": 10,
+          "end_col": 61
+        },
+        {
+          "words": 23,
+          "line": 12,
+          "col": 1,
+          "end_line": 13,
+          "end_col": 55
+        }
+      ]
+    },
+    "spans_consistent": true
   },
   "slack-post.md": {
     "detell": {
@@ -871,16 +1193,16 @@
       "fixes": {},
       "flags": {},
       "metrics": {
-        "words": 45,
+        "words": 44,
         "sentences": 7,
         "paragraphs": 5,
-        "mean_sentence_words": 6.4,
+        "mean_sentence_words": 6.3,
         "max_sentence_words": 9,
         "pct_long_sentences": 0.0,
-        "flesch_reading_ease": 76.2,
-        "flesch_kincaid_grade": 4.2,
+        "flesch_reading_ease": 75.5,
+        "flesch_kincaid_grade": 4.3,
         "pct_passive_sentences": 0.0,
-        "pct_long_words": 6.7,
+        "pct_long_words": 6.8,
         "max_paragraph_words": 16,
         "pct_ly_adverbs": 0.0
       },
@@ -890,7 +1212,98 @@
     "locate": {
       "detell": [],
       "simplify": []
-    }
+    },
+    "spans": {
+      "sentences": [
+        {
+          "words": 2,
+          "line": 1,
+          "col": 1,
+          "end_line": 1,
+          "end_col": 13
+        },
+        {
+          "words": 6,
+          "line": 1,
+          "col": 14,
+          "end_line": 1,
+          "end_col": 46
+        },
+        {
+          "words": 8,
+          "line": 3,
+          "col": 3,
+          "end_line": 3,
+          "end_col": 40
+        },
+        {
+          "words": 6,
+          "line": 4,
+          "col": 3,
+          "end_line": 4,
+          "end_col": 36
+        },
+        {
+          "words": 6,
+          "line": 5,
+          "col": 3,
+          "end_line": 5,
+          "end_col": 76
+        },
+        {
+          "words": 9,
+          "line": 7,
+          "col": 1,
+          "end_line": 7,
+          "end_col": 55
+        },
+        {
+          "words": 7,
+          "line": 7,
+          "col": 56,
+          "end_line": 8,
+          "end_col": 15
+        }
+      ],
+      "paragraphs": [
+        {
+          "words": 8,
+          "line": 1,
+          "col": 1,
+          "end_line": 1,
+          "end_col": 46
+        },
+        {
+          "words": 8,
+          "line": 3,
+          "col": 1,
+          "end_line": 3,
+          "end_col": 40
+        },
+        {
+          "words": 6,
+          "line": 4,
+          "col": 1,
+          "end_line": 4,
+          "end_col": 36
+        },
+        {
+          "words": 6,
+          "line": 5,
+          "col": 1,
+          "end_line": 5,
+          "end_col": 76
+        },
+        {
+          "words": 16,
+          "line": 7,
+          "col": 1,
+          "end_line": 8,
+          "end_col": 15
+        }
+      ]
+    },
+    "spans_consistent": true
   },
   "too-short.md": {
     "detell": {
@@ -923,6 +1336,34 @@
           "Prior to"
         ]
       ]
-    }
+    },
+    "spans": {
+      "sentences": [
+        {
+          "words": 3,
+          "line": 1,
+          "col": 1,
+          "end_line": 1,
+          "end_col": 16
+        },
+        {
+          "words": 4,
+          "line": 1,
+          "col": 17,
+          "end_line": 1,
+          "end_col": 35
+        }
+      ],
+      "paragraphs": [
+        {
+          "words": 7,
+          "line": 1,
+          "col": 1,
+          "end_line": 1,
+          "end_col": 35
+        }
+      ]
+    },
+    "spans_consistent": true
   }
 }
