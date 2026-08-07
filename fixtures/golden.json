@@ -1,0 +1,928 @@
+{
+  "__config__": {
+    "budget": {
+      "mean_sentence_words": [
+        "max",
+        18.0
+      ],
+      "max_sentence_words": [
+        "max",
+        30
+      ],
+      "pct_long_sentences": [
+        "max",
+        15.0
+      ],
+      "flesch_reading_ease": [
+        "min",
+        50.0
+      ],
+      "flesch_kincaid_grade": [
+        "max",
+        12.0
+      ],
+      "pct_passive_sentences": [
+        "max",
+        10.0
+      ],
+      "pct_long_words": [
+        "max",
+        20.0
+      ],
+      "max_paragraph_words": [
+        "max",
+        90
+      ],
+      "pct_ly_adverbs": [
+        "max",
+        4.0
+      ]
+    },
+    "long_sentence": 25,
+    "long_word_syllables": 3,
+    "min_words_to_score": 30,
+    "rules": {
+      "detell_fix": [
+        "crlf",
+        "zero_width",
+        "nbsp",
+        "curly_double",
+        "curly_single",
+        "ellipsis",
+        "endash_range",
+        "endash_clause",
+        "em_dash",
+        "in_order_to",
+        "comma_at_bol",
+        "space_comma",
+        "double_comma",
+        "comma_stop",
+        "run_spaces",
+        "trailing_ws"
+      ],
+      "detell_flag": [
+        "word:vocabulary",
+        "phrase:not-just",
+        "phrase:not-about",
+        "phrase:not-only",
+        "phrase:dive-in",
+        "phrase:dive-deeper",
+        "phrase:todays-world",
+        "phrase:worth-noting",
+        "phrase:when-it-comes",
+        "phrase:end-of-day",
+        "phrase:that-said",
+        "phrase:needless",
+        "phrase:closer",
+        "phrase:game-changer",
+        "phrase:navigate",
+        "phrase:unlock-pot",
+        "chat:preamble",
+        "chat:hope-helps",
+        "chat:feel-free",
+        "chat:let-me-know",
+        "hedge:filler",
+        "hedge:the-fact"
+      ],
+      "simplify_fix": [
+        "clutter:because",
+        "clutter:although",
+        "clutter:if",
+        "clutter:so-that",
+        "clutter:whether",
+        "clutter:now",
+        "clutter:soon",
+        "clutter:before",
+        "clutter:after",
+        "clutter:during",
+        "clutter:period",
+        "clutter:basis",
+        "clutter:regularly",
+        "clutter:most",
+        "clutter:few",
+        "clutter:enough",
+        "clutter:can",
+        "clutter:could",
+        "clutter:in",
+        "clutter:about",
+        "clutter:every",
+        "clutter:first",
+        "clutter:purposes",
+        "clutter:currently",
+        "run_spaces"
+      ],
+      "simplify_flag": [
+        "passive",
+        "nominalisation",
+        "there-is",
+        "it-is-that",
+        "in-terms-of",
+        "for-the-purpose",
+        "in-the-process",
+        "vague-quantity",
+        "in-a-manner",
+        "abstraction",
+        "long-word",
+        "hedge-stack"
+      ]
+    }
+  },
+  "ai-tells.md": {
+    "detell": {
+      "fixes": {
+        "curly_single": 1,
+        "ellipsis": 1,
+        "endash_range": 1,
+        "em_dash": 1
+      },
+      "flags": {
+        "word:vocabulary": 8,
+        "phrase:dive-in": 1,
+        "phrase:todays-world": 1,
+        "phrase:worth-noting": 1,
+        "phrase:closer": 1,
+        "phrase:game-changer": 1,
+        "chat:preamble": 1,
+        "chat:hope-helps": 1,
+        "chat:feel-free": 1
+      },
+      "cleaned": "Certainly! Let's delve into the tapestry of results, it is a testament to\nthe robust landscape. In today's fast-paced world we must leverage synergy.\n\nIt's worth noting that the 3-5 day window is crucial. Feel free to reach out.\n\nOverall, this is a game-changer... I hope this helps.\n"
+    },
+    "simplify": {
+      "fixes": {},
+      "flags": {},
+      "metrics": {
+        "words": 47,
+        "sentences": 7,
+        "paragraphs": 3,
+        "mean_sentence_words": 6.7,
+        "max_sentence_words": 15,
+        "pct_long_sentences": 0.0,
+        "flesch_reading_ease": 72.2,
+        "flesch_kincaid_grade": 4.9,
+        "pct_passive_sentences": 0.0,
+        "pct_long_words": 14.9,
+        "max_paragraph_words": 24,
+        "pct_ly_adverbs": 2.1
+      },
+      "scored": true,
+      "over_budget": []
+    },
+    "locate": {
+      "detell": [
+        [
+          "chat:preamble",
+          "tell",
+          1,
+          1,
+          1,
+          11,
+          "Certainly!"
+        ],
+        [
+          "phrase:dive-in",
+          "tell",
+          1,
+          12,
+          1,
+          23,
+          "Let's delve"
+        ],
+        [
+          "word:vocabulary",
+          "tell",
+          1,
+          18,
+          1,
+          23,
+          "delve"
+        ],
+        [
+          "word:vocabulary",
+          "tell",
+          1,
+          33,
+          1,
+          41,
+          "tapestry"
+        ],
+        [
+          "word:vocabulary",
+          "tell",
+          1,
+          63,
+          1,
+          72,
+          "testament"
+        ],
+        [
+          "word:vocabulary",
+          "tell",
+          2,
+          5,
+          2,
+          11,
+          "robust"
+        ],
+        [
+          "word:vocabulary",
+          "tell",
+          2,
+          12,
+          2,
+          21,
+          "landscape"
+        ],
+        [
+          "phrase:todays-world",
+          "tell",
+          2,
+          23,
+          2,
+          44,
+          "In today's fast-paced"
+        ],
+        [
+          "word:vocabulary",
+          "tell",
+          2,
+          59,
+          2,
+          67,
+          "leverage"
+        ],
+        [
+          "word:vocabulary",
+          "tell",
+          2,
+          68,
+          2,
+          75,
+          "synergy"
+        ],
+        [
+          "word:vocabulary",
+          "tell",
+          4,
+          46,
+          4,
+          53,
+          "crucial"
+        ],
+        [
+          "chat:feel-free",
+          "tell",
+          4,
+          55,
+          4,
+          67,
+          "Feel free to"
+        ],
+        [
+          "phrase:closer",
+          "tell",
+          5,
+          1,
+          6,
+          9,
+          "\nOverall,"
+        ],
+        [
+          "phrase:game-changer",
+          "tell",
+          6,
+          20,
+          6,
+          32,
+          "game-changer"
+        ],
+        [
+          "chat:hope-helps",
+          "tell",
+          6,
+          34,
+          6,
+          51,
+          "I hope this helps"
+        ]
+      ],
+      "simplify": []
+    }
+  },
+  "bloated-insight.md": {
+    "detell": {
+      "fixes": {},
+      "flags": {
+        "word:vocabulary": 1,
+        "hedge:the-fact": 1
+      },
+      "cleaned": "# Insight: DLM capability gaps\n\nPrior to the commencement of the migration, it was determined that there are a\nnumber of limitations in relation to the current implementation of the dynamic\nload management functionality, which, due to the fact that capacity groups are\nmodelled as circuits in the legacy platform, necessitates additional\nconfigurability in terms of how meter values are utilised for the purposes of\nload balancing across the estate.\n\nIn the event that the aforementioned meter values are not received on a regular\nbasis, the allocation of available current is calculated by the platform using a\nfallback which was implemented for the purpose of protecting the site, and it\nshould be noted that this behaviour is not currently surfaced to the operator in\na manner which facilitates rapid diagnosis.\n\nIt may be the case that the prioritisation of visibility improvements would\ndeliver a more holistic outcome. There is a possibility that alignment with the\nsmart charging workstream is required.\n"
+    },
+    "simplify": {
+      "fixes": {
+        "clutter:because": 1,
+        "clutter:if": 1,
+        "clutter:before": 1,
+        "clutter:regularly": 1
+      },
+      "flags": {
+        "passive": 7,
+        "abstraction": 6,
+        "nominalisation": 3,
+        "there-is": 2,
+        "in-terms-of": 2,
+        "for-the-purpose": 2,
+        "long-word": 2,
+        "hedge-stack": 2,
+        "it-is-that": 1,
+        "vague-quantity": 1
+      },
+      "metrics": {
+        "words": 148,
+        "sentences": 5,
+        "paragraphs": 4,
+        "mean_sentence_words": 29.6,
+        "max_sentence_words": 60,
+        "pct_long_sentences": 40.0,
+        "flesch_reading_ease": 17.3,
+        "flesch_kincaid_grade": 18.2,
+        "pct_passive_sentences": 60.0,
+        "pct_long_words": 24.3,
+        "max_paragraph_words": 60,
+        "pct_ly_adverbs": 1.4
+      },
+      "scored": true,
+      "over_budget": [
+        "mean_sentence_words",
+        "max_sentence_words",
+        "pct_long_sentences",
+        "flesch_reading_ease",
+        "flesch_kincaid_grade",
+        "pct_passive_sentences",
+        "pct_long_words"
+      ]
+    },
+    "locate": {
+      "detell": [
+        [
+          "hedge:the-fact",
+          "tell",
+          5,
+          46,
+          5,
+          59,
+          "the fact that"
+        ],
+        [
+          "word:vocabulary",
+          "tell",
+          17,
+          16,
+          17,
+          24,
+          "holistic"
+        ]
+      ],
+      "simplify": [
+        [
+          "abstraction",
+          "complexity",
+          1,
+          16,
+          1,
+          26,
+          "capability"
+        ],
+        [
+          "clutter:before",
+          "clutter",
+          3,
+          1,
+          3,
+          9,
+          "Prior to"
+        ],
+        [
+          "nominalisation",
+          "complexity",
+          3,
+          10,
+          3,
+          29,
+          "the commencement of"
+        ],
+        [
+          "it-is-that",
+          "complexity",
+          3,
+          45,
+          3,
+          67,
+          "it was determined that"
+        ],
+        [
+          "passive",
+          "complexity",
+          3,
+          48,
+          3,
+          62,
+          "was determined"
+        ],
+        [
+          "there-is",
+          "complexity",
+          3,
+          68,
+          3,
+          77,
+          "there are"
+        ],
+        [
+          "vague-quantity",
+          "complexity",
+          3,
+          78,
+          4,
+          10,
+          "a\nnumber of"
+        ],
+        [
+          "in-terms-of",
+          "complexity",
+          4,
+          23,
+          4,
+          37,
+          "in relation to"
+        ],
+        [
+          "abstraction",
+          "complexity",
+          5,
+          17,
+          5,
+          30,
+          "functionality"
+        ],
+        [
+          "clutter:because",
+          "clutter",
+          5,
+          39,
+          5,
+          59,
+          "due to the fact that"
+        ],
+        [
+          "passive",
+          "complexity",
+          5,
+          76,
+          6,
+          9,
+          "are\nmodelled"
+        ],
+        [
+          "long-word",
+          "complexity",
+          6,
+          59,
+          6,
+          69,
+          "additional"
+        ],
+        [
+          "abstraction",
+          "complexity",
+          7,
+          1,
+          7,
+          16,
+          "configurability"
+        ],
+        [
+          "in-terms-of",
+          "complexity",
+          7,
+          17,
+          7,
+          28,
+          "in terms of"
+        ],
+        [
+          "passive",
+          "complexity",
+          7,
+          46,
+          7,
+          58,
+          "are utilised"
+        ],
+        [
+          "for-the-purpose",
+          "complexity",
+          7,
+          59,
+          7,
+          78,
+          "for the purposes of"
+        ],
+        [
+          "clutter:if",
+          "clutter",
+          10,
+          1,
+          10,
+          18,
+          "In the event that"
+        ],
+        [
+          "long-word",
+          "complexity",
+          10,
+          23,
+          10,
+          37,
+          "aforementioned"
+        ],
+        [
+          "clutter:regularly",
+          "clutter",
+          10,
+          68,
+          11,
+          6,
+          "on a regular\nbasis"
+        ],
+        [
+          "nominalisation",
+          "complexity",
+          11,
+          8,
+          11,
+          25,
+          "the allocation of"
+        ],
+        [
+          "passive",
+          "complexity",
+          11,
+          44,
+          11,
+          57,
+          "is calculated"
+        ],
+        [
+          "passive",
+          "complexity",
+          12,
+          16,
+          12,
+          31,
+          "was implemented"
+        ],
+        [
+          "for-the-purpose",
+          "complexity",
+          12,
+          32,
+          12,
+          50,
+          "for the purpose of"
+        ],
+        [
+          "passive",
+          "complexity",
+          13,
+          8,
+          13,
+          16,
+          "be noted"
+        ],
+        [
+          "hedge-stack",
+          "complexity",
+          16,
+          1,
+          16,
+          24,
+          "It may be the case that"
+        ],
+        [
+          "nominalisation",
+          "complexity",
+          16,
+          25,
+          16,
+          46,
+          "the prioritisation of"
+        ],
+        [
+          "abstraction",
+          "complexity",
+          16,
+          47,
+          16,
+          57,
+          "visibility"
+        ],
+        [
+          "there-is",
+          "complexity",
+          17,
+          34,
+          17,
+          42,
+          "There is"
+        ],
+        [
+          "hedge-stack",
+          "complexity",
+          17,
+          34,
+          17,
+          61,
+          "There is a possibility that"
+        ],
+        [
+          "abstraction",
+          "complexity",
+          17,
+          62,
+          17,
+          71,
+          "alignment"
+        ],
+        [
+          "abstraction",
+          "complexity",
+          18,
+          16,
+          18,
+          26,
+          "workstream"
+        ],
+        [
+          "passive",
+          "complexity",
+          18,
+          27,
+          18,
+          38,
+          "is required"
+        ]
+      ]
+    }
+  },
+  "code-mixed.md": {
+    "detell": {
+      "fixes": {},
+      "flags": {
+        "word:vocabulary": 1
+      },
+      "cleaned": "The endpoint returns the current limit. Use `leverage the utilize flag` sparingly.\n\n```python\n# The implementation of the delve tapestry was utilized prior to launch.\ndef facilitate(x):\n    return x\n```\n\nPrior to the review we should ascertain whether the fallback is robust.\n"
+    },
+    "simplify": {
+      "fixes": {
+        "clutter:before": 1
+      },
+      "flags": {
+        "long-word": 1
+      },
+      "metrics": {
+        "words": 19,
+        "sentences": 3
+      },
+      "scored": false,
+      "over_budget": []
+    },
+    "locate": {
+      "detell": [
+        [
+          "word:vocabulary",
+          "tell",
+          9,
+          65,
+          9,
+          71,
+          "robust"
+        ]
+      ],
+      "simplify": [
+        [
+          "clutter:before",
+          "clutter",
+          9,
+          1,
+          9,
+          9,
+          "Prior to"
+        ],
+        [
+          "long-word",
+          "complexity",
+          9,
+          31,
+          9,
+          40,
+          "ascertain"
+        ]
+      ]
+    }
+  },
+  "hard-wrapped.md": {
+    "detell": {
+      "fixes": {},
+      "flags": {
+        "phrase:not-just": 1,
+        "hedge:filler": 1
+      },
+      "cleaned": "Honestly it is fine but it's not just a fix,\nit's a paradigm shift that we need.\n\nThe values are not received on a regular\nbasis, which happened during the\ncourse of the last quarter and was raised\nby multiple customers.\n"
+    },
+    "simplify": {
+      "fixes": {
+        "clutter:during": 1,
+        "clutter:regularly": 1
+      },
+      "flags": {
+        "passive": 1,
+        "vague-quantity": 1
+      },
+      "metrics": {
+        "words": 35,
+        "sentences": 2,
+        "paragraphs": 2,
+        "mean_sentence_words": 17.5,
+        "max_sentence_words": 18,
+        "pct_long_sentences": 0.0,
+        "flesch_reading_ease": 65.8,
+        "flesch_kincaid_grade": 8.4,
+        "pct_passive_sentences": 50.0,
+        "pct_long_words": 14.3,
+        "max_paragraph_words": 18,
+        "pct_ly_adverbs": 5.7
+      },
+      "scored": true,
+      "over_budget": [
+        "pct_passive_sentences",
+        "pct_ly_adverbs"
+      ]
+    },
+    "locate": {
+      "detell": [
+        [
+          "phrase:not-just",
+          "tell",
+          1,
+          25,
+          2,
+          5,
+          "it's not just a fix,\nit's"
+        ],
+        [
+          "hedge:filler",
+          "tell",
+          1,
+          34,
+          1,
+          38,
+          "just"
+        ]
+      ],
+      "simplify": [
+        [
+          "clutter:regularly",
+          "clutter",
+          4,
+          29,
+          5,
+          6,
+          "on a regular\nbasis"
+        ],
+        [
+          "clutter:during",
+          "clutter",
+          5,
+          23,
+          6,
+          10,
+          "during the\ncourse of"
+        ],
+        [
+          "passive",
+          "complexity",
+          6,
+          32,
+          6,
+          42,
+          "was raised"
+        ],
+        [
+          "vague-quantity",
+          "complexity",
+          7,
+          4,
+          7,
+          12,
+          "multiple"
+        ]
+      ]
+    }
+  },
+  "plain-rewrite.md": {
+    "detell": {
+      "fixes": {},
+      "flags": {},
+      "cleaned": "# Insight: operators can't see why DLM throttled a charger\n\nLegacy capacity groups map to circuits in our model. When a charger stops\nsending meter values, the platform falls back to a safe current limit to\nprotect the site. That's the right call. The problem is we never tell the\noperator we did it.\n\nSo the charger throttles, the driver complains, and the operator has no way to\nsee the cause. They end up reading comm logs to work out which capacity group\nwent into fallback. Four customers raised this last quarter.\n\nWe should surface fallback state on the capacity group itself. I'd sequence it\nwith the smart charging work rather than as a one-off.\n"
+    },
+    "simplify": {
+      "fixes": {},
+      "flags": {},
+      "metrics": {
+        "words": 114,
+        "sentences": 10,
+        "paragraphs": 4,
+        "mean_sentence_words": 11.4,
+        "max_sentence_words": 20,
+        "pct_long_sentences": 0.0,
+        "flesch_reading_ease": 72.8,
+        "flesch_kincaid_grade": 5.9,
+        "pct_passive_sentences": 0.0,
+        "pct_long_words": 7.0,
+        "max_paragraph_words": 44,
+        "pct_ly_adverbs": 0.0
+      },
+      "scored": true,
+      "over_budget": []
+    },
+    "locate": {
+      "detell": [],
+      "simplify": []
+    }
+  },
+  "slack-post.md": {
+    "detell": {
+      "fixes": {},
+      "flags": {},
+      "cleaned": "Morning all. Quick update on the pilot site 🙏\n\n* Tariff pricing is live on the web app\n* The currency fix went out Tuesday\n* Payment terminals arrive Thursday, [tracking here](https://example.com/x)\n\n@Sam can you confirm the terminal IDs before Thursday? I'll pick up the pricing\nchecks myself.\n"
+    },
+    "simplify": {
+      "fixes": {},
+      "flags": {},
+      "metrics": {
+        "words": 45,
+        "sentences": 7,
+        "paragraphs": 5,
+        "mean_sentence_words": 6.4,
+        "max_sentence_words": 9,
+        "pct_long_sentences": 0.0,
+        "flesch_reading_ease": 76.2,
+        "flesch_kincaid_grade": 4.2,
+        "pct_passive_sentences": 0.0,
+        "pct_long_words": 6.7,
+        "max_paragraph_words": 16,
+        "pct_ly_adverbs": 0.0
+      },
+      "scored": true,
+      "over_budget": []
+    },
+    "locate": {
+      "detell": [],
+      "simplify": []
+    }
+  },
+  "too-short.md": {
+    "detell": {
+      "fixes": {},
+      "flags": {},
+      "cleaned": "Ship it Friday. Prior to the demo.\n"
+    },
+    "simplify": {
+      "fixes": {
+        "clutter:before": 1
+      },
+      "flags": {},
+      "metrics": {
+        "words": 6,
+        "sentences": 2
+      },
+      "scored": false,
+      "over_budget": []
+    },
+    "locate": {
+      "detell": [],
+      "simplify": [
+        [
+          "clutter:before",
+          "clutter",
+          1,
+          17,
+          1,
+          25,
+          "Prior to"
+        ]
+      ]
+    }
+  }
+}
