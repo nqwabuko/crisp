@@ -288,7 +288,14 @@ def _unwrap(text: str) -> str:
 _ABBREV = re.compile(
     r"\b(?:e\.g|i\.e|etc|vs|approx|Mr|Mrs|Ms|Dr|Prof|Fig|No|Inc|Ltd|Corp|St|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\.",
     re.I)
-_SENT_END = re.compile(r"(?<=[.!?])[\"')\]]*\s+")
+# A boundary may be followed by closing punctuation *and* by markdown emphasis
+# markers. `**Lead with it.** Then this.` and `~~Struck sentence.~~ Then this.`
+# both end in `.` followed by a marker, and without the marker in this class the
+# boundary is invisible and two sentences are counted as one. The blank-emphasis
+# trick in `spans()` hides the `*` case but not `~`, and not `~~**both**~~` where
+# the paired-delimiter strip in `_plain` leaves a stray `~` behind. Putting the
+# markers here fixes every combination in one place, on both sides.
+_SENT_END = re.compile(r"(?<=[.!?])[\"')\]*_~]*\s+")
 _WORD = re.compile(r"[A-Za-z][A-Za-z'’\-]*")
 
 
