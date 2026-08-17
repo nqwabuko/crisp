@@ -77,10 +77,21 @@
         "phrase:game-changer",
         "phrase:navigate",
         "phrase:unlock-pot",
+        "phrase:plays-role",
+        "phrase:more-than",
+        "phrase:in-a-world",
+        "phrase:this-is-where",
+        "phrase:whether-youre",
+        "phrase:we-will",
+        "phrase:takeaway",
+        "phrase:no-denying",
         "chat:preamble",
         "chat:hope-helps",
         "chat:feel-free",
         "chat:let-me-know",
+        "chat:happy-to",
+        "chat:as-an-ai",
+        "chat:heres-summary",
         "hedge:filler",
         "hedge:the-fact"
       ],
@@ -144,7 +155,8 @@
         "phrase:game-changer": 1,
         "chat:preamble": 1,
         "chat:hope-helps": 1,
-        "chat:feel-free": 1
+        "chat:feel-free": 1,
+        "hedge:filler": 1
       },
       "cleaned": "Certainly! Let's delve into the tapestry of results, it is a testament to\nthe robust landscape. In today's fast-paced world we must leverage synergy.\n\nIt's worth noting that the 3-5 day window is crucial. Feel free to reach out.\n\nOverall, this is a game-changer... I hope this helps.\n"
     },
@@ -178,6 +190,15 @@
           1,
           11,
           "Certainly!"
+        ],
+        [
+          "hedge:filler",
+          "tell",
+          1,
+          1,
+          1,
+          10,
+          "Certainly"
         ],
         [
           "phrase:dive-in",
@@ -1041,6 +1062,481 @@
           "line": 4,
           "col": 1,
           "end_line": 7,
+          "end_col": 23
+        }
+      ]
+    },
+    "spans_consistent": true
+  },
+  "modern-slop.md": {
+    "detell": {
+      "fixes": {},
+      "flags": {
+        "word:vocabulary": 16,
+        "hedge:filler": 6,
+        "phrase:worth-noting": 1,
+        "phrase:closer": 1,
+        "phrase:plays-role": 1,
+        "phrase:more-than": 1,
+        "phrase:in-a-world": 1,
+        "phrase:this-is-where": 1,
+        "phrase:whether-youre": 1,
+        "phrase:we-will": 1,
+        "phrase:takeaway": 1,
+        "phrase:no-denying": 1,
+        "chat:happy-to": 1,
+        "chat:as-an-ai": 1,
+        "chat:heres-summary": 1
+      },
+      "cleaned": "Here's a quick rundown of the pilot. In an era where drivers expect instant\ncharging, our streamlined onboarding plays a crucial role, and the curated\ntariff library showcases what a cutting-edge platform can do.\n\nThis is more than just a config change. That is where the new roaming layer\ncomes in: it empowers operators, boasts state-of-the-art failover, and the\nresults resonate across an ever-evolving market.\n\nWhether you're a CPO or an eMSP, it is important to remember that the\ntransformative gains are arguably somewhat overstated. Clearly this pitch\nresonates, and obviously the rollout will certainly land.\n\nNext we'll walk through the rollout. Key takeaway: I'd be happy to help. As an\nAI assistant I would call this profound, innovative work. Make no mistake, the\nunparalleled results speak for themselves. To wrap up, we spearhead the\nrevolutionary rebuild.\n"
+    },
+    "simplify": {
+      "fixes": {},
+      "flags": {},
+      "metrics": {
+        "words": 137,
+        "sentences": 11,
+        "paragraphs": 4,
+        "mean_sentence_words": 12.5,
+        "max_sentence_words": 27,
+        "pct_long_sentences": 9.1,
+        "flesch_reading_ease": 56.5,
+        "flesch_kincaid_grade": 8.5,
+        "pct_passive_sentences": 0.0,
+        "pct_long_words": 16.8,
+        "max_paragraph_words": 41,
+        "pct_ly_adverbs": 2.9
+      },
+      "scored": true,
+      "over_budget": []
+    },
+    "locate": {
+      "detell": [
+        [
+          "chat:heres-summary",
+          "tell",
+          1,
+          1,
+          1,
+          23,
+          "Here's a quick rundown"
+        ],
+        [
+          "phrase:in-a-world",
+          "tell",
+          1,
+          38,
+          1,
+          53,
+          "In an era where"
+        ],
+        [
+          "word:vocabulary",
+          "tell",
+          2,
+          15,
+          2,
+          26,
+          "streamlined"
+        ],
+        [
+          "phrase:plays-role",
+          "tell",
+          2,
+          38,
+          2,
+          58,
+          "plays a crucial role"
+        ],
+        [
+          "word:vocabulary",
+          "tell",
+          2,
+          46,
+          2,
+          53,
+          "crucial"
+        ],
+        [
+          "word:vocabulary",
+          "tell",
+          3,
+          16,
+          3,
+          25,
+          "showcases"
+        ],
+        [
+          "word:vocabulary",
+          "tell",
+          3,
+          33,
+          3,
+          45,
+          "cutting-edge"
+        ],
+        [
+          "phrase:more-than",
+          "tell",
+          5,
+          9,
+          5,
+          23,
+          "more than just"
+        ],
+        [
+          "hedge:filler",
+          "tell",
+          5,
+          19,
+          5,
+          23,
+          "just"
+        ],
+        [
+          "phrase:this-is-where",
+          "tell",
+          5,
+          41,
+          6,
+          9,
+          "That is where the new roaming layer\ncomes in"
+        ],
+        [
+          "word:vocabulary",
+          "tell",
+          6,
+          14,
+          6,
+          22,
+          "empowers"
+        ],
+        [
+          "word:vocabulary",
+          "tell",
+          6,
+          34,
+          6,
+          40,
+          "boasts"
+        ],
+        [
+          "word:vocabulary",
+          "tell",
+          6,
+          41,
+          6,
+          57,
+          "state-of-the-art"
+        ],
+        [
+          "word:vocabulary",
+          "tell",
+          7,
+          9,
+          7,
+          17,
+          "resonate"
+        ],
+        [
+          "word:vocabulary",
+          "tell",
+          7,
+          28,
+          7,
+          41,
+          "ever-evolving"
+        ],
+        [
+          "phrase:whether-youre",
+          "tell",
+          9,
+          1,
+          9,
+          15,
+          "Whether you're"
+        ],
+        [
+          "phrase:worth-noting",
+          "tell",
+          9,
+          34,
+          9,
+          66,
+          "it is important to remember that"
+        ],
+        [
+          "word:vocabulary",
+          "tell",
+          10,
+          1,
+          10,
+          15,
+          "transformative"
+        ],
+        [
+          "hedge:filler",
+          "tell",
+          10,
+          26,
+          10,
+          34,
+          "arguably"
+        ],
+        [
+          "hedge:filler",
+          "tell",
+          10,
+          35,
+          10,
+          43,
+          "somewhat"
+        ],
+        [
+          "hedge:filler",
+          "tell",
+          10,
+          56,
+          10,
+          63,
+          "Clearly"
+        ],
+        [
+          "word:vocabulary",
+          "tell",
+          11,
+          1,
+          11,
+          10,
+          "resonates"
+        ],
+        [
+          "hedge:filler",
+          "tell",
+          11,
+          16,
+          11,
+          25,
+          "obviously"
+        ],
+        [
+          "hedge:filler",
+          "tell",
+          11,
+          43,
+          11,
+          52,
+          "certainly"
+        ],
+        [
+          "phrase:we-will",
+          "tell",
+          13,
+          6,
+          13,
+          24,
+          "we'll walk through"
+        ],
+        [
+          "phrase:takeaway",
+          "tell",
+          13,
+          38,
+          13,
+          50,
+          "Key takeaway"
+        ],
+        [
+          "chat:happy-to",
+          "tell",
+          13,
+          52,
+          13,
+          67,
+          "I'd be happy to"
+        ],
+        [
+          "chat:as-an-ai",
+          "tell",
+          13,
+          74,
+          14,
+          13,
+          "As an\nAI assistant"
+        ],
+        [
+          "word:vocabulary",
+          "tell",
+          14,
+          32,
+          14,
+          40,
+          "profound"
+        ],
+        [
+          "word:vocabulary",
+          "tell",
+          14,
+          42,
+          14,
+          52,
+          "innovative"
+        ],
+        [
+          "phrase:no-denying",
+          "tell",
+          14,
+          59,
+          14,
+          74,
+          "Make no mistake"
+        ],
+        [
+          "word:vocabulary",
+          "tell",
+          15,
+          1,
+          15,
+          13,
+          "unparalleled"
+        ],
+        [
+          "phrase:closer",
+          "tell",
+          15,
+          44,
+          15,
+          54,
+          "To wrap up"
+        ],
+        [
+          "word:vocabulary",
+          "tell",
+          15,
+          59,
+          15,
+          68,
+          "spearhead"
+        ],
+        [
+          "word:vocabulary",
+          "tell",
+          16,
+          1,
+          16,
+          14,
+          "revolutionary"
+        ]
+      ],
+      "simplify": []
+    },
+    "spans": {
+      "sentences": [
+        {
+          "words": 7,
+          "line": 1,
+          "col": 1,
+          "end_line": 1,
+          "end_col": 37
+        },
+        {
+          "words": 27,
+          "line": 1,
+          "col": 38,
+          "end_line": 3,
+          "end_col": 62
+        },
+        {
+          "words": 8,
+          "line": 5,
+          "col": 1,
+          "end_line": 5,
+          "end_col": 40
+        },
+        {
+          "words": 23,
+          "line": 5,
+          "col": 41,
+          "end_line": 7,
+          "end_col": 49
+        },
+        {
+          "words": 20,
+          "line": 9,
+          "col": 1,
+          "end_line": 10,
+          "end_col": 55
+        },
+        {
+          "words": 11,
+          "line": 10,
+          "col": 56,
+          "end_line": 11,
+          "end_col": 58
+        },
+        {
+          "words": 6,
+          "line": 13,
+          "col": 1,
+          "end_line": 13,
+          "end_col": 37
+        },
+        {
+          "words": 7,
+          "line": 13,
+          "col": 38,
+          "end_line": 13,
+          "end_col": 73
+        },
+        {
+          "words": 11,
+          "line": 13,
+          "col": 74,
+          "end_line": 14,
+          "end_col": 58
+        },
+        {
+          "words": 9,
+          "line": 14,
+          "col": 59,
+          "end_line": 15,
+          "end_col": 43
+        },
+        {
+          "words": 8,
+          "line": 15,
+          "col": 44,
+          "end_line": 16,
+          "end_col": 23
+        }
+      ],
+      "paragraphs": [
+        {
+          "words": 34,
+          "line": 1,
+          "col": 1,
+          "end_line": 3,
+          "end_col": 62
+        },
+        {
+          "words": 31,
+          "line": 5,
+          "col": 1,
+          "end_line": 7,
+          "end_col": 49
+        },
+        {
+          "words": 31,
+          "line": 9,
+          "col": 1,
+          "end_line": 11,
+          "end_col": 58
+        },
+        {
+          "words": 41,
+          "line": 13,
+          "col": 1,
+          "end_line": 16,
           "end_col": 23
         }
       ]

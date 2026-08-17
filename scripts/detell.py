@@ -98,6 +98,13 @@ FLAG_RULES = [
         "utilized", "utilizing", "meticulous", "meticulously", "bustling",
         "vibrant", "crucial", "vital", "harness", "unlock", "unlocking",
         "embark", "foster", "fostering", "cultivate", "endeavor", "paramount",
+        # Later-generation marketing register: the same fingerprint, newer words.
+        "showcase", "showcases", "showcasing", "streamline", "streamlines",
+        "streamlined", "streamlining", "cutting-edge", "state-of-the-art",
+        "transformative", "revolutionise", "revolutionize", "revolutionary",
+        "empower", "empowers", "empowering", "resonate", "resonates",
+        "unparalleled", "ever-evolving", "profound", "innovative",
+        "spearhead", "boasts",
     )),
 
     # Sentence scaffolds ChatGPT reaches for.
@@ -107,27 +114,44 @@ FLAG_RULES = [
     ("phrase:dive-in",      re.compile(r"\blet'?s (?:dive|delve|jump)\b", re.I)),
     ("phrase:dive-deeper",  re.compile(r"\bdive (?:deeper|into)\b", re.I)),
     ("phrase:todays-world", re.compile(r"\bin today'?s (?:fast-paced|digital|modern|ever-changing)\b", re.I)),
-    ("phrase:worth-noting", re.compile(r"\bit'?s (?:worth|important) (?:noting|to note) that\b", re.I)),
+    ("phrase:worth-noting", re.compile(r"\bit(?:'?s| is) (?:worth|important) "
+                                       r"(?:noting|to note|to remember|to understand|"
+                                       r"to highlight|to recognis[ez]e) that\b", re.I)),
     ("phrase:when-it-comes",re.compile(r"\bwhen it comes to\b", re.I)),
     ("phrase:end-of-day",   re.compile(r"\bat the end of the day\b", re.I)),
     ("phrase:that-said",    re.compile(r"\bthat being said\b", re.I)),
     ("phrase:needless",     re.compile(r"\bneedless to say\b", re.I)),
-    ("phrase:closer",       re.compile(r"\b(?:in conclusion|in summary|to sum up)\b|^\s*overall,", re.I | re.M)),
+    ("phrase:closer",       re.compile(r"\b(?:in conclusion|in summary|to sum up|to wrap up|all in all)\b"
+                                       r"|^\s*overall,", re.I | re.M)),
     ("phrase:game-changer", re.compile(r"\bgame[- ]?changer\b", re.I)),
     ("phrase:navigate",     re.compile(r"\bnavigat(?:e|ing) the\b", re.I)),
     ("phrase:unlock-pot",   re.compile(r"\bunlock(?:ing)? (?:the )?(?:potential|power)\b", re.I)),
+    ("phrase:plays-role",   re.compile(r"\bplays? a (?:crucial|key|vital|pivotal|significant|central|major) role\b", re.I)),
+    ("phrase:more-than",    re.compile(r"\bmore than just\b", re.I)),
+    ("phrase:in-a-world",   re.compile(r"\bin (?:a|an|today'?s) (?:world|era|age|landscape|climate) where\b", re.I)),
+    ("phrase:this-is-where",re.compile(r"\b(?:this|that) is where\b[^.\n]*?\b(?:comes? in|shines?)\b", re.I)),
+    ("phrase:whether-youre",re.compile(r"\bwhether you'?re\b", re.I)),
+    ("phrase:we-will",      re.compile(r"\bwe'?(?:ll|re going to) (?:explore|discuss|cover|walk through|take a look at|dive into)\b", re.I)),
+    ("phrase:takeaway",     re.compile(r"\b(?:key takeaway|the takeaway (?:here|is))\b", re.I)),
+    ("phrase:no-denying",   re.compile(r"\b(?:make no mistake|there'?s no denying|it goes without saying)\b", re.I)),
 
     # Assistant preamble / chat residue that should never survive into prose.
     ("chat:preamble",       re.compile(r"(?mi)^\s*(?:certainly|absolutely|sure|of course|great question)[!,.]", re.I)),
     ("chat:hope-helps",     re.compile(r"\bi hope this helps\b", re.I)),
     ("chat:feel-free",      re.compile(r"\bfeel free to\b", re.I)),
     ("chat:let-me-know",    re.compile(r"\blet me know if\b", re.I)),
+    ("chat:happy-to",       re.compile(r"\bi'?d be happy to\b", re.I)),
+    # "as an AI, I..." only. The bare noun phrase is ordinary prose ("reads as
+    # an AI tell"), so the rule needs the comma or the qualifier to be a tell.
+    ("chat:as-an-ai",       re.compile(r"\bas an ai(?:,|\s+(?:language model|model|assistant))", re.I)),
+    ("chat:heres-summary",  re.compile(r"\bhere'?s (?:a|the) (?:quick )?(?:breakdown|rundown|summary|overview)\b", re.I)),
 
     # Hedges / filler — usually deletable with zero loss. High-count, so the
     # report shows a tally rather than every hit.
     ("hedge:filler",  _words(
         "very", "really", "quite", "just", "actually", "basically",
         "essentially", "simply", "truly", "literally", "definitely",
+        "arguably", "certainly", "clearly", "obviously", "somewhat",
     )),
     ("hedge:the-fact", re.compile(r"\bthe fact that\b", re.I)),
 ]
