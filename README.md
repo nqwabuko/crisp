@@ -63,7 +63,7 @@ plus what must never be simplified away) and
 installed skill are the same files:
 
 ```bash
-ln -s ~/Programming/crisp ~/.claude/skills/crisp
+ln -s ~/CharliesCode/crisp ~/.claude/skills/crisp
 ```
 
 ## Tests
