@@ -24,6 +24,11 @@ Three kinds of rule, kept deliberately separate:
             --check exits 1 when the text is over budget, so "simple enough"
             is a test you can fail rather than an opinion.
 
+Every budget metric is a ratio, so a document can pass all of them and still be
+twice as long as it needs to be. --baseline adds the other half: measure the
+rewrite against the source it came from and require it to be COMPRESSION_TARGET
+percent shorter, so "as short as it reasonably gets" is also a test.
+
 Fenced ``` blocks and inline `code` pass through untouched (shared with
 detell.py). Markdown structure (headings, bullets, table rows) is treated as
 sentence boundaries so a bullet list is not scored as one 200-word sentence.
@@ -62,6 +67,29 @@ def _phrase(*variants: str) -> re.Pattern:
     """
     flexible = [v.replace(" ", r"\s+") for v in variants]
     return re.compile(r"\b(?:%s)\b" % "|".join(flexible), re.I)
+
+
+def _padding(*variants: str) -> tuple[re.Pattern, object]:
+    """Match a pure-padding phrase plus the word after it, and keep only the word.
+
+    Deleting a phrase outright leaves a double space and, when the phrase opened
+    the sentence, a lower-case start. So the rule swallows the following
+    whitespace and the next character, and re-capitalises when the padding
+    itself was capitalised (a good enough proxy for sentence-initial). A phrase
+    with no word after it is left alone rather than guessed at.
+    """
+    flexible = [v.replace(" ", r"\s+") for v in variants]
+    # `([^\w\s]*)` catches an opening quote or bracket. When there is one the
+    # case is left alone: capitalising the first word of a quotation would be
+    # editing someone's actual words to fix our own deletion.
+    pat = re.compile(r"\b(?:%s)\s*,?\s+([^\w\s]*)(\w)" % "|".join(flexible), re.I)
+
+    def repl(m: re.Match) -> str:
+        lead, nxt = m.group(1), m.group(2)
+        cap = m.group(0)[:1].isupper() and not lead
+        return lead + (nxt.upper() if cap else nxt)
+
+    return pat, repl
 
 
 FIX_RULES = [
@@ -125,6 +153,45 @@ FIX_RULES = [
                                      r"([a-z]+)\s+purposes\b", re.I),           r"for \1"),
     ("clutter:currently", _phrase(r"as of the current time", r"as things currently stand"),
                                                                        _cased("now")),
+
+    # ── redundant pairs: one of the two words already says it ──
+    # These capture the surviving word rather than substituting a fixed string,
+    # so the inflection survives: "reverted back" -> "reverted", not "revert".
+    ("clutter:result",    re.compile(r"\bend\s+(results?)\b", re.I),          r"\1"),
+    ("clutter:outcome",   re.compile(r"\b(?:final|end)\s+(outcomes?)\b", re.I), r"\1"),
+    ("clutter:history",   re.compile(r"\bpast\s+(histor(?:y|ies))\b", re.I),  r"\1"),
+    ("clutter:plans",     re.compile(r"\bfuture\s+(plans?)\b", re.I),         r"\1"),
+    ("clutter:revert",    re.compile(r"\b(revert\w*)\s+back\b", re.I),        r"\1"),
+    ("clutter:plan",      re.compile(r"\b(plan\w*)\s+ahead(?:\s+in\s+advance)?\b", re.I),
+                                                                                r"\1"),
+    ("clutter:planning",  re.compile(r"\badvance\s+(planning)\b", re.I),      r"\1"),
+    ("clutter:together",  re.compile(r"\b((?:combin|collaborat|merg|join|group)\w*)\s+together\b", re.I),
+                                                                                r"\1"),
+    ("clutter:essential", re.compile(r"\babsolutely\s+(essential)\b", re.I),  r"\1"),
+    ("clutter:eliminate", re.compile(r"\bcompletely\s+(eliminat\w+)\b", re.I), r"\1"),
+    ("clutter:near",      _phrase(r"in close proximity to", r"in proximity to"),
+                                                                      _cased("near")),
+    ("clutter:innovation", re.compile(r"\bnew\s+(innovations?)\b", re.I),     r"\1"),
+    ("clutter:bonus",     re.compile(r"\badded\s+(bonus(?:es)?)\b", re.I),    r"\1"),
+    ("clutter:summary",   re.compile(r"\bbrief\s+(summar(?:y|ies))\b", re.I), r"\1"),
+    ("clutter:fundamentals", re.compile(r"\bbasic\s+(fundamentals)\b", re.I), r"\1"),
+
+    # ── throat-clearing: the phrase carries no meaning, so it goes entirely ──
+    # `_padding` keeps the word after it and re-capitalises, so the sentence
+    # survives the deletion intact.
+    ("padding:note",      *_padding(r"it should be noted that",
+                                    r"it is important to note that",
+                                    r"it'?s important to note that",
+                                    r"it is worth noting that",
+                                    r"it'?s worth noting that",
+                                    r"it is worth mentioning that",
+                                    r"it goes without saying that")),
+    ("padding:fact",      *_padding(r"as a matter of fact", r"in point of fact",
+                                    r"the fact of the matter is that",
+                                    r"needless to say")),
+    ("padding:ultimately", *_padding(r"at the end of the day",
+                                     r"when all is said and done",
+                                     r"for all intents and purposes")),
 
     # ── cleanup after the rules above ──
     ("run_spaces",        re.compile(r"(?<=\S)[ \t]{2,}(?=\S)"),        " "),
@@ -211,6 +278,21 @@ FLAG_RULES = [
         "prioritize", "incentivise", "incentivize"),
      "short word available: start/end/try/help/do/get/need/change/tell/check/about/so/also/but"),
 
+    # Single-word filler. Strunk & White's leeches: the sentence means the same
+    # without them, so the default is delete. FLAG not FIX because a few are
+    # load-bearing ("just" and "simply" often mean "only", "literally" sometimes
+    # means literally), and the count is what tells you how padded the draft is.
+    ("padding", _phrase(
+        # "rather than" is a comparison, not a hedge, so it is excluded here
+        # rather than left for the reader to dismiss every time.
+        "very", "really", "quite", r"rather(?!\s+than)", "somewhat", "fairly", "actually",
+        "basically", "essentially", "literally", "simply", "just", "truly",
+        "certainly", "definitely", "absolutely", "obviously", "clearly",
+        "sort of", "kind of", "a bit", "pretty much", "in general",
+        "generally speaking", "as such", "that said"),
+     "filler: delete it. Keep only if load-bearing "
+     "(\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")"),
+
     ("hedge-stack", _phrase(r"it (?:may|might|could) be (?:the case )?that",
                             r"it would (?:appear|seem) that",
                             r"there is a possibility that",
@@ -239,6 +321,15 @@ BUDGET = {
 }
 
 MIN_WORDS_TO_SCORE = 30    # below this the percentages are noise
+
+# How much shorter the rewrite has to come out, as a percentage of the source
+# word count. Every budget metric above is a *ratio*, so a draft can sit inside
+# all of them and still be twice as long as it needs to be: shortening does not
+# happen unless it is measured. Strunk's "omit needless words" and Zinsser's
+# 30-50% observation put the reachable range well above this; 25% is the floor
+# a real business draft should clear, not the target. Only applied when a
+# baseline is supplied, and only when the baseline is long enough to score.
+COMPRESSION_TARGET = 25.0
 
 # Markdown / URL noise stripped before counting. Block markers go first, so an
 # asterisk bullet is not mistaken for emphasis.
@@ -443,6 +534,44 @@ def measure(text: str) -> Metrics:
     return m
 
 
+def word_count(text: str) -> int:
+    """Words as the metrics count them: code excluded, markdown stripped.
+
+    Goes through `measure` rather than counting separately, so the length gate
+    and the scorecard can never disagree about how long the document is.
+    """
+    return measure(text).values.get("words", 0)
+
+
+@dataclass
+class Compression:
+    """How much shorter the text got, against the source it came from."""
+    before: int
+    after: int
+    target: float = COMPRESSION_TARGET
+
+    @property
+    def cut_pct(self) -> float:
+        if not self.before:
+            return 0.0
+        return round(100 * (self.before - self.after) / self.before, 1)
+
+    @property
+    def scored(self) -> bool:
+        # Same guard as the scorecard: on a short note the percentage is noise,
+        # and a 40-word Slack message has no fat to find.
+        return self.before >= MIN_WORDS_TO_SCORE
+
+    @property
+    def ok(self) -> bool:
+        return not self.scored or self.cut_pct >= self.target
+
+    def as_dict(self) -> dict:
+        return {"before": self.before, "after": self.after,
+                "cut_pct": self.cut_pct, "target": self.target,
+                "scored": self.scored, "ok": self.ok}
+
+
 # ── the pipeline ─────────────────────────────────────────────────────────────
 
 @dataclass
@@ -450,6 +579,9 @@ class Report:
     fixes: dict = field(default_factory=dict)
     flags: list = field(default_factory=list)
     metrics: Metrics = field(default_factory=Metrics)
+    # Set by the caller when a --baseline is supplied; simplify() itself only
+    # ever sees one document and cannot know what it started as.
+    compression: "Compression | None" = None
 
     @property
     def total_fixes(self):  return sum(self.fixes.values())
@@ -620,7 +752,7 @@ def locate(text: str) -> list[dict]:
 
     for base, span in prose_spans(text):
         for name, pat, repl in FIX_RULES:
-            if not name.startswith("clutter:"):
+            if not name.startswith(("clutter:", "padding:")):
                 continue          # cleanup rules only tidy after a real fix
             for m in pat.finditer(span):
                 add(name, "clutter", m, base,
@@ -678,6 +810,17 @@ def _truncate(s: str, n: int = 72) -> str:
     return s if len(s) <= n else s[: n - 3].rstrip() + "..."
 
 
+def _render_length(r: Report) -> list[str]:
+    c = r.compression
+    if not c:
+        return []
+    if not c.scored:
+        return [f"LENGTH: {c.before} -> {c.after} words "
+                f"(source under {MIN_WORDS_TO_SCORE} words, no cut required)"]
+    return [f"LENGTH  [{'PASS' if c.ok else 'SHORT'}]  {c.before} -> {c.after} words, "
+            f"cut {c.cut_pct}%   target >= {c.target}%"]
+
+
 def render_report(r: Report) -> str:
     L = ["== simplify report =========================="]
 
@@ -701,6 +844,9 @@ def render_report(r: Report) -> str:
     if not m.scored:
         L.append(f"SCORECARD: skipped, only {m.values.get('words', 0)} words "
                  f"(need {MIN_WORDS_TO_SCORE}+ to score)")
+        L += _render_length(r)
+        if r.compression and not r.compression.ok:
+            L.append("VERDICT: OVER BUDGET on length")
         L.append("=============================================")
         return "\n".join(L)
 
@@ -712,6 +858,8 @@ def render_report(r: Report) -> str:
         L.append(f"  [{'PASS' if ok else 'OVER'}]  {key:<22} {val:>7}   "
                  f"budget {arrow} {limit}")
 
+    L += _render_length(r)
+
     if m.long_sentences:
         L.append(f"LONGEST SENTENCES (over {LONG_SENTENCE} words, cut or split):")
         for n, s in m.long_sentences[:5]:
@@ -722,6 +870,8 @@ def render_report(r: Report) -> str:
             L.append(f"       {_truncate(s)}")
 
     over = m.over_budget
+    if r.compression:
+        over = over + ["length"] if not r.compression.ok else over
     L.append(f"VERDICT: {'OVER BUDGET on ' + ', '.join(over) if over else 'within budget'}")
     L.append("=============================================")
     return "\n".join(L)
@@ -734,7 +884,11 @@ def main(argv=None):
     ap.add_argument("--report", "-r", action="store_true", help="human report on stderr")
     ap.add_argument("--json", action="store_true", help="JSON report on stderr")
     ap.add_argument("--check", action="store_true",
-                    help="exit 1 if the text is over the complexity budget")
+                    help="exit 1 if the text is over the complexity budget "
+                         "(or, with --baseline, under the length target)")
+    ap.add_argument("--baseline", metavar="FILE",
+                    help="the source this text was rewritten from: adds the LENGTH "
+                         f"gate, which requires a cut of {COMPRESSION_TARGET}%% or more")
     ap.add_argument("--locate", action="store_true",
                     help="measure only: JSON findings + metrics on STDOUT, input left alone")
     ap.add_argument("--spans", action="store_true",
@@ -764,6 +918,11 @@ def main(argv=None):
 
     cleaned, report = simplify(text)
 
+    if args.baseline:
+        source = open(args.baseline, encoding="utf-8").read()
+        report.compression = Compression(before=word_count(source),
+                                         after=word_count(cleaned))
+
     sys.stdout.write(cleaned)
 
     if args.json:
@@ -777,11 +936,14 @@ def main(argv=None):
                                for n, s in report.metrics.long_sentences[:5]],
             "total_fixes": report.total_fixes,
             "total_flags": report.total_flags,
+            "compression": report.compression.as_dict() if report.compression else None,
         }, indent=2) + "\n")
     elif args.report:
         sys.stderr.write(render_report(report) + "\n")
 
-    return 1 if (args.check and report.metrics.over_budget) else 0
+    failed = bool(report.metrics.over_budget) or (
+        report.compression is not None and not report.compression.ok)
+    return 1 if (args.check and failed) else 0
 
 
 if __name__ == "__main__":

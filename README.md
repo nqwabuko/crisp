@@ -4,7 +4,9 @@ A deterministic prose-quality engine: strip the machine fingerprints, cut the
 clutter, and measure whether a document is harder to read than it needs to be.
 
 It exists because "this is too complex" was an opinion you could argue with.
-`simplify.py --check` turns it into a test that exits 1.
+`simplify.py --check` turns it into a test that exits 1. `--baseline` does the
+same for "this is too long": measure the rewrite against the source it came from
+and fail it if fewer than a quarter of the words are gone.
 
 ## What it is
 
@@ -14,7 +16,7 @@ No dependencies, no network, no state.
 | | |
 |---|---|
 | `scripts/detell.py` | Strips typographic AI tells (em dashes, curly quotes, invisible unicode). Flags the meaning-changing ones rather than rewriting them. |
-| `scripts/simplify.py` | Cuts Zinsser's clutter ("prior to" to "before"), flags complexity (passive voice, buried verbs, abstraction), and scores against a readability budget. |
+| `scripts/simplify.py` | Cuts Zinsser's clutter ("prior to" to "before") and pure padding ("it should be noted that", "end result"), flags complexity (passive voice, buried verbs, filler, abstraction), and scores against a readability budget and a length gate. |
 
 The split that matters is **FIX vs FLAG**. A FIX has exactly one correct plain
 equivalent, so a script applies it. A FLAG changes meaning, so the script only
@@ -24,9 +26,9 @@ reweight what you said.
 ## Use
 
 ```bash
-# clean a draft and check it against the budget
+# clean a draft and check it against the budget and the length gate
 python3 scripts/detell.py < draft.md 2>/dev/null \
-  | python3 scripts/simplify.py --report --check > clean.md
+  | python3 scripts/simplify.py --report --check --baseline draft.md > clean.md
 
 # measure only, with ranges: for editors and other programs
 python3 scripts/simplify.py --locate draft.md
@@ -42,6 +44,12 @@ the judgement ones. It is the mode a consumer should build against.
 `--spans` adds every sentence and paragraph with the same range shape and its
 word count. The metrics say the longest sentence is 65 words; the spans say
 where it is.
+
+`--baseline` names the document the input was rewritten from and adds one line to
+the report: `412 -> 251 words, cut 39.1%   target >= 25.0%`. Every other metric
+is a ratio, so a document can sit inside all of them and still be twice as long
+as it needs to be. Length is the one thing a per-sentence measure cannot see, and
+it is usually the biggest win available.
 
 Full usage, including the agent-facing workflow, is in [SKILL.md](SKILL.md). The
 writing rules behind the judgement calls are in

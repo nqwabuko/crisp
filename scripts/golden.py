@@ -116,6 +116,7 @@ def config() -> dict:
         "long_sentence": simplify.LONG_SENTENCE,
         "long_word_syllables": simplify.LONG_WORD_SYLLABLES,
         "min_words_to_score": simplify.MIN_WORDS_TO_SCORE,
+        "compression_target": simplify.COMPRESSION_TARGET,
         "rules": {
             "detell_fix": [n for n, *_ in detell.FIX_RULES],
             "detell_flag": [n for n, *_ in detell.FLAG_RULES],

@@ -26,7 +26,38 @@ The instinct is to rewrite a bloated sentence into a smoother bloated sentence.
 Delete instead. Most drafts lose 30-50% of their words with no loss of meaning.
 If you can strike a word and the sentence still means what it meant, the word
 was clutter. This is the single highest-leverage move and the one that gets
-skipped.
+skipped, which is why `simplify.py --baseline` now measures it: under a 25% cut
+the run fails.
+
+**Cut in descending order of size.** Deleting words is the last resort, not the
+first move, because a paragraph that should not exist cannot be saved by tidying
+its adjectives.
+
+| Cut | What it looks like |
+|---|---|
+| A section | Background the reader already has. "How we got here." |
+| A paragraph | The one restating the paragraph above in other words. |
+| A sentence | The setup for the next sentence. The summary of the last one. The unasked-for caveat. The apology. |
+| A clause | "which means that", "in order to", "so that we can", the trailing repeat of the point. |
+| A word | Filler, intensifiers, stacked adjectives, the second half of a doublet. |
+
+**The usual suspects, all deletable on sight.**
+- Throat-clearing openers: "It should be noted that", "It is worth noting that",
+  "Needless to say", "At the end of the day", "As such". The script cuts these.
+- Intensifiers and fillers: very, really, quite, actually, basically,
+  essentially, literally, simply, truly, obviously, clearly. Strunk's rule: the
+  sentence is stronger without them. Keep "just" and "simply" only where they
+  mean "only".
+- Doublets where one word carries it: end result, past history, future plans,
+  advance planning, absolutely essential, collaborated together, added bonus.
+- The meta sentence: "This document sets out...", "In this section we will...",
+  "Hopefully that makes sense". Say the thing; don't announce it.
+- Your own reasoning. The reader wants the conclusion. Show the working only
+  where they have to check it.
+
+**Two tests for anything that survives.** Does this sentence do work no other
+sentence is doing? Would the reader act differently without it? Two nos means
+delete.
 
 ### 3. Split
 One idea per sentence. When a sentence has a "which", a "meaning that", and a
@@ -127,3 +158,8 @@ back:
 The budget in `simplify.py` is a servant, not a master. If a metric is over
 because the text genuinely needs a technical term or a 28-word sentence, say so
 and move on. What you must not do is leave it over because you didn't try.
+
+The same goes for the length gate, in both directions. A draft that will not
+reach a 25% cut without losing a number or a caveat has genuinely arrived short:
+say so and ship it. But "I couldn't find 25%" almost always means you were
+shaving words when there was a paragraph to delete.

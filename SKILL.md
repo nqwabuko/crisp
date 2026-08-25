@@ -4,17 +4,21 @@ description: >-
   Turn any draft into clean, AI-tell-free, plain prose in a good-PM voice: strip
   em dashes and machine fingerprints, cut Zinsser/Strunk-and-White clutter, then
   tighten to the point (Ben Horowitz "good product manager" cadence, lead with
-  the point, cut fluff). Two deterministic scripts do the mechanical passes every
-  run, including a measured complexity budget (sentence length, Flesch, passive
-  voice) that the text must pass; the agent does the voice and simplification
-  rewrite. Use when the user wants text de-slopped, de-AI'd, "made crisp",
-  simplified, shortened, made plainer or less complex, or put in
+  the point, cut fluff). Always makes the text SHORTER: a measured length gate
+  requires the rewrite to cut at least a quarter of the words, and that is the
+  floor, not the target. Two deterministic scripts do the mechanical passes every
+  run, including a complexity budget (sentence length, Flesch, passive voice) and
+  the length gate that the text must pass; the agent does the voice, cutting and
+  simplification rewrite. Use when the user wants text de-slopped, de-AI'd, "made
+  crisp", simplified, shortened, cut down, made plainer or less complex, or put in
   Charlie's/Horowitz's voice, including insights and stories criticised as too
-  complex. Trigger keywords - "crisp", "de-slop", "de-ai", "remove em dashes",
-  "make it clean", "AI clean", "tighten this", "get to the point", "cut the
-  fluff", "horowitz", "good pm voice", "simplify", "simpler", "too complex",
+  complex or too long. Trigger keywords - "crisp", "de-slop", "de-ai", "remove em
+  dashes", "make it clean", "AI clean", "tighten this", "get to the point", "cut
+  the fluff", "horowitz", "good pm voice", "simplify", "simpler", "too complex",
   "too wordy", "plain english", "readability", "shorter sentences", "hard to
-  read", "zinsser", "strunk", "elements of style", "dumb it down".
+  read", "zinsser", "strunk", "elements of style", "dumb it down", "shorten",
+  "make it shorter", "cut this down", "trim", "condense", "too long", "half the
+  length", "tl;dr".
 ---
 
 # crisp
@@ -23,12 +27,13 @@ Three-pass text cleaner. Two deterministic passes run every time:
 
 1. **de-tell** (`detell.py`) strips the typographic AI tells: em dashes, curly
    quotes, invisible unicode.
-2. **simplify** (`simplify.py`) cuts Zinsser's clutter ("prior to" -> "before"),
-   flags the complexity tells (passive voice, buried verbs, abstraction), and
-   **scores the text against a complexity budget** it must pass.
+2. **simplify** (`simplify.py`) cuts Zinsser's clutter ("prior to" -> "before")
+   and the pure padding ("it should be noted that", "end result"), flags the
+   complexity tells (passive voice, buried verbs, filler words, abstraction), and
+   **scores the text against a complexity budget and a length gate** it must pass.
 
-Then the judgement pass: the agent tightens into a crisp, good-PM voice, makes
-the text plain, and acts on what the scripts only *flagged*.
+Then the judgement pass: the agent cuts, tightens into a crisp, good-PM voice,
+makes the text plain, and acts on what the scripts only *flagged*.
 
 The split is deliberate. Typography and stock wordy phrases are mechanical, so
 scripts do them reliably. Meaning-changing edits (killing "delve", rewriting
@@ -39,6 +44,12 @@ and the scorecard.
 **The budget is the point.** "Too complex" is otherwise an opinion you can argue
 with. `simplify.py --check` turns it into a test that exits 1, so the success
 criterion is observable rather than a matter of taste.
+
+**Shorter is half the job.** Every budget metric is a ratio, so a draft can pass
+all of them and still be twice as long as it needs to be. `--baseline` measures
+the rewrite against the source it came from and fails it if fewer than 25% of the
+words are gone. Treat 25% as the floor. Most business drafts have 30-50% in them,
+and the way to find it is deleting whole sentences, not shaving words.
 
 ## Workflow
 
@@ -70,19 +81,48 @@ Chain the second script. It cuts clutter, flags complexity, and scores:
 ```bash
 python3 ~/.claude/skills/crisp/scripts/detell.py < /tmp/crisp-in.txt 2>/dev/null \
   | python3 ~/.claude/skills/crisp/scripts/simplify.py --report --check \
+      --baseline /tmp/crisp-in.txt \
   > /tmp/crisp-clean.txt
 ```
 
-- stdout = text with the stock wordy phrases already cut.
-- stderr = CLUTTER CUT (auto), FLAGGED (with a fix hint each), SCORECARD, plus
-  your LONGEST SENTENCES and PASSIVE SENTENCES listed verbatim so the rewrite is
-  targeted rather than vague.
-- exit 1 with `--check` = over the complexity budget. `--json` to parse it.
+- stdout = text with the stock wordy phrases and padding already cut.
+- stderr = CLUTTER CUT (auto), FLAGGED (with a fix hint each), SCORECARD, LENGTH,
+  plus your LONGEST SENTENCES and PASSIVE SENTENCES listed verbatim so the
+  rewrite is targeted rather than vague.
+- `--baseline` names the source, which is what makes the LENGTH line possible:
+  `122 -> 89 words, cut 27.0%   target >= 25.0%`. Always pass it.
+- exit 1 with `--check` = over the complexity budget or under the length target.
+  `--json` to parse it (the `compression` block carries the same numbers).
 
-Read the OVER lines and the offender lists before you rewrite. They tell you
-exactly which sentences are doing the damage.
+Read the OVER lines, the SHORT line and the offender lists before you rewrite.
+They tell you exactly which sentences are doing the damage. The percentage the
+scripts cut on their own is the easy part: the rest is yours.
 
-### 3. Voice and simplification rewrite (the judgement)
+### 3. Cut it down (do this before anything else in the rewrite)
+Shortening is the highest-leverage pass and the one that gets skipped, so it goes
+first. Cutting also fixes most of the OVER metrics for free, while rewording
+fixes none of them.
+
+Work in this order, biggest unit first:
+1. **Whole sections and paragraphs.** What is the one point? Anything that does
+   not serve it goes, however well written it is.
+2. **Whole sentences.** Restatements, the sentence that sets up the next
+   sentence, the summary of what you just said, the caveat nobody asked for, the
+   history of how you found out. Cut the sentence, not its adjectives.
+3. **Clauses.** "which means that ...", "in order to ...", the trailing "so that
+   we can ..." that repeats the point.
+4. **Words.** Only now. Every filler the `padding` flag lists, every intensifier,
+   every "in fact", every stacked adjective.
+
+Then read it back and ask Zinsser's question of each remaining sentence: *is this
+doing work no other sentence is doing?* If not, it goes.
+
+The gate is 25%. Do not stop there if more is available: keep cutting until
+taking out one more word would lose a fact, a number, a name or a real caveat.
+Never buy the number by cutting one of those (`references/simplify.md` Part D is
+the do-not-cut list).
+
+### 4. Voice and simplification rewrite (the judgement)
 Read `references/voice.md` and `references/simplify.md`, then rewrite:
 - Act on every FLAG from both reports (kill AI vocabulary, rewrite the scaffolds,
   cut hedges and chat residue, dig the verb out of the nominalisation, name the
@@ -101,8 +141,10 @@ caveat for a better score. If a flagged word is load-bearing (a quote, proper
 noun, term of art, code), keep it and note why. `references/simplify.md` Part D
 lists what not to simplify.
 
-### 4. Deliver
+### 5. Deliver
 - Show the final text.
+- Say what it cost: `412 -> 251 words (-39%)`. One line, so the user can see the
+  cut and push back if something they wanted is gone.
 - Offer a quick before/after note if useful (what changed and why), but keep it
   short.
 - Offer to copy it out. For plain text: `pbcopy < final.txt`. For a Slack or
@@ -114,9 +156,14 @@ Before delivering, run the final text back through **both** scripts. Success is
 
 ```bash
 python3 ~/.claude/skills/crisp/scripts/detell.py --report /tmp/crisp-final.txt >/dev/null
-python3 ~/.claude/skills/crisp/scripts/simplify.py --report --check /tmp/crisp-final.txt >/dev/null
+python3 ~/.claude/skills/crisp/scripts/simplify.py --report --check \
+  --baseline /tmp/crisp-in.txt /tmp/crisp-final.txt >/dev/null
 echo "budget exit: $?"
 ```
+
+`--baseline` is the *original* source and the file argument is your *final*
+draft, so the LENGTH line measures the whole job, script passes and rewrite
+together. Getting these the wrong way round scores the cut backwards.
 
 Send stdout to `/dev/null` and let the report come out on stderr, as above. Do
 not write `2>&1 >/dev/null` to try to keep the report: under zsh's MULTIOS the
@@ -128,6 +175,12 @@ the text you are about to hand over, not just the input. If a metric is still
 OVER when you deliver, say which one and why you're leaving it (a term of art, a
 number that has to stay). Never silently ship an over-budget draft, and never hit
 the number by deleting a fact.
+
+LENGTH gets the same treatment. `SHORT` means go back and cut a paragraph, not
+shave adjectives. The honest exception is a source that was already tight: a
+lean 200-word Slack post has no 25% in it, and squeezing it produces telegraphese.
+Say that plainly ("the source was already tight, cut 11%") instead of padding the
+number by dropping something the reader needed.
 
 ## Measure-only mode, for editors and other consumers
 
@@ -212,10 +265,16 @@ edit changes another program's output.
   matched, and wrapped lines are rejoined before scoring so sentence length is
   measured on real sentences.
 - Text under 30 words skips the scorecard (the percentages would be noise) and
-  passes `--check`. The flags still run.
+  passes `--check`. The flags still run. A *source* under 30 words skips the
+  LENGTH gate for the same reason.
+- The padding cuts do not know about quotation marks. If the draft quotes
+  someone, check their words survived intact and put back anything the script
+  trimmed inside the quotes.
 - To extend the tell list, add one line to `FIX_RULES` or `FLAG_RULES` in
   `scripts/detell.py`. Same for clutter and complexity in `scripts/simplify.py`.
   The rule tables are the program.
+- The length target lives in `COMPRESSION_TARGET` in `scripts/simplify.py`, one
+  number, next to the budget.
 - The complexity budget lives in one place: the `BUDGET` dict in
   `scripts/simplify.py`. It's tuned for short business writing (filed insights,
   Slack, email, story descriptions). Tune it there, not per run.

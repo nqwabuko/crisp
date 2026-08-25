@@ -41,6 +41,7 @@
     "long_sentence": 25,
     "long_word_syllables": 3,
     "min_words_to_score": 30,
+    "compression_target": 25.0,
     "rules": {
       "detell_fix": [
         "crlf",
@@ -120,6 +121,24 @@
         "clutter:first",
         "clutter:purposes",
         "clutter:currently",
+        "clutter:result",
+        "clutter:outcome",
+        "clutter:history",
+        "clutter:plans",
+        "clutter:revert",
+        "clutter:plan",
+        "clutter:planning",
+        "clutter:together",
+        "clutter:essential",
+        "clutter:eliminate",
+        "clutter:near",
+        "clutter:innovation",
+        "clutter:bonus",
+        "clutter:summary",
+        "clutter:fundamentals",
+        "padding:note",
+        "padding:fact",
+        "padding:ultimately",
         "run_spaces"
       ],
       "simplify_flag": [
@@ -134,6 +153,7 @@
         "in-a-manner",
         "abstraction",
         "long-word",
+        "padding",
         "hedge-stack"
       ]
     }
@@ -161,21 +181,25 @@
       "cleaned": "Certainly! Let's delve into the tapestry of results, it is a testament to\nthe robust landscape. In today's fast-paced world we must leverage synergy.\n\nIt's worth noting that the 3-5 day window is crucial. Feel free to reach out.\n\nOverall, this is a game-changer... I hope this helps.\n"
     },
     "simplify": {
-      "fixes": {},
-      "flags": {},
+      "fixes": {
+        "padding:note": 1
+      },
+      "flags": {
+        "padding": 1
+      },
       "metrics": {
-        "words": 47,
+        "words": 43,
         "sentences": 7,
         "paragraphs": 3,
-        "mean_sentence_words": 6.7,
+        "mean_sentence_words": 6.1,
         "max_sentence_words": 15,
         "pct_long_sentences": 0.0,
-        "flesch_reading_ease": 72.2,
+        "flesch_reading_ease": 70.7,
         "flesch_kincaid_grade": 4.9,
         "pct_passive_sentences": 0.0,
-        "pct_long_words": 14.9,
+        "pct_long_words": 16.3,
         "max_paragraph_words": 24,
-        "pct_ly_adverbs": 2.1
+        "pct_ly_adverbs": 2.3
       },
       "scored": true,
       "over_budget": []
@@ -327,7 +351,17 @@
           "I hope this helps"
         ]
       ],
-      "simplify": []
+      "simplify": [
+        [
+          "padding",
+          "complexity",
+          1,
+          1,
+          1,
+          10,
+          "Certainly"
+        ]
+      ]
     },
     "spans": {
       "sentences": [
@@ -414,10 +448,11 @@
         "clutter:because": 1,
         "clutter:if": 1,
         "clutter:before": 1,
-        "clutter:regularly": 1
+        "clutter:regularly": 1,
+        "padding:note": 1
       },
       "flags": {
-        "passive": 7,
+        "passive": 6,
         "abstraction": 6,
         "nominalisation": 3,
         "there-is": 2,
@@ -429,16 +464,16 @@
         "vague-quantity": 1
       },
       "metrics": {
-        "words": 148,
+        "words": 143,
         "sentences": 5,
         "paragraphs": 4,
-        "mean_sentence_words": 29.6,
+        "mean_sentence_words": 28.6,
         "max_sentence_words": 60,
         "pct_long_sentences": 40.0,
-        "flesch_reading_ease": 17.3,
+        "flesch_reading_ease": 15.7,
         "flesch_kincaid_grade": 18.2,
         "pct_passive_sentences": 60.0,
-        "pct_long_words": 24.3,
+        "pct_long_words": 25.2,
         "max_paragraph_words": 60,
         "pct_ly_adverbs": 1.4
       },
@@ -681,6 +716,15 @@
           12,
           50,
           "for the purpose of"
+        ],
+        [
+          "padding:note",
+          "clutter",
+          12,
+          76,
+          13,
+          23,
+          "it\nshould be noted that t"
         ],
         [
           "passive",
@@ -950,7 +994,8 @@
       },
       "flags": {
         "passive": 1,
-        "vague-quantity": 1
+        "vague-quantity": 1,
+        "padding": 1
       },
       "metrics": {
         "words": 35,
@@ -994,6 +1039,15 @@
         ]
       ],
       "simplify": [
+        [
+          "padding",
+          "complexity",
+          1,
+          34,
+          1,
+          38,
+          "just"
+        ],
         [
           "clutter:regularly",
           "clutter",
@@ -1092,7 +1146,9 @@
     },
     "simplify": {
       "fixes": {},
-      "flags": {},
+      "flags": {
+        "padding": 5
+      },
       "metrics": {
         "words": 137,
         "sentences": 11,
@@ -1428,7 +1484,53 @@
           "revolutionary"
         ]
       ],
-      "simplify": []
+      "simplify": [
+        [
+          "padding",
+          "complexity",
+          5,
+          19,
+          5,
+          23,
+          "just"
+        ],
+        [
+          "padding",
+          "complexity",
+          10,
+          35,
+          10,
+          43,
+          "somewhat"
+        ],
+        [
+          "padding",
+          "complexity",
+          10,
+          56,
+          10,
+          63,
+          "Clearly"
+        ],
+        [
+          "padding",
+          "complexity",
+          11,
+          16,
+          11,
+          25,
+          "obviously"
+        ],
+        [
+          "padding",
+          "complexity",
+          11,
+          43,
+          11,
+          52,
+          "certainly"
+        ]
+      ]
     },
     "spans": {
       "sentences": [
@@ -1538,6 +1640,516 @@
           "col": 1,
           "end_line": 16,
           "end_col": 23
+        }
+      ]
+    },
+    "spans_consistent": true
+  },
+  "padded.md": {
+    "detell": {
+      "fixes": {
+        "em_dash": 1
+      },
+      "flags": {
+        "hedge:filler": 7,
+        "phrase:needless": 2,
+        "phrase:worth-noting": 1,
+        "phrase:end-of-day": 1
+      },
+      "cleaned": "# Padding and redundancy\n\nIt should be noted that the depot rollout was signed off prior to the\ndeadline. At the end of the day, the end result is that we can basically plan\nahead for phase two, which is absolutely essential.\n\nNeedless to say, the past history here is quite complex. It is worth noting that\nthe two teams collaborated together in close proximity to go-live, and the\nmigration script was really just a very simple change to `tariff_id`.\n\nThe customer said, \"needless to say, it broke\", and it did. As such, we reverted\nback and completely eliminated the retry loop:\n\n```python\n# padding words inside code must survive: it should be noted that basically\nresult = very_simple(x)\n```\n\nThat said, the added bonus is a brief summary in the console, so obviously the\noperator can see which limit actually applied.\n"
+    },
+    "simplify": {
+      "fixes": {
+        "clutter:before": 1,
+        "clutter:result": 1,
+        "clutter:history": 1,
+        "clutter:plan": 1,
+        "clutter:together": 1,
+        "clutter:essential": 1,
+        "clutter:near": 1,
+        "padding:note": 2,
+        "padding:fact": 2,
+        "padding:ultimately": 1,
+        "clutter:revert": 1,
+        "clutter:eliminate": 1,
+        "clutter:bonus": 1,
+        "clutter:summary": 1
+      },
+      "flags": {
+        "padding": 9,
+        "passive": 1
+      },
+      "metrics": {
+        "words": 87,
+        "sentences": 8,
+        "paragraphs": 5,
+        "mean_sentence_words": 10.9,
+        "max_sentence_words": 20,
+        "pct_long_sentences": 0.0,
+        "flesch_reading_ease": 64.5,
+        "flesch_kincaid_grade": 7.0,
+        "pct_passive_sentences": 12.5,
+        "pct_long_words": 14.9,
+        "max_paragraph_words": 24,
+        "pct_ly_adverbs": 4.6
+      },
+      "scored": true,
+      "over_budget": [
+        "pct_passive_sentences",
+        "pct_ly_adverbs"
+      ]
+    },
+    "locate": {
+      "detell": [
+        [
+          "phrase:end-of-day",
+          "tell",
+          4,
+          11,
+          4,
+          32,
+          "At the end of the day"
+        ],
+        [
+          "hedge:filler",
+          "tell",
+          4,
+          64,
+          4,
+          73,
+          "basically"
+        ],
+        [
+          "phrase:needless",
+          "tell",
+          7,
+          1,
+          7,
+          16,
+          "Needless to say"
+        ],
+        [
+          "hedge:filler",
+          "tell",
+          7,
+          43,
+          7,
+          48,
+          "quite"
+        ],
+        [
+          "phrase:worth-noting",
+          "tell",
+          7,
+          58,
+          7,
+          81,
+          "It is worth noting that"
+        ],
+        [
+          "hedge:filler",
+          "tell",
+          9,
+          22,
+          9,
+          28,
+          "really"
+        ],
+        [
+          "hedge:filler",
+          "tell",
+          9,
+          29,
+          9,
+          33,
+          "just"
+        ],
+        [
+          "hedge:filler",
+          "tell",
+          9,
+          36,
+          9,
+          40,
+          "very"
+        ],
+        [
+          "phrase:needless",
+          "tell",
+          11,
+          21,
+          11,
+          36,
+          "needless to say"
+        ],
+        [
+          "hedge:filler",
+          "tell",
+          19,
+          66,
+          19,
+          75,
+          "obviously"
+        ],
+        [
+          "hedge:filler",
+          "tell",
+          20,
+          30,
+          20,
+          38,
+          "actually"
+        ]
+      ],
+      "simplify": [
+        [
+          "padding:note",
+          "clutter",
+          3,
+          1,
+          3,
+          26,
+          "It should be noted that t"
+        ],
+        [
+          "passive",
+          "complexity",
+          3,
+          11,
+          3,
+          19,
+          "be noted"
+        ],
+        [
+          "passive",
+          "complexity",
+          3,
+          43,
+          3,
+          53,
+          "was signed"
+        ],
+        [
+          "clutter:before",
+          "clutter",
+          3,
+          58,
+          3,
+          66,
+          "prior to"
+        ],
+        [
+          "padding:ultimately",
+          "clutter",
+          4,
+          11,
+          4,
+          35,
+          "At the end of the day, t"
+        ],
+        [
+          "clutter:result",
+          "clutter",
+          4,
+          38,
+          4,
+          48,
+          "end result"
+        ],
+        [
+          "padding",
+          "complexity",
+          4,
+          64,
+          4,
+          73,
+          "basically"
+        ],
+        [
+          "clutter:plan",
+          "clutter",
+          4,
+          74,
+          5,
+          6,
+          "plan\nahead"
+        ],
+        [
+          "clutter:essential",
+          "clutter",
+          5,
+          31,
+          5,
+          51,
+          "absolutely essential"
+        ],
+        [
+          "padding",
+          "complexity",
+          5,
+          31,
+          5,
+          41,
+          "absolutely"
+        ],
+        [
+          "padding:fact",
+          "clutter",
+          7,
+          1,
+          7,
+          19,
+          "Needless to say, t"
+        ],
+        [
+          "clutter:history",
+          "clutter",
+          7,
+          22,
+          7,
+          34,
+          "past history"
+        ],
+        [
+          "padding",
+          "complexity",
+          7,
+          43,
+          7,
+          48,
+          "quite"
+        ],
+        [
+          "padding:note",
+          "clutter",
+          7,
+          58,
+          8,
+          2,
+          "It is worth noting that\nt"
+        ],
+        [
+          "clutter:together",
+          "clutter",
+          8,
+          15,
+          8,
+          36,
+          "collaborated together"
+        ],
+        [
+          "clutter:near",
+          "clutter",
+          8,
+          37,
+          8,
+          58,
+          "in close proximity to"
+        ],
+        [
+          "padding",
+          "complexity",
+          9,
+          22,
+          9,
+          28,
+          "really"
+        ],
+        [
+          "padding",
+          "complexity",
+          9,
+          29,
+          9,
+          33,
+          "just"
+        ],
+        [
+          "padding",
+          "complexity",
+          9,
+          36,
+          9,
+          40,
+          "very"
+        ],
+        [
+          "padding:fact",
+          "clutter",
+          11,
+          21,
+          11,
+          39,
+          "needless to say, i"
+        ],
+        [
+          "padding",
+          "complexity",
+          11,
+          62,
+          11,
+          69,
+          "As such"
+        ],
+        [
+          "clutter:revert",
+          "clutter",
+          11,
+          74,
+          12,
+          5,
+          "reverted\nback"
+        ],
+        [
+          "clutter:eliminate",
+          "clutter",
+          12,
+          10,
+          12,
+          31,
+          "completely eliminated"
+        ],
+        [
+          "padding",
+          "complexity",
+          19,
+          1,
+          19,
+          10,
+          "That said"
+        ],
+        [
+          "clutter:bonus",
+          "clutter",
+          19,
+          16,
+          19,
+          27,
+          "added bonus"
+        ],
+        [
+          "clutter:summary",
+          "clutter",
+          19,
+          33,
+          19,
+          46,
+          "brief summary"
+        ],
+        [
+          "padding",
+          "complexity",
+          19,
+          66,
+          19,
+          75,
+          "obviously"
+        ],
+        [
+          "padding",
+          "complexity",
+          20,
+          30,
+          20,
+          38,
+          "actually"
+        ]
+      ]
+    },
+    "spans": {
+      "sentences": [
+        {
+          "words": 3,
+          "line": 1,
+          "col": 1,
+          "end_line": 1,
+          "end_col": 25
+        },
+        {
+          "words": 15,
+          "line": 3,
+          "col": 1,
+          "end_line": 4,
+          "end_col": 10
+        },
+        {
+          "words": 23,
+          "line": 4,
+          "col": 11,
+          "end_line": 5,
+          "end_col": 52
+        },
+        {
+          "words": 10,
+          "line": 7,
+          "col": 1,
+          "end_line": 7,
+          "end_col": 57
+        },
+        {
+          "words": 27,
+          "line": 7,
+          "col": 58,
+          "end_line": 9,
+          "end_col": 70
+        },
+        {
+          "words": 11,
+          "line": 11,
+          "col": 1,
+          "end_line": 11,
+          "end_col": 61
+        },
+        {
+          "words": 11,
+          "line": 11,
+          "col": 62,
+          "end_line": 12,
+          "end_col": 47
+        },
+        {
+          "words": 22,
+          "line": 19,
+          "col": 1,
+          "end_line": 20,
+          "end_col": 47
+        }
+      ],
+      "paragraphs": [
+        {
+          "words": 3,
+          "line": 1,
+          "col": 1,
+          "end_line": 1,
+          "end_col": 25
+        },
+        {
+          "words": 38,
+          "line": 3,
+          "col": 1,
+          "end_line": 5,
+          "end_col": 52
+        },
+        {
+          "words": 37,
+          "line": 7,
+          "col": 1,
+          "end_line": 9,
+          "end_col": 70
+        },
+        {
+          "words": 22,
+          "line": 11,
+          "col": 1,
+          "end_line": 12,
+          "end_col": 47
+        },
+        {
+          "words": 22,
+          "line": 19,
+          "col": 1,
+          "end_line": 20,
+          "end_col": 47
         }
       ]
     },
