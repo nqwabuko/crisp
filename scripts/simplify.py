@@ -360,6 +360,43 @@ CODE_REFS = [
     (re.compile(r"\$\w+->\w+"), "object property access"),
 ]
 
+# A customer's commercial numbers must not reach a shared product backlog
+# either. An insight is read well outside the engagement that filed it, and
+# estate size, contract value and share-of-business are the customer's to
+# disclose, not ours. Added 2026-09-21 after an insight went out naming a
+# customer's charge point count: the structure gate passed it, because it only
+# looked for code.
+#
+# Narrow on purpose, same reasoning as CODE_REFS. Protocol versions
+# ("OCPP 2.0.1"), story references and platform limits must not trip it, so a
+# bare number is never enough: it has to be large AND sitting next to a word
+# that makes it a count of the customer's estate, or carry a currency symbol.
+_ESTATE_NOUN = (r"charge\s*points?|chargers?|connectors?|EVSEs?|sites?|locations?|"
+                r"terminals?|sessions?|users?|drivers?|vehicles?|units?")
+
+CUSTOMER_METRICS = [
+    # "5,700 charge points", "roughly 5700 chargers", "12,000 sessions a day"
+    (re.compile(r"\b\d{1,3}(?:,\d{3})+\s+(?:\w+\s+){0,2}(?:" + _ESTATE_NOUN + r")\b", re.I),
+     "customer estate size"),
+    (re.compile(r"\b[1-9]\d{3,}\s+(?:\w+\s+){0,2}(?:" + _ESTATE_NOUN + r")\b", re.I),
+     "customer estate size"),
+    # the same figure written the other way round: "charge points: 5,700"
+    (re.compile(r"\b(?:" + _ESTATE_NOUN + r")\b[^.\n]{0,12}?\b\d{1,3}(?:,\d{3})+\b", re.I),
+     "customer estate size"),
+    # money: "EUR 55,000", "£8,500", "$1.2m"
+    (re.compile(r"(?:[\u00a3\u20ac$]|\b(?:EUR|GBP|USD)\s)\s?\d[\d,.]*\s*[km]?\b", re.I),
+     "contract or revenue figure"),
+    # share of a customer's business
+    (re.compile(r"\b\d{1,3}(?:\.\d+)?\s?%\s+of\s+(?:their|the customer|[A-Z][\w']+'s)\b"),
+     "share of the customer's business"),
+]
+
+# Phrasing that marks a number as OUR platform limit rather than THEIR estate.
+LIMIT_CONTEXT = re.compile(
+    r"\b(?:up to|at most|maximum|max|minimum|min|limit(?:ed|s)? to|cap(?:ped|s)? at|"
+    r"no more than|per call|per operation|per request|per batch|page size|"
+    r"hard limit|rate limit)\b", re.I)
+
 
 def _ask_block(text: str):
     """Return (start_word_index, block_text) for the ask, or None."""
@@ -414,6 +451,24 @@ def check_insight(text: str) -> list[dict]:
             out.append({"check": "no_internal_refs", "detail":
                         f"{what}: {', '.join(found[:3])}"
                         + (f" (+{len(found) - 3} more)" if len(found) > 3 else "")})
+
+    seen = set()
+    for pat, what in CUSTOMER_METRICS:
+        for m in pat.finditer(text):
+            h = " ".join(m.group(0).split())
+            if h.lower() in seen:
+                continue
+            # A platform limit is phrased as a limit, and is ours to state.
+            # "up to 1000 EVSEs per call" is documentation; "1000 EVSEs" on its
+            # own is the customer's estate. Without this the gate fires on our
+            # own API caps and gets switched off.
+            window = text[max(0, m.start() - 40):m.end() + 40].lower()
+            if LIMIT_CONTEXT.search(window):
+                continue
+            seen.add(h.lower())
+            out.append({"check": "no_customer_metrics", "detail":
+                        f"{what}: \"{h}\" — describe it qualitatively instead "
+                        "(\"a large estate\"); the number is the customer's to disclose"})
 
     return out
 

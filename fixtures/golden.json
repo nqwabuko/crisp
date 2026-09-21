@@ -1239,6 +1239,10 @@
       {
         "check": "no_internal_refs",
         "detail": "object property access: $chargePoint->dlm_circuit_id"
+      },
+      {
+        "check": "no_customer_metrics",
+        "detail": "customer estate size: \"25,000 residential chargers\" — describe it qualitatively instead (\"a large estate\"); the number is the customer's to disclose"
       }
     ],
     "spans": {
@@ -1370,7 +1374,16 @@
       "detell": [],
       "simplify": []
     },
-    "insight": [],
+    "insight": [
+      {
+        "check": "no_customer_metrics",
+        "detail": "customer estate size: \"25,000 units\" — describe it qualitatively instead (\"a large estate\"); the number is the customer's to disclose"
+      },
+      {
+        "check": "no_customer_metrics",
+        "detail": "customer estate size: \"25,000 chargers\" — describe it qualitatively instead (\"a large estate\"); the number is the customer's to disclose"
+      }
+    ],
     "spans": {
       "sentences": [
         {

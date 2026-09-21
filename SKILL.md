@@ -210,7 +210,7 @@ python3 ~/.claude/skills/crisp/scripts/simplify.py --report --check --insight \
     --baseline /tmp/crisp-in.txt /tmp/crisp-final.txt >/dev/null
 ```
 
-Five structural checks, all deterministic, all exit 1 under `--check`:
+Six structural checks, all deterministic, all exit 1 under `--check`:
 
 | Check | Requires |
 |-------|----------|
@@ -220,6 +220,7 @@ Five structural checks, all deterministic, all exit 1 under `--check`:
 | `sections` | Context, Insight Description, Significance, Customer Details all present |
 | `significance` | exactly one of Low / Medium / High / Critical on its own line |
 | `no_internal_refs` | no source paths, `Class::method`, or `$obj->prop` |
+| `no_customer_metrics` | no estate size, contract value or share-of-business figure |
 
 The shape the gate enforces:
 
@@ -244,6 +245,21 @@ patterns are deliberately narrow: only unambiguous code signatures. Domain nouns
 that happen to be CamelCase, like `BootNotification` or `DataTransfer`, are the
 customer's own vocabulary and are left alone, because a gate that cries wolf gets
 switched off.
+
+`no_customer_metrics` closes the same door on the other side. Added 2026-09-21,
+after an insight went out naming a customer's charge point count: every prose
+metric passed and the structure gate passed, because it only looked for code. An
+insight is read well outside the engagement that filed it, and estate size,
+contract value and share of business are the customer's to disclose, not ours.
+The fix in the text is always the same, so the message says it: describe it
+qualitatively, "a large estate".
+
+Narrow on the same principle. A bare number never trips it: the figure has to be
+large *and* sitting next to a word that makes it a count of the customer's
+estate, or carry a currency. And a number phrased as a limit is ours to state, so
+"up to 1000 EVSEs per call" passes while "1000 EVSEs" does not. Without that
+carve-out the gate fires on our own API caps, which is how it would get switched
+off. Protocol versions, story references and firmware strings never match.
 
 `--insight` is opt-in and changes nothing when absent, so every other use of the
 skill is unaffected.
