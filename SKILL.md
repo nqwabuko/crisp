@@ -53,6 +53,12 @@ and the way to find it is deleting whole sentences, not shaving words.
 
 ## Workflow
 
+**First, one branch.** If the text is an insight being filed to Shortcut, add
+`--insight` to every `simplify.py` call below. It adds a structure gate on top of
+the prose budget, because a filed insight can pass every readability metric and
+still hide its ask. See "Filing an insight" for what it checks and why. Everything
+else in this workflow is identical.
+
 ### 1. Get the text
 Whatever the user wants cleaned. If they didn't paste it inline, it's usually:
 - the previous assistant draft in this conversation, or
@@ -91,6 +97,8 @@ python3 ~/.claude/skills/crisp/scripts/detell.py < /tmp/crisp-in.txt 2>/dev/null
   rewrite is targeted rather than vague.
 - `--baseline` names the source, which is what makes the LENGTH line possible:
   `122 -> 89 words, cut 27.0%   target >= 25.0%`. Always pass it.
+- **Filing an insight?** Add `--insight` to that `simplify.py` call. The report
+  gains an `INSIGHT STRUCTURE` block and `--check` fails on a buried ask.
 - exit 1 with `--check` = over the complexity budget or under the length target.
   `--json` to parse it (the `compression` block carries the same numbers).
 
@@ -159,6 +167,11 @@ python3 ~/.claude/skills/crisp/scripts/detell.py --report /tmp/crisp-final.txt >
 python3 ~/.claude/skills/crisp/scripts/simplify.py --report --check \
   --baseline /tmp/crisp-in.txt /tmp/crisp-final.txt >/dev/null
 echo "budget exit: $?"
+
+# filing an insight: same command, plus the structure gate
+python3 ~/.claude/skills/crisp/scripts/simplify.py --report --check --insight \
+  --baseline /tmp/crisp-in.txt /tmp/crisp-final.txt >/dev/null
+echo "budget+structure exit: $?"
 ```
 
 `--baseline` is the *original* source and the file argument is your *final*
@@ -181,6 +194,59 @@ shave adjectives. The honest exception is a source that was already tight: a
 lean 200-word Slack post has no 25% in it, and squeezing it produces telegraphese.
 Say that plainly ("the source was already tight, cut 11%") instead of padding the
 number by dropping something the reader needed.
+
+## Filing an insight: always add `--insight`
+
+Readability is necessary for a filed insight and not sufficient. On 2026-09-17 a
+408-word insight passed all nine metrics above, and the reviewer still could not
+find the ask, because the ask was in the middle. He asked for it "plainly in 1-2
+sentences", got it in a comment, and understood it in 39 seconds. The prose was
+fine. The structure was not, and nothing measured the structure.
+
+So an insight gets a second gate:
+
+```bash
+python3 ~/.claude/skills/crisp/scripts/simplify.py --report --check --insight \
+    --baseline /tmp/crisp-in.txt /tmp/crisp-final.txt >/dev/null
+```
+
+Five structural checks, all deterministic, all exit 1 under `--check`:
+
+| Check | Requires |
+|-------|----------|
+| `ask_present` | a `**The ask**` block exists |
+| `ask_first` | at most 25 words before it |
+| `ask_short` | at most 60 words in it |
+| `sections` | Context, Insight Description, Significance, Customer Details all present |
+| `significance` | exactly one of Low / Medium / High / Critical on its own line |
+| `no_internal_refs` | no source paths, `Class::method`, or `$obj->prop` |
+
+The shape the gate enforces:
+
+```
+**The ask**
+
+<1-2 plain sentences. What you want built, and the first example.>
+
+# INSIGHT
+**Context** ...
+```
+
+**This resolves the "more context or less" bind.** Shorter insights get worse
+research from the product bot, longer ones lose the reader. The ask goes *above*
+the context, not instead of it: the reviewer reads three lines and knows what
+they are triaging, the bot still gets its 400 words. Nothing is traded.
+
+The last check exists because internal references are the other way an insight
+fails its reader. A product reviewer cannot act on a class name, and a customer
+name sits on the story, so the backlog is the wrong place for a file path. The
+patterns are deliberately narrow: only unambiguous code signatures. Domain nouns
+that happen to be CamelCase, like `BootNotification` or `DataTransfer`, are the
+customer's own vocabulary and are left alone, because a gate that cries wolf gets
+switched off.
+
+`--insight` is opt-in and changes nothing when absent, so every other use of the
+skill is unaffected.
 
 ## Measure-only mode, for editors and other consumers
 

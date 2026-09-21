@@ -30,6 +30,9 @@ reweight what you said.
 python3 scripts/detell.py < draft.md 2>/dev/null \
   | python3 scripts/simplify.py --report --check --baseline draft.md > clean.md
 
+# filing an insight: adds the structure gate on top of the budget
+python3 scripts/simplify.py --report --check --insight draft.md
+
 # measure only, with ranges: for editors and other programs
 python3 scripts/simplify.py --locate draft.md
 
@@ -50,6 +53,15 @@ the report: `412 -> 251 words, cut 39.1%   target >= 25.0%`. Every other metric
 is a ratio, so a document can sit inside all of them and still be twice as long
 as it needs to be. Length is the one thing a per-sentence measure cannot see, and
 it is usually the biggest win available.
+
+`--insight` adds a structure gate for a document being filed to the product
+backlog: the ask must exist, be first (at most 25 words before it) and be short
+(at most 60 words), the four template sections must be present, significance must
+be exactly one value, and no internal code references may survive. It exists
+because every other metric here is a ratio or an average, so none of them can see
+*where* a sentence sits. In the incident that prompted it, a 408-word insight
+passed all nine metrics and the reviewer still could not find the ask, because the
+ask was in the middle. Opt-in: absent the flag, nothing changes.
 
 Full usage, including the agent-facing workflow, is in [SKILL.md](SKILL.md). The
 writing rules behind the judgement calls are in

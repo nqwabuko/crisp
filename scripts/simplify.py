@@ -331,6 +331,93 @@ MIN_WORDS_TO_SCORE = 30    # below this the percentages are noise
 # baseline is supplied, and only when the baseline is long enough to score.
 COMPRESSION_TARGET = 25.0
 
+# ── the insight lens (--insight) ─────────────────────────────────────────────
+#
+# Readability is necessary for a filed insight and not sufficient. On
+# 2026-09-17 a 408-word insight passed all nine metrics above and the reviewer
+# still could not find the ask, because the ask was in the middle. A verifier
+# that measures only the thing it can already measure passes bad work
+# confidently, so this lens checks the one property those metrics cannot see:
+# can the reader find the request without reading the document.
+#
+# Structure only. It never scores prose, and the prose budget still applies.
+
+ASK_HEADING = re.compile(r"^\s*(?:#{1,6}\s*|\*\*)the ask\b", re.I | re.M)
+ASK_MAX_WORDS = 60          # 2-3 plain sentences; longer is an argument, not an ask
+ASK_MUST_START_WITHIN = 25  # words of preamble tolerated before the ask
+
+INSIGHT_SECTIONS = ("Context", "Insight Description", "Significance", "Customer Details")
+SIGNIFICANCE = re.compile(r"^\s*(Low|Medium|High|Critical)\s*$", re.M)
+
+# Internal references that must not reach the product backlog. Deliberately
+# narrow: only unambiguous code signatures. Domain nouns that happen to be
+# CamelCase (BootNotification, DataTransfer) are the customer's vocabulary and
+# are left alone, because a gate with false positives gets ignored.
+CODE_REFS = [
+    (re.compile(r"\b[\w/.-]+\.(?:php|py|ts|tsx|js|go|rb|java|kt|yaml|yml)\b(?::\d+(?:-\d+)?)?"),
+     "source file path"),
+    (re.compile(r"\b\w+::\w+"), "class/static reference"),
+    (re.compile(r"\$\w+->\w+"), "object property access"),
+]
+
+
+def _ask_block(text: str):
+    """Return (start_word_index, block_text) for the ask, or None."""
+    m = ASK_HEADING.search(text)
+    if not m:
+        return None
+    before = word_count(_plain(text[:m.start()]))
+    rest = text[m.end():]
+    # The block runs to the next heading of any kind, or the end.
+    nxt = re.search(r"^\s*(?:#{1,6}\s|\*\*[A-Z])", rest, re.M)
+    return before, rest[:nxt.start()] if nxt else rest
+
+
+def check_insight(text: str) -> list[dict]:
+    """Structural failures for a filed insight. Empty list means it passes."""
+    out = []
+
+    ask = _ask_block(text)
+    if ask is None:
+        out.append({"check": "ask_present", "detail":
+                    "no '**The ask**' block; the reader cannot find the request"})
+    else:
+        before, body = ask
+        n = word_count(_plain(body))
+        if before > ASK_MUST_START_WITHIN:
+            out.append({"check": "ask_first", "detail":
+                        f"{before} words before the ask (max {ASK_MUST_START_WITHIN}); "
+                        "move it to the top"})
+        if n > ASK_MAX_WORDS:
+            out.append({"check": "ask_short", "detail":
+                        f"ask is {n} words (max {ASK_MAX_WORDS}); state the request, "
+                        "leave the argument to the body"})
+        if n == 0:
+            out.append({"check": "ask_short", "detail": "ask block is empty"})
+
+    missing = [h for h in INSIGHT_SECTIONS if h.lower() not in text.lower()]
+    if missing:
+        out.append({"check": "sections", "detail":
+                    "missing template section(s): " + ", ".join(missing)})
+
+    hits = SIGNIFICANCE.findall(text)
+    if len(hits) != 1:
+        out.append({"check": "significance", "detail":
+                    f"found {len(hits)} significance value(s); keep exactly one of "
+                    "Low / Medium / High / Critical on its own line"})
+
+    for pat, what in CODE_REFS:
+        # Deliberately NOT _strip_code: a backticked `Foo::bar` is precisely
+        # the thing being looked for, and stripping code hid it.
+        found = sorted(set(pat.findall(text)))
+        if found:
+            out.append({"check": "no_internal_refs", "detail":
+                        f"{what}: {', '.join(found[:3])}"
+                        + (f" (+{len(found) - 3} more)" if len(found) > 3 else "")})
+
+    return out
+
+
 # Markdown / URL noise stripped before counting. Block markers go first, so an
 # asterisk bullet is not mistaken for emphasis.
 # Stop the URL before a closing paren. `\S+` used to swallow the `)` that ends a
@@ -582,6 +669,9 @@ class Report:
     # Set by the caller when a --baseline is supplied; simplify() itself only
     # ever sees one document and cannot know what it started as.
     compression: "Compression | None" = None
+    # Set only under --insight. None means the lens did not run, which is not
+    # the same as an insight that passed with no failures ([]).
+    insight: "list | None" = None
 
     @property
     def total_fixes(self):  return sum(self.fixes.values())
@@ -821,6 +911,17 @@ def _render_length(r: Report) -> list[str]:
             f"cut {c.cut_pct}%   target >= {c.target}%"]
 
 
+def _render_insight(r: Report) -> list[str]:
+    if r.insight is None:
+        return []
+    if not r.insight:
+        return ["INSIGHT STRUCTURE  [PASS]  ask is first, sections present, no internal refs"]
+    L = [f"INSIGHT STRUCTURE  [FAIL] ({len(r.insight)}):"]
+    for f in r.insight:
+        L.append(f"  [FAIL]  {f['check']:<18} {f['detail']}")
+    return L
+
+
 def render_report(r: Report) -> str:
     L = ["== simplify report =========================="]
 
@@ -845,6 +946,7 @@ def render_report(r: Report) -> str:
         L.append(f"SCORECARD: skipped, only {m.values.get('words', 0)} words "
                  f"(need {MIN_WORDS_TO_SCORE}+ to score)")
         L += _render_length(r)
+        L += _render_insight(r)
         if r.compression and not r.compression.ok:
             L.append("VERDICT: OVER BUDGET on length")
         L.append("=============================================")
@@ -869,9 +971,13 @@ def render_report(r: Report) -> str:
         for s in m.passive_sentences[:5]:
             L.append(f"       {_truncate(s)}")
 
+    L += _render_insight(r)
+
     over = m.over_budget
     if r.compression:
         over = over + ["length"] if not r.compression.ok else over
+    if r.insight:
+        over = over + ["insight structure"]
     L.append(f"VERDICT: {'OVER BUDGET on ' + ', '.join(over) if over else 'within budget'}")
     L.append("=============================================")
     return "\n".join(L)
@@ -891,6 +997,10 @@ def main(argv=None):
                          f"gate, which requires a cut of {COMPRESSION_TARGET}%% or more")
     ap.add_argument("--locate", action="store_true",
                     help="measure only: JSON findings + metrics on STDOUT, input left alone")
+    ap.add_argument("--insight", action="store_true",
+                    help="also apply the insight-filing structure gate: ask first, "
+                         "ask short, template sections present, one significance "
+                         "value, no internal code references")
     ap.add_argument("--spans", action="store_true",
                     help="with --locate: add positioned sentences and paragraphs "
                          "(for a live long-sentence indicator)")
@@ -909,14 +1019,20 @@ def main(argv=None):
             "scored": m.scored,
             "over_budget": m.over_budget,
         }
+        if args.insight:
+            payload["insight"] = check_insight(text)
         # Opt-in: one entry per sentence is a lot of payload for a caller that
         # only wants the findings.
         if args.spans:
             payload["spans"] = spans(text)
         sys.stdout.write(json.dumps(payload, indent=2) + "\n")
-        return 1 if (args.check and m.over_budget) else 0
+        bad = bool(m.over_budget) or bool(payload.get("insight"))
+        return 1 if (args.check and bad) else 0
 
     cleaned, report = simplify(text)
+
+    if args.insight:
+        report.insight = check_insight(cleaned)
 
     if args.baseline:
         source = open(args.baseline, encoding="utf-8").read()
@@ -937,11 +1053,12 @@ def main(argv=None):
             "total_fixes": report.total_fixes,
             "total_flags": report.total_flags,
             "compression": report.compression.as_dict() if report.compression else None,
+            "insight": report.insight,
         }, indent=2) + "\n")
     elif args.report:
         sys.stderr.write(render_report(report) + "\n")
 
-    failed = bool(report.metrics.over_budget) or (
+    failed = bool(report.metrics.over_budget) or bool(report.insight) or (
         report.compression is not None and not report.compression.ok)
     return 1 if (args.check and failed) else 0
 

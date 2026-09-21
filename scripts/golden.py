@@ -96,6 +96,9 @@ def record(text: str) -> dict:
             "detell": ranges(detell.locate_flags(text)),
             "simplify": ranges(simplify.locate(text)),
         },
+        # Structure lens (--insight). Recorded for every fixture, so a rule
+        # change shows up even on documents that are not insights.
+        "insight": simplify.check_insight(text),
         "spans": simplify.spans(text),
         # Proof, recorded per fixture, that the positioned spans and the
         # aggregate metrics still describe the same document.
@@ -117,6 +120,12 @@ def config() -> dict:
         "long_word_syllables": simplify.LONG_WORD_SYLLABLES,
         "min_words_to_score": simplify.MIN_WORDS_TO_SCORE,
         "compression_target": simplify.COMPRESSION_TARGET,
+        "insight": {
+            "ask_max_words": simplify.ASK_MAX_WORDS,
+            "ask_must_start_within": simplify.ASK_MUST_START_WITHIN,
+            "sections": list(simplify.INSIGHT_SECTIONS),
+            "code_ref_rules": [what for _, what in simplify.CODE_REFS],
+        },
         "rules": {
             "detell_fix": [n for n, *_ in detell.FIX_RULES],
             "detell_flag": [n for n, *_ in detell.FLAG_RULES],
