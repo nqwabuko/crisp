@@ -112,6 +112,12 @@ first. Cutting also fixes most of the OVER metrics for free, while rewording
 fixes none of them.
 
 Work in this order, biggest unit first:
+0. **Anything the reader already knows.** Before cutting for length, cut for
+   audience. Explaining someone's own system, terms or feature back to them is
+   the largest and least visible source of bulk, and it reads as doubting them.
+   Arguing the benefit of a thing you are asking them to build is the same
+   mistake wearing a tie. `references/voice.md` Part B rule 7 has a worked
+   before-and-after.
 1. **Whole sections and paragraphs.** What is the one point? Anything that does
    not serve it goes, however well written it is.
 2. **Whole sentences.** Restatements, the sentence that sets up the next
@@ -139,7 +145,11 @@ Read `references/voice.md` and `references/simplify.md`, then rewrite:
   deleting words**, not rewording. Take the listed offenders one at a time.
 - Apply the Horowitz good-PM rules: lead with the point, take a position, active
   voice, one idea per sentence, cut every word that doesn't change the meaning,
-  close on the next step.
+  close on the next step, and **assume the reader's competence**. The
+  `audience-briefing`, `benefit-pitch` and `definition` flags mark the sentences
+  that fail the last one, but they only catch the phrasings that are lexically
+  obvious. Exposition written in plain declaratives needs your judgement: ask of
+  every sentence whether this particular reader already knows it.
 - Honour Charlie's house style (no em dashes, warm and plain, internal/external
   split). If the text is in Charlie's voice already, mirror his cadence.
 

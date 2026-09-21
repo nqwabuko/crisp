@@ -89,6 +89,39 @@ the good/bad format (unless the user asks for that format).
 6. **Close with momentum.** End on the next step or the ask, not a summary. The
    final line should move something forward.
 
+7. **Assume the reader is competent. Write the news, not the briefing.** This is
+   the one most drafts fail, and it fails invisibly, because explaining feels
+   like being helpful. Horowitz's essay is written *to* product managers and
+   never once tells them what a product manager does. Every line spends itself
+   on something the reader does not already have.
+
+   So before each sentence, ask: **does this reader already know this?** If they
+   do, it is not context, it is padding, and it quietly says you think they
+   might not. Cut it.
+
+   Concretely, cut: how their own system works, what their own terms mean, what
+   their own feature was built for, the benefit of the thing you are asking them
+   to build. Keep: what happened, what broke, what you found, what you want, and
+   the facts only you have because you were there.
+
+**The audience test, worked.** A real insight filed to a product team, before
+and after the reader edited it. Nothing was wrong with the prose. Every cut is
+a sentence explaining the reader's own product back to them.
+
+| Cut | Why |
+|---|---|
+| "A tariff group holds several tariffs, and the platform picks between them per session by matching the driver: app, RFID, roaming, partner, ad hoc." | They built tariff groups. |
+| "...but that exists for CTEP price display and only runs on OCPP 2.0.1. The estate is OCPP 1.6." | Trimmed to "but that exists for CTEP." They know what it runs on. |
+| "What it unlocks:" plus three bullets | Arguing the value of a feature to the people who would build it. They can see it. |
+| "A spreadsheet does not scale to that, and the platform cannot see it." | The obvious consequence of the sentence before it. |
+| "So anything writing a price to a charger must answer one question first:" | Scaffolding. The question survives on its own. |
+
+What survived is the shape to aim for: the ask, the one mechanism unique to this
+customer, the workarounds that fail and why, the concrete proposal, and the
+commercial fact. 436 words to 290, and the sharpest lines were all keepers:
+*"Both produce a confident wrong price."* *"Order encodes eligibility, not
+intent."*
+
 **The good/bad contrast as an editing lens** (apply silently, keep the good):
 - Bad: describes the problem. Good: states the decision.
 - Bad: "we should probably consider maybe looking into". Good: "we'll do X."

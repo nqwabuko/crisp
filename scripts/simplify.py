@@ -230,6 +230,35 @@ FLAG_RULES = [
      "buried verb: turn the noun back into a verb "
      "(\"the migration of the chargers\" -> \"migrating the chargers\")"),
 
+    # Writing that explains the subject to a reader who owns it. Horowitz's
+    # essay assumes the reader is competent and spends every line on what they
+    # do not already know; this family catches the opposite. Added 2026-09-21
+    # after an insight explained AMPECO's tariff model to AMPECO's product
+    # team and argued the benefit of a feature they would build.
+    ("audience-briefing", _phrase(
+        r"as you (?:know|are aware|will know|may know)", r"as we (?:all )?know",
+        r"for context", r"by way of (?:background|context)", r"for those unfamiliar",
+        r"to recap", r"as a reminder", r"remember that", r"bear in mind that",
+        r"it (?:is|'s) worth noting that", r"note that", r"it should be noted that",
+        r"just to be clear", r"to be clear"),
+     "briefing a reader who already knows: cut the sentence. Spend the line on "
+     "what is new to them"),
+
+    ("benefit-pitch", re.compile(
+        r"\b(?:what (?:it|this) (?:unlocks|enables|gives us|allows|means)|"
+        r"the benefits?(?: (?:are|is|of this))?|this (?:would )?(?:allow|enable|let)s? (?:us|you|them|operators?)|"
+        r"this means (?:you|we|they) (?:can|could|would)|why this matters|the value (?:here )?is)\b", re.I),
+     "selling the benefit: state the problem and the ask, and let the reader "
+     "draw the value. They can"),
+
+    # Indefinite article on BOTH sides. "A tariff group is an ordered list" is
+    # a definition; "the bonus is a summary in the console" is a statement about
+    # a specific known thing, and an earlier version flagged it.
+    ("definition", re.compile(
+        r"(?<![\w'])(?:A|An)\s+\w+(?:\s+\w+){0,2}\s+(?:is|are)\s+(?:a|an)\s+\w+"),
+     "defining a term for its owner: cut it unless the reader genuinely cannot "
+     "know it (a customer's own setup, not your product's)"),
+
     ("there-is", re.compile(r"(?<![\w'])[Tt]here\s+(?:is|are|was|were)\b"),
      "expletive opener: start with the real subject "
      "(\"there are three tenants affected\" -> \"three tenants are affected\")"),
