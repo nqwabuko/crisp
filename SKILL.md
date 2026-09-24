@@ -11,7 +11,7 @@ description: >-
   the length gate that the text must pass; the agent does the voice, cutting and
   simplification rewrite. Use when the user wants text de-slopped, de-AI'd, "made
   crisp", simplified, shortened, cut down, made plainer or less complex, or put in
-  Charlie's/Horowitz's voice, including insights and stories criticised as too
+  the author's/Horowitz's voice, including insights and stories criticised as too
   complex or too long. Trigger keywords - "crisp", "de-slop", "de-ai", "remove em
   dashes", "make it clean", "AI clean", "tighten this", "get to the point", "cut
   the fluff", "horowitz", "good pm voice", "simplify", "simpler", "too complex",
@@ -150,8 +150,8 @@ Read `references/voice.md` and `references/simplify.md`, then rewrite:
   that fail the last one, but they only catch the phrasings that are lexically
   obvious. Exposition written in plain declaratives needs your judgement: ask of
   every sentence whether this particular reader already knows it.
-- Honour Charlie's house style (no em dashes, warm and plain, internal/external
-  split). If the text is in Charlie's voice already, mirror his cadence.
+- Honour the house style in `references/voice.md` Part C (no em dashes, warm and
+  plain, internal/external split). If the text already has a voice, mirror it.
 
 Stay surgical: remove tells, cut clutter, tighten, but preserve facts, structure,
 and intent. Don't rewrite the argument. Never trade a fact, a number, or a real
@@ -205,7 +205,26 @@ lean 200-word Slack post has no 25% in it, and squeezing it produces telegraphes
 Say that plainly ("the source was already tight, cut 11%") instead of padding the
 number by dropping something the reader needed.
 
-## Filing an insight: always add `--insight`
+## Filing an insight: hand over to `/insight`
+
+**If the insight is not yet filed, stop and run `/insight` instead.** That
+command owns the whole flow: research, duplicate check, draft, an adversarial
+refuter, a clipboard handoff to the human, gates on *their* version, submit, and
+a diff of draft-versus-final appended to
+`~/Programming/arch-n-delivery/library/insight-lessons.md`.
+
+Text gates are one step of nine. On their own they produce a well-written draft
+that still explains the product to the people who built it, which is the failure
+they cannot see: whether a sentence is exposition or news depends on who is
+reading, and that is not a property of the text.
+
+Use `--insight` here for an insight that is **already filed** and needs tidying,
+or when `/insight` calls this skill as its step 4 and step 7.
+
+Before drafting either way, read the lessons file. It is what this reader has
+cut before, and the recurring kinds are the usable part.
+
+## The `--insight` flag itself
 
 Readability is necessary for a filed insight and not sufficient. On 2026-09-17 a
 408-word insight passed all nine metrics above, and the reviewer still could not

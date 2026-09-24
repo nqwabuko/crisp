@@ -233,8 +233,9 @@ FLAG_RULES = [
     # Writing that explains the subject to a reader who owns it. Horowitz's
     # essay assumes the reader is competent and spends every line on what they
     # do not already know; this family catches the opposite. Added 2026-09-21
-    # after an insight explained AMPECO's tariff model to AMPECO's product
-    # team and argued the benefit of a feature they would build.
+    # after an insight explained a platform's own tariff model back to the
+    # product team that owns it, and argued the benefit of a feature they
+    # would build.
     ("audience-briefing", _phrase(
         r"as you (?:know|are aware|will know|may know)", r"as we (?:all )?know",
         r"for context", r"by way of (?:background|context)", r"for those unfamiliar",

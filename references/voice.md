@@ -15,7 +15,7 @@ rest, because removing them changes meaning. Your job is to act on the flags.
 **Typography (script handles, verify it read right):**
 - Em dashes become commas. Sometimes a period or colon reads better, upgrade
   where the clause is really two sentences or a setup+payoff. Never reintroduce
-  the em dash. (Charlie's rule: commas, colons, parentheses, or two sentences.)
+  the em dash. (House rule: commas, colons, parentheses, or two sentences.)
 - En dashes: kept as hyphens inside number ranges (3-5), commas elsewhere.
 - Straight quotes and `...` only.
 
@@ -130,10 +130,11 @@ intent."*
 
 ---
 
-## Part C: Charlie's house style (must-honour)
+## Part C: House style (must-honour)
 
-This skill exists partly to enforce Charlie's own comms rules, so the output
-should already match them:
+These are the author's own comms rules, and the reason this skill exists. They
+are opinions rather than laws: edit this section and the output follows. The
+output should already match them:
 - **No em dashes, ever.** Commas, colons, parentheses, or two sentences.
 - Warm, plain, direct. Contractions are good. Not formal, not artifact-heavy.
 - Lead with the practical (plan/ask first), then the *why* in plain words.
@@ -141,8 +142,8 @@ should already match them:
 - Internal vs external split: for anything customer-facing, strip internal refs,
   jargon, version numbers, and internal metrics; keep it qualitative.
 
-If the source is a Slack post or email in Charlie's voice, match his cadence over
-the generic "good PM" tone. The Horowitz rules are the default when there's no
+If the source is a Slack post or email already in the writer's own voice, match
+that cadence over the generic "good PM" tone. The Horowitz rules are the default when there's no
 existing voice to mirror.
 
 ---

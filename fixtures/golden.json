@@ -1209,27 +1209,29 @@
     "detell": {
       "fixes": {},
       "flags": {},
-      "cleaned": "# INSIGHT\n\n**Context**\nMartin at FLO asked for boot-time configuration refresh across 25,000 residential chargers. The platform cannot react to a charger event today without customer-hosted middleware sitting in between.\n\n**Insight Description**\nThe gap is that `ScriptTriggerEnum` in `main/modules-marketplace/app-manifest/src/Enums/ScriptTriggerEnum.php:7-12` has only four cases. Nine listeners hang off `ChargePointBootNotificationReceived`, registered in `main/app/Providers/EventServiceProvider.php:1090`. The write path exists via `EvseService::updatePowerOptions` and `$chargePoint->dlm_circuit_id`.\n\n**Significance**\nHigh\n\n**Customer Details**\nCustomer Name(s): FLO\n"
+      "cleaned": "# INSIGHT\n\n**Context**\nDana at Halcyon asked for boot-time configuration refresh across 18,000 residential chargers. The platform cannot react to a charger event today without customer-hosted middleware sitting in between.\n\n**Insight Description**\nThe gap is that `TriggerKindEnum` in `core/modules-marketplace/app-manifest/src/Enums/TriggerKindEnum.php:7-12` has only four cases. Nine listeners hang off `ChargePointBootNotificationReceived`, registered in `core/app/Providers/EventServiceProvider.php:1090`. The write path exists via `ConnectorService::updatePowerOptions` and `$chargePoint->load_group_id`.\n\n**Significance**\nHigh\n\n**Customer Details**\nCustomer Name(s): Halcyon Energy\n"
     },
     "simplify": {
       "fixes": {},
       "flags": {},
       "metrics": {
-        "words": 59,
+        "words": 60,
         "sentences": 8,
         "paragraphs": 5,
-        "mean_sentence_words": 7.4,
+        "mean_sentence_words": 7.5,
         "max_sentence_words": 15,
         "pct_long_sentences": 0.0,
-        "flesch_reading_ease": 51.7,
-        "flesch_kincaid_grade": 7.9,
+        "flesch_reading_ease": 46.9,
+        "flesch_kincaid_grade": 8.6,
         "pct_passive_sentences": 0.0,
-        "pct_long_words": 16.9,
+        "pct_long_words": 18.3,
         "max_paragraph_words": 27,
         "pct_ly_adverbs": 0.0
       },
       "scored": true,
-      "over_budget": []
+      "over_budget": [
+        "flesch_reading_ease"
+      ]
     },
     "locate": {
       "detell": [],
@@ -1242,19 +1244,19 @@
       },
       {
         "check": "no_internal_refs",
-        "detail": "source file path: main/app/Providers/EventServiceProvider.php:1090, main/modules-marketplace/app-manifest/src/Enums/ScriptTriggerEnum.php:7-12"
+        "detail": "source file path: core/app/Providers/EventServiceProvider.php:1090, core/modules-marketplace/app-manifest/src/Enums/TriggerKindEnum.php:7-12"
       },
       {
         "check": "no_internal_refs",
-        "detail": "class/static reference: EvseService::updatePowerOptions"
+        "detail": "class/static reference: ConnectorService::updatePowerOptions"
       },
       {
         "check": "no_internal_refs",
-        "detail": "object property access: $chargePoint->dlm_circuit_id"
+        "detail": "object property access: $chargePoint->load_group_id"
       },
       {
         "check": "no_customer_metrics",
-        "detail": "customer estate size: \"25,000 residential chargers\" — describe it qualitatively instead (\"a large estate\"); the number is the customer's to disclose"
+        "detail": "customer estate size: \"18,000 residential chargers\" — describe it qualitatively instead (\"a large estate\"); the number is the customer's to disclose"
       }
     ],
     "spans": {
@@ -1271,33 +1273,33 @@
           "line": 3,
           "col": 3,
           "end_line": 4,
-          "end_col": 92
+          "end_col": 94
         },
         {
           "words": 15,
           "line": 4,
-          "col": 93,
+          "col": 95,
           "end_line": 4,
-          "end_col": 198
+          "end_col": 200
         },
         {
           "words": 11,
           "line": 6,
           "col": 3,
           "end_line": 7,
-          "end_col": 137
+          "end_col": 133
         },
         {
           "words": 6,
           "line": 7,
-          "col": 138,
+          "col": 134,
           "end_line": 7,
-          "end_col": 266
+          "end_col": 262
         },
         {
           "words": 6,
           "line": 7,
-          "col": 267,
+          "col": 263,
           "end_line": 7,
           "end_col": 362
         },
@@ -1309,11 +1311,11 @@
           "end_col": 5
         },
         {
-          "words": 6,
+          "words": 7,
           "line": 12,
           "col": 3,
           "end_line": 13,
-          "end_col": 22
+          "end_col": 33
         }
       ],
       "paragraphs": [
@@ -1329,7 +1331,7 @@
           "line": 3,
           "col": 1,
           "end_line": 4,
-          "end_col": 198
+          "end_col": 200
         },
         {
           "words": 23,
@@ -1346,11 +1348,11 @@
           "end_col": 5
         },
         {
-          "words": 6,
+          "words": 7,
           "line": 12,
           "col": 1,
           "end_line": 13,
-          "end_col": 22
+          "end_col": 33
         }
       ]
     },
@@ -1360,23 +1362,23 @@
     "detell": {
       "fixes": {},
       "flags": {},
-      "cleaned": "**The ask**\n\nA general workflow builder for the marketplace, like IFTTT: watch for a trigger, then do something. FLO is the first example. When a charger boots, send a DataTransfer, then use the response to update the charger and EVSE records.\n\n# INSIGHT\n\n**Context**\n\nMartin Faisant (Product Manager, FLO) asked on 2026-09-09 that AMPECO read a charger's real configuration each time it boots, and keep our record in step. FLO's residential migration is around 25,000 units, and the drivers moving across want Dynamic Load Management and Power Sharing.\n\nThe charger, not the platform, is the source of truth. A driver can change the maximum current with a physical switch on the unit. When our record drifts, load management runs on the wrong numbers and breaks the one feature they migrated for.\n\n**Insight Description**\n\nAMPECO can tell a customer that something happened on a charger, but cannot act on it. We already ask the charger for its configuration after boot, then send the result out as a webhook. Customers can write values back through the API, and we already run their code as marketplace apps. Nothing joins them up.\n\nSo FLO's only route is to keep a service running around the clock, catching that webhook and calling us back to write the result. That is the middleware they are paying us to take over.\n\nThis request keeps coming back. JLR asked in 2025, and AGL asked for event-driven throttling. FLO named two more of their own uses on the call: credit card handling, and FLO Ultra sending user details.\n\n**Significance**\n\nHigh\n\nFLO's residential migration is around 25,000 chargers and gates the second contract. Not Critical, because FLO can host the middleware themselves. But that asks them to keep running the system they are replacing.\n\n**Customer Details**\nCustomer Name(s): FLO (AddÉnergie Technologies), Canada\nURL (tenant environment): https://flo.ca-flo.charge.ampeco.tech/\n"
+      "cleaned": "**The ask**\n\nA general workflow builder for the marketplace, like IFTTT: watch for a trigger, then do something. Halcyon is the first example. When a charger boots, send a DataTransfer, then use the response to update the charger and EVSE records.\n\n# INSIGHT\n\n**Context**\n\nDana Whitfield (Product Manager, Halcyon Energy) asked on 2026-09-09 that the platform read a charger's real configuration each time it boots, and keep our record in step. Halcyon's residential migration is around 18,000 units, and the drivers moving across want Dynamic Load Management and Power Sharing.\n\nThe charger, not the platform, is the source of truth. A driver can change the maximum current with a physical switch on the unit. When our record drifts, load management runs on the wrong numbers and breaks the one feature they migrated for.\n\n**Insight Description**\n\nThe platform can tell a customer that something happened on a charger, but cannot act on it. We already ask the charger for its configuration after boot, then send the result out as a webhook. Customers can write values back through the API, and we already run their code as marketplace apps. Nothing joins them up.\n\nSo Halcyon's only route is to keep a service running around the clock, catching that webhook and calling us back to write the result. That is the middleware they are paying us to take over.\n\nThis request keeps coming back. Brightline Fleet asked in 2025, and Cavendish Motors asked for event-driven throttling. Halcyon named two more of their own uses on the call: credit card handling, and Halcyon Ultra sending user details.\n\n**Significance**\n\nHigh\n\nHalcyon's residential migration is around 18,000 chargers and gates the second contract. Not Critical, because Halcyon can host the middleware themselves. But that asks them to keep running the system they are replacing.\n\n**Customer Details**\nCustomer Name(s): Halcyon Energy, Canada\nURL (tenant environment): https://halcyon.tenant.example.com/\n"
     },
     "simplify": {
       "fixes": {},
       "flags": {},
       "metrics": {
-        "words": 302,
+        "words": 305,
         "sentences": 27,
         "paragraphs": 14,
-        "mean_sentence_words": 11.2,
-        "max_sentence_words": 24,
-        "pct_long_sentences": 0.0,
-        "flesch_reading_ease": 66.6,
-        "flesch_kincaid_grade": 6.7,
+        "mean_sentence_words": 11.3,
+        "max_sentence_words": 26,
+        "pct_long_sentences": 3.7,
+        "flesch_reading_ease": 63.9,
+        "flesch_kincaid_grade": 7.2,
         "pct_passive_sentences": 0.0,
-        "pct_long_words": 12.3,
-        "max_paragraph_words": 55,
+        "pct_long_words": 12.1,
+        "max_paragraph_words": 56,
         "pct_ly_adverbs": 0.0
       },
       "scored": true,
@@ -1389,11 +1391,11 @@
     "insight": [
       {
         "check": "no_customer_metrics",
-        "detail": "customer estate size: \"25,000 units\" — describe it qualitatively instead (\"a large estate\"); the number is the customer's to disclose"
+        "detail": "customer estate size: \"18,000 units\" — describe it qualitatively instead (\"a large estate\"); the number is the customer's to disclose"
       },
       {
         "check": "no_customer_metrics",
-        "detail": "customer estate size: \"25,000 chargers\" — describe it qualitatively instead (\"a large estate\"); the number is the customer's to disclose"
+        "detail": "customer estate size: \"18,000 chargers\" — describe it qualitatively instead (\"a large estate\"); the number is the customer's to disclose"
       }
     ],
     "spans": {
@@ -1417,14 +1419,14 @@
           "line": 3,
           "col": 101,
           "end_line": 3,
-          "end_col": 126
+          "end_col": 130
         },
         {
           "words": 18,
           "line": 3,
-          "col": 127,
+          "col": 131,
           "end_line": 3,
-          "end_col": 231
+          "end_col": 235
         },
         {
           "words": 1,
@@ -1441,18 +1443,18 @@
           "end_col": 10
         },
         {
-          "words": 24,
+          "words": 26,
           "line": 9,
           "col": 1,
           "end_line": 9,
-          "end_col": 155
+          "end_col": 172
         },
         {
           "words": 18,
           "line": 9,
-          "col": 156,
+          "col": 173,
           "end_line": 9,
-          "end_col": 285
+          "end_col": 306
         },
         {
           "words": 10,
@@ -1483,46 +1485,46 @@
           "end_col": 22
         },
         {
-          "words": 16,
+          "words": 17,
           "line": 15,
           "col": 1,
           "end_line": 15,
-          "end_col": 87
+          "end_col": 93
         },
         {
           "words": 18,
           "line": 15,
-          "col": 88,
+          "col": 94,
           "end_line": 15,
-          "end_col": 187
+          "end_col": 193
         },
         {
           "words": 17,
           "line": 15,
-          "col": 188,
+          "col": 194,
           "end_line": 15,
-          "end_col": 287
+          "end_col": 293
         },
         {
           "words": 4,
           "line": 15,
-          "col": 288,
+          "col": 294,
           "end_line": 15,
-          "end_col": 310
+          "end_col": 316
         },
         {
           "words": 24,
           "line": 17,
           "col": 1,
           "end_line": 17,
-          "end_col": 130
+          "end_col": 134
         },
         {
           "words": 11,
           "line": 17,
-          "col": 131,
+          "col": 135,
           "end_line": 17,
-          "end_col": 186
+          "end_col": 190
         },
         {
           "words": 5,
@@ -1532,18 +1534,18 @@
           "end_col": 32
         },
         {
-          "words": 9,
+          "words": 11,
           "line": 19,
           "col": 33,
           "end_line": 19,
-          "end_col": 94
+          "end_col": 120
         },
         {
           "words": 20,
           "line": 19,
-          "col": 95,
+          "col": 121,
           "end_line": 19,
-          "end_col": 202
+          "end_col": 236
         },
         {
           "words": 1,
@@ -1564,28 +1566,28 @@
           "line": 25,
           "col": 1,
           "end_line": 25,
-          "end_col": 85
+          "end_col": 89
         },
         {
           "words": 9,
           "line": 25,
-          "col": 86,
+          "col": 90,
           "end_line": 25,
-          "end_col": 147
+          "end_col": 155
         },
         {
           "words": 12,
           "line": 25,
-          "col": 148,
+          "col": 156,
           "end_line": 25,
-          "end_col": 213
+          "end_col": 221
         },
         {
-          "words": 14,
+          "words": 12,
           "line": 27,
           "col": 3,
           "end_line": 29,
-          "end_col": 65
+          "end_col": 62
         }
       ],
       "paragraphs": [
@@ -1601,7 +1603,7 @@
           "line": 3,
           "col": 1,
           "end_line": 3,
-          "end_col": 231
+          "end_col": 235
         },
         {
           "words": 1,
@@ -1618,11 +1620,11 @@
           "end_col": 12
         },
         {
-          "words": 42,
+          "words": 44,
           "line": 9,
           "col": 1,
           "end_line": 9,
-          "end_col": 285
+          "end_col": 306
         },
         {
           "words": 43,
@@ -1639,25 +1641,25 @@
           "end_col": 24
         },
         {
-          "words": 55,
+          "words": 56,
           "line": 15,
           "col": 1,
           "end_line": 15,
-          "end_col": 310
+          "end_col": 316
         },
         {
           "words": 35,
           "line": 17,
           "col": 1,
           "end_line": 17,
-          "end_col": 186
+          "end_col": 190
         },
         {
-          "words": 34,
+          "words": 36,
           "line": 19,
           "col": 1,
           "end_line": 19,
-          "end_col": 202
+          "end_col": 236
         },
         {
           "words": 1,
@@ -1678,14 +1680,14 @@
           "line": 25,
           "col": 1,
           "end_line": 25,
-          "end_col": 213
+          "end_col": 221
         },
         {
-          "words": 14,
+          "words": 12,
           "line": 27,
           "col": 1,
           "end_line": 29,
-          "end_col": 65
+          "end_col": 62
         }
       ]
     },

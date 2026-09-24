@@ -147,8 +147,8 @@ back:
 - **Precise numbers, versions, IDs, config keys** (internal writing). "Several
   sessions" is worse than "31 sessions", not simpler.
 - **Terms of art** the audience shares. "Capacity group" is the right word for
-  an AMPECO reader. Simplify jargon for the audience that doesn't have it, not
-  for the one that does.
+  a charging-platform reader. Simplify jargon for the audience that doesn't
+  have it, not for the one that does.
 - **A real qualification.** If something is true only for AC chargers, "only on
   AC" stays. Losing a caveat is not concision, it's an error.
 - **Quotes and names.** Never smooth someone's actual words.
