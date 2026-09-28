@@ -356,25 +356,21 @@ MIN_WORDS_TO_SCORE = 30    # below this the percentages are noise
 # word count. Every budget metric above is a *ratio*, so a draft can sit inside
 # all of them and still be twice as long as it needs to be: shortening does not
 # happen unless it is measured. Strunk's "omit needless words" and Zinsser's
-# 30-50% observation put the reachable range well above this; 25% is the floor
-# a real business draft should clear, not the target. Only applied when a
-# baseline is supplied, and only when the baseline is long enough to score.
-COMPRESSION_TARGET = 25.0
+# 30-50% observation put the reachable range at or above this; 40% is the floor
+# a real business draft should clear, not the target (raised from 25% on
+# 2026-09-28: drafts were stopping at the floor). Only applied when a baseline
+# is supplied, and only when the baseline is long enough to score.
+COMPRESSION_TARGET = 40.0
 
 # ── the insight lens (--insight) ─────────────────────────────────────────────
 #
-# Readability is necessary for a filed insight and not sufficient. On
-# 2026-09-17 a 408-word insight passed all nine metrics above and the reviewer
-# still could not find the ask, because the ask was in the middle. A verifier
-# that measures only the thing it can already measure passes bad work
-# confidently, so this lens checks the one property those metrics cannot see:
-# can the reader find the request without reading the document.
+# Readability is necessary for a filed insight and not sufficient: the prose
+# metrics cannot see whether the template is filled in, or whether the text
+# leaks code references or a customer's commercial numbers. This lens checks
+# those. (It used to require a '**The ask**' block at the top; dropped
+# 2026-09-28 at the author's request: insights no longer carry that line.)
 #
 # Structure only. It never scores prose, and the prose budget still applies.
-
-ASK_HEADING = re.compile(r"^\s*(?:#{1,6}\s*|\*\*)the ask\b", re.I | re.M)
-ASK_MAX_WORDS = 60          # 2-3 plain sentences; longer is an argument, not an ask
-ASK_MUST_START_WITHIN = 25  # words of preamble tolerated before the ask
 
 INSIGHT_SECTIONS = ("Context", "Insight Description", "Significance", "Customer Details")
 SIGNIFICANCE = re.compile(r"^\s*(Low|Medium|High|Critical)\s*$", re.M)
@@ -428,39 +424,9 @@ LIMIT_CONTEXT = re.compile(
     r"hard limit|rate limit)\b", re.I)
 
 
-def _ask_block(text: str):
-    """Return (start_word_index, block_text) for the ask, or None."""
-    m = ASK_HEADING.search(text)
-    if not m:
-        return None
-    before = word_count(_plain(text[:m.start()]))
-    rest = text[m.end():]
-    # The block runs to the next heading of any kind, or the end.
-    nxt = re.search(r"^\s*(?:#{1,6}\s|\*\*[A-Z])", rest, re.M)
-    return before, rest[:nxt.start()] if nxt else rest
-
-
 def check_insight(text: str) -> list[dict]:
     """Structural failures for a filed insight. Empty list means it passes."""
     out = []
-
-    ask = _ask_block(text)
-    if ask is None:
-        out.append({"check": "ask_present", "detail":
-                    "no '**The ask**' block; the reader cannot find the request"})
-    else:
-        before, body = ask
-        n = word_count(_plain(body))
-        if before > ASK_MUST_START_WITHIN:
-            out.append({"check": "ask_first", "detail":
-                        f"{before} words before the ask (max {ASK_MUST_START_WITHIN}); "
-                        "move it to the top"})
-        if n > ASK_MAX_WORDS:
-            out.append({"check": "ask_short", "detail":
-                        f"ask is {n} words (max {ASK_MAX_WORDS}); state the request, "
-                        "leave the argument to the body"})
-        if n == 0:
-            out.append({"check": "ask_short", "detail": "ask block is empty"})
 
     missing = [h for h in INSIGHT_SECTIONS if h.lower() not in text.lower()]
     if missing:
@@ -1000,7 +966,7 @@ def _render_insight(r: Report) -> list[str]:
     if r.insight is None:
         return []
     if not r.insight:
-        return ["INSIGHT STRUCTURE  [PASS]  ask is first, sections present, no internal refs"]
+        return ["INSIGHT STRUCTURE  [PASS]  sections present, no internal refs"]
     L = [f"INSIGHT STRUCTURE  [FAIL] ({len(r.insight)}):"]
     for f in r.insight:
         L.append(f"  [FAIL]  {f['check']:<18} {f['detail']}")
@@ -1083,8 +1049,8 @@ def main(argv=None):
     ap.add_argument("--locate", action="store_true",
                     help="measure only: JSON findings + metrics on STDOUT, input left alone")
     ap.add_argument("--insight", action="store_true",
-                    help="also apply the insight-filing structure gate: ask first, "
-                         "ask short, template sections present, one significance "
+                    help="also apply the insight-filing structure gate: template "
+                         "sections present, one significance "
                          "value, no internal code references")
     ap.add_argument("--spans", action="store_true",
                     help="with --locate: add positioned sentences and paragraphs "

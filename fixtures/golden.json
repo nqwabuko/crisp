@@ -41,10 +41,8 @@
     "long_sentence": 25,
     "long_word_syllables": 3,
     "min_words_to_score": 30,
-    "compression_target": 25.0,
+    "compression_target": 40.0,
     "insight": {
-      "ask_max_words": 60,
-      "ask_must_start_within": 25,
       "sections": [
         "Context",
         "Insight Description",
@@ -382,10 +380,6 @@
       ]
     },
     "insight": [
-      {
-        "check": "ask_present",
-        "detail": "no '**The ask**' block; the reader cannot find the request"
-      },
       {
         "check": "sections",
         "detail": "missing template section(s): Context, Insight Description, Significance, Customer Details"
@@ -852,10 +846,6 @@
     },
     "insight": [
       {
-        "check": "ask_present",
-        "detail": "no '**The ask**' block; the reader cannot find the request"
-      },
-      {
         "check": "sections",
         "detail": "missing template section(s): Context, Insight Description, Significance, Customer Details"
       },
@@ -991,10 +981,6 @@
       ]
     },
     "insight": [
-      {
-        "check": "ask_present",
-        "detail": "no '**The ask**' block; the reader cannot find the request"
-      },
       {
         "check": "sections",
         "detail": "missing template section(s): Context, Insight Description, Significance, Customer Details"
@@ -1157,10 +1143,6 @@
     },
     "insight": [
       {
-        "check": "ask_present",
-        "detail": "no '**The ask**' block; the reader cannot find the request"
-      },
-      {
         "check": "sections",
         "detail": "missing template section(s): Context, Insight Description, Significance, Customer Details"
       },
@@ -1238,10 +1220,6 @@
       "simplify": []
     },
     "insight": [
-      {
-        "check": "ask_present",
-        "detail": "no '**The ask**' block; the reader cannot find the request"
-      },
       {
         "check": "no_internal_refs",
         "detail": "source file path: core/app/Providers/EventServiceProvider.php:1090, core/modules-marketplace/app-manifest/src/Enums/TriggerKindEnum.php:7-12"
@@ -2115,10 +2093,6 @@
     },
     "insight": [
       {
-        "check": "ask_present",
-        "detail": "no '**The ask**' block; the reader cannot find the request"
-      },
-      {
         "check": "sections",
         "detail": "missing template section(s): Context, Insight Description, Significance, Customer Details"
       },
@@ -2671,10 +2645,6 @@
     },
     "insight": [
       {
-        "check": "ask_present",
-        "detail": "no '**The ask**' block; the reader cannot find the request"
-      },
-      {
         "check": "sections",
         "detail": "missing template section(s): Context, Insight Description, Significance, Customer Details"
       },
@@ -2813,10 +2783,6 @@
       "simplify": []
     },
     "insight": [
-      {
-        "check": "ask_present",
-        "detail": "no '**The ask**' block; the reader cannot find the request"
-      },
       {
         "check": "sections",
         "detail": "missing template section(s): Context, Insight Description, Significance, Customer Details"
@@ -2964,10 +2930,6 @@
     },
     "insight": [
       {
-        "check": "ask_present",
-        "detail": "no '**The ask**' block; the reader cannot find the request"
-      },
-      {
         "check": "sections",
         "detail": "missing template section(s): Context, Insight Description, Significance, Customer Details"
       },
@@ -3101,10 +3063,6 @@
       ]
     },
     "insight": [
-      {
-        "check": "ask_present",
-        "detail": "no '**The ask**' block; the reader cannot find the request"
-      },
       {
         "check": "sections",
         "detail": "missing template section(s): Context, Insight Description, Significance, Customer Details"

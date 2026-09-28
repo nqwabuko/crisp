@@ -49,19 +49,16 @@ word count. The metrics say the longest sentence is 65 words; the spans say
 where it is.
 
 `--baseline` names the document the input was rewritten from and adds one line to
-the report: `412 -> 251 words, cut 39.1%   target >= 25.0%`. Every other metric
+the report: `412 -> 240 words, cut 41.7%   target >= 40.0%`. Every other metric
 is a ratio, so a document can sit inside all of them and still be twice as long
 as it needs to be. Length is the one thing a per-sentence measure cannot see, and
 it is usually the biggest win available.
 
 `--insight` adds a structure gate for a document being filed to the product
-backlog: the ask must exist, be first (at most 25 words before it) and be short
-(at most 60 words), the four template sections must be present, significance must
-be exactly one value, and no internal code references may survive. It exists
-because every other metric here is a ratio or an average, so none of them can see
-*where* a sentence sits. In the incident that prompted it, a 408-word insight
-passed all nine metrics and the reviewer still could not find the ask, because the
-ask was in the middle. Opt-in: absent the flag, nothing changes.
+backlog: the four template sections must be present, significance must be exactly
+one value, and no internal code references or customer commercial numbers may
+survive. None of the prose metrics can see those. Opt-in: absent the flag,
+nothing changes.
 
 Full usage, including the agent-facing workflow, is in [SKILL.md](SKILL.md). The
 writing rules behind the judgement calls are in

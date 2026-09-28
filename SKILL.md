@@ -5,11 +5,11 @@ description: >-
   em dashes and machine fingerprints, cut Zinsser/Strunk-and-White clutter, then
   tighten to the point (Ben Horowitz "good product manager" cadence, lead with
   the point, cut fluff). Always makes the text SHORTER: a measured length gate
-  requires the rewrite to cut at least a quarter of the words, and that is the
-  floor, not the target. Two deterministic scripts do the mechanical passes every
-  run, including a complexity budget (sentence length, Flesch, passive voice) and
-  the length gate that the text must pass; the agent does the voice, cutting and
-  simplification rewrite. Use when the user wants text de-slopped, de-AI'd, "made
+  requires the rewrite to cut at least 40% of the words, and that is the floor,
+  not the target. Two deterministic scripts do the mechanical passes every run,
+  including a complexity budget (sentence length, Flesch, passive voice) and the
+  length gate that the text must pass; the voice, cutting and simplification
+  rewrite then runs twice, each time in a fresh subagent. Use when the user wants text de-slopped, de-AI'd, "made
   crisp", simplified, shortened, cut down, made plainer or less complex, or put in
   the author's/Horowitz's voice, including insights and stories criticised as too
   complex or too long. Trigger keywords - "crisp", "de-slop", "de-ai", "remove em
@@ -47,16 +47,22 @@ criterion is observable rather than a matter of taste.
 
 **Shorter is half the job.** Every budget metric is a ratio, so a draft can pass
 all of them and still be twice as long as it needs to be. `--baseline` measures
-the rewrite against the source it came from and fails it if fewer than 25% of the
-words are gone. Treat 25% as the floor. Most business drafts have 30-50% in them,
-and the way to find it is deleting whole sentences, not shaving words.
+the rewrite against the source it came from and fails it if fewer than 40% of the
+words are gone. Treat 40% as the floor, not the target. The way to find it is
+deleting whole sentences, not shaving words.
+
+**Two rewrites, two fresh agents.** The judgement pass runs twice, each time in a
+separate subagent that has never seen the draft before. The second one gets only
+the first one's output, not its reasoning, so it reads the text the way the real
+reader will: cold. Whatever the first pass talked itself into keeping, the second
+pass has no reason to keep.
 
 ## Workflow
 
 **First, one branch.** If the text is an insight being filed to Shortcut, add
 `--insight` to every `simplify.py` call below. It adds a structure gate on top of
-the prose budget, because a filed insight can pass every readability metric and
-still hide its ask. See "Filing an insight" for what it checks and why. Everything
+the prose budget: template sections present, no code references, no customer
+numbers. See "The `--insight` flag itself" for what it checks. Everything
 else in this workflow is identical.
 
 ### 1. Get the text
@@ -96,9 +102,10 @@ python3 ~/.claude/skills/crisp/scripts/detell.py < /tmp/crisp-in.txt 2>/dev/null
   plus your LONGEST SENTENCES and PASSIVE SENTENCES listed verbatim so the
   rewrite is targeted rather than vague.
 - `--baseline` names the source, which is what makes the LENGTH line possible:
-  `122 -> 89 words, cut 27.0%   target >= 25.0%`. Always pass it.
+  `122 -> 70 words, cut 42.6%   target >= 40.0%`. Always pass it.
 - **Filing an insight?** Add `--insight` to that `simplify.py` call. The report
-  gains an `INSIGHT STRUCTURE` block and `--check` fails on a buried ask.
+  gains an `INSIGHT STRUCTURE` block and `--check` fails on a missing section
+  or a leaked reference.
 - exit 1 with `--check` = over the complexity budget or under the length target.
   `--json` to parse it (the `compression` block carries the same numbers).
 
@@ -106,7 +113,35 @@ Read the OVER lines, the SHORT line and the offender lists before you rewrite.
 They tell you exactly which sentences are doing the damage. The percentage the
 scripts cut on their own is the easy part: the rest is yours.
 
-### 3. Cut it down (do this before anything else in the rewrite)
+### 3. Rewrite twice, each time in a fresh agent
+
+Do not rewrite the text yourself. Spawn two subagents **one after the other**
+with the Agent tool (`subagent_type: general-purpose`, `run_in_background:
+false`, since each needs the last one's file). Each runs Pass steps A and B below,
+then the verify commands, and returns only the file path, its LENGTH line and any
+metric it is leaving OVER with the reason.
+
+**Pass 1** gets:
+- the script-cleaned text (`crisp-clean.txt`) as the draft to rewrite,
+- the original source (`crisp-in.txt`) as `--baseline`,
+- the stderr report from step 2b,
+- whether this is an insight (`--insight`),
+- this file's path, and an instruction to follow Pass steps A and B, read both
+  references, and write `crisp-pass1.txt`.
+
+**Pass 2** is a new Agent call, never a SendMessage to pass 1. It gets:
+- `crisp-pass1.txt` as the draft, described as *someone else's draft that is
+  still too long*. Tell it to cut it as if seeing it for the first time.
+- the original source, labelled **for fact-checking only**: it may put back a
+  fact pass 1 lost, never pass 1's deleted wording.
+- `--baseline crisp-in.txt`, so the gate measures the whole job,
+- the same references and flags, and it writes `crisp-final.txt`.
+
+Do not hand pass 2 anything pass 1 said about its choices. Its value is that it
+has no stake in them. Use full scratchpad paths in both prompts; subagents do not
+share your working directory assumptions.
+
+### Pass step A. Cut it down (before anything else in the rewrite)
 Shortening is the highest-leverage pass and the one that gets skipped, so it goes
 first. Cutting also fixes most of the OVER metrics for free, while rewording
 fixes none of them.
@@ -131,12 +166,12 @@ Work in this order, biggest unit first:
 Then read it back and ask Zinsser's question of each remaining sentence: *is this
 doing work no other sentence is doing?* If not, it goes.
 
-The gate is 25%. Do not stop there if more is available: keep cutting until
+The gate is 40%. Do not stop there if more is available: keep cutting until
 taking out one more word would lose a fact, a number, a name or a real caveat.
 Never buy the number by cutting one of those (`references/simplify.md` Part D is
 the do-not-cut list).
 
-### 4. Voice and simplification rewrite (the judgement)
+### Pass step B. Voice and simplification rewrite (the judgement)
 Read `references/voice.md` and `references/simplify.md`, then rewrite:
 - Act on every FLAG from both reports (kill AI vocabulary, rewrite the scaffolds,
   cut hedges and chat residue, dig the verb out of the nominalisation, name the
@@ -150,6 +185,8 @@ Read `references/voice.md` and `references/simplify.md`, then rewrite:
   that fail the last one, but they only catch the phrasings that are lexically
   obvious. Exposition written in plain declaratives needs your judgement: ask of
   every sentence whether this particular reader already knows it.
+- **Carry facts plainly.** See "Facts: keep them, simplify how they go in"
+  below.
 - Honour the house style in `references/voice.md` Part C (no em dashes, warm and
   plain, internal/external split). If the text already has a voice, mirror it.
 
@@ -160,9 +197,11 @@ noun, term of art, code), keep it and note why. `references/simplify.md` Part D
 lists what not to simplify.
 
 ### 5. Deliver
+- Run the verify commands below on `crisp-final.txt` yourself. Trust the file,
+  not the subagent's summary of it.
 - Show the final text.
-- Say what it cost: `412 -> 251 words (-39%)`. One line, so the user can see the
-  cut and push back if something they wanted is gone.
+- Say what it cost, per pass: `412 -> 240 -> 198 words (-52%)`. One line, so the
+  user can see the cut and push back if something they wanted is gone.
 - Offer a quick before/after note if useful (what changed and why), but keep it
   short.
 - Offer to copy it out. For plain text: `pbcopy < final.txt`. For a Slack or
@@ -201,9 +240,27 @@ the number by deleting a fact.
 
 LENGTH gets the same treatment. `SHORT` means go back and cut a paragraph, not
 shave adjectives. The honest exception is a source that was already tight: a
-lean 200-word Slack post has no 25% in it, and squeezing it produces telegraphese.
+lean 200-word Slack post has no 40% in it, and squeezing it produces telegraphese.
 Say that plainly ("the source was already tight, cut 11%") instead of padding the
 number by dropping something the reader needed.
+
+## Facts: keep them, simplify how they go in
+
+The do-not-cut list protects facts, and that is where drafts hide their bulk: a
+fact wrapped in a title, a date, a qualifier and a relative clause. Keep the fact,
+drop the wrapping.
+
+- **One fact, one plain sentence.** Subject, verb, number. "Halcyon has 18,000
+  chargers." Not "Halcyon's residential migration, which covers around 18,000
+  units, ...".
+- **Say it once.** A number that appears twice is one sentence too many.
+- **No packaging.** Job titles, meeting dates, "(as discussed on the call)",
+  "according to", "roughly", "around": cut them unless the reader acts on them.
+  "Dana Whitfield (Product Manager, Halcyon Energy) asked on 2026-09-09 that the
+  platform read..." becomes "Halcyon wants the platform to read...".
+- **Only the facts the reader acts on.** A true fact that changes nothing about
+  the decision is decoration. Cut it. The number, name or caveat the reader needs
+  stays, always.
 
 ## Filing an insight: hand over to `/insight`
 
@@ -226,48 +283,29 @@ cut before, and the recurring kinds are the usable part.
 
 ## The `--insight` flag itself
 
-Readability is necessary for a filed insight and not sufficient. On 2026-09-17 a
-408-word insight passed all nine metrics above, and the reviewer still could not
-find the ask, because the ask was in the middle. He asked for it "plainly in 1-2
-sentences", got it in a comment, and understood it in 39 seconds. The prose was
-fine. The structure was not, and nothing measured the structure.
-
-So an insight gets a second gate:
+Readability is necessary for a filed insight and not sufficient. The prose
+metrics cannot see a missing template section, a leaked file path, or a
+customer's charge point count. So an insight gets a second gate:
 
 ```bash
 python3 ~/.claude/skills/crisp/scripts/simplify.py --report --check --insight \
     --baseline /tmp/crisp-in.txt /tmp/crisp-final.txt >/dev/null
 ```
 
-Six structural checks, all deterministic, all exit 1 under `--check`:
+Four structural checks, all deterministic, all exit 1 under `--check`:
 
 | Check | Requires |
 |-------|----------|
-| `ask_present` | a `**The ask**` block exists |
-| `ask_first` | at most 25 words before it |
-| `ask_short` | at most 60 words in it |
 | `sections` | Context, Insight Description, Significance, Customer Details all present |
 | `significance` | exactly one of Low / Medium / High / Critical on its own line |
 | `no_internal_refs` | no source paths, `Class::method`, or `$obj->prop` |
 | `no_customer_metrics` | no estate size, contract value or share-of-business figure |
 
-The shape the gate enforces:
+There is no `**The ask**` block. The gate used to require one at the top; it was
+dropped on 2026-09-28. Lead with the point in the Context's first sentence
+instead (`references/voice.md` Part B rule 1).
 
-```
-**The ask**
-
-<1-2 plain sentences. What you want built, and the first example.>
-
-# INSIGHT
-**Context** ...
-```
-
-**This resolves the "more context or less" bind.** Shorter insights get worse
-research from the product bot, longer ones lose the reader. The ask goes *above*
-the context, not instead of it: the reviewer reads three lines and knows what
-they are triaging, the bot still gets its 400 words. Nothing is traded.
-
-The last check exists because internal references are the other way an insight
+`no_internal_refs` exists because internal references are the other way an insight
 fails its reader. A product reviewer cannot act on a class name, and a customer
 name sits on the story, so the backlog is the wrong place for a file path. The
 patterns are deliberately narrow: only unambiguous code signatures. Domain nouns

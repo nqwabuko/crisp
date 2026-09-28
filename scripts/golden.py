@@ -121,8 +121,6 @@ def config() -> dict:
         "min_words_to_score": simplify.MIN_WORDS_TO_SCORE,
         "compression_target": simplify.COMPRESSION_TARGET,
         "insight": {
-            "ask_max_words": simplify.ASK_MAX_WORDS,
-            "ask_must_start_within": simplify.ASK_MUST_START_WITHIN,
             "sections": list(simplify.INSIGHT_SECTIONS),
             "code_ref_rules": [what for _, what in simplify.CODE_REFS],
         },
