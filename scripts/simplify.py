@@ -358,8 +358,9 @@ MIN_WORDS_TO_SCORE = 30    # below this the percentages are noise
 # happen unless it is measured. Strunk's "omit needless words" and Zinsser's
 # 30-50% observation put the reachable range at or above this; 40% is the floor
 # a real business draft should clear, not the target (raised from 25% on
-# 2026-09-28: drafts were stopping at the floor). Only applied when a baseline
-# is supplied, and only when the baseline is long enough to score.
+# 2026-09-28 at the author's request, because drafts were stopping at the
+# floor). Only applied when a baseline is supplied, and only when the baseline
+# is long enough to score.
 COMPRESSION_TARGET = 40.0
 
 # ── the insight lens (--insight) ─────────────────────────────────────────────
