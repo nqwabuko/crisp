@@ -95,9 +95,11 @@ FLAG_RULES = [
         "underscore", "underscores", "pivotal", "intricate", "myriad",
         "plethora", "elevate", "elevates", "holistic", "synergy", "seamless",
         "seamlessly", "robust", "leverage", "leveraging", "utilize", "utilizes",
-        "utilized", "utilizing", "meticulous", "meticulously", "bustling",
+        "utilized", "utilizing", "utilise", "utilises", "utilised", "utilising",
+        "meticulous", "meticulously", "bustling",
         "vibrant", "crucial", "vital", "harness", "unlock", "unlocking",
-        "embark", "foster", "fostering", "cultivate", "endeavor", "paramount",
+        "embark", "foster", "fostering", "cultivate", "endeavor", "endeavour",
+        "paramount",
         # Later-generation marketing register: the same fingerprint, newer words.
         "showcase", "showcases", "showcasing", "streamline", "streamlines",
         "streamlined", "streamlining", "cutting-edge", "state-of-the-art",

@@ -6,14 +6,9 @@
 //! vendored copy, nothing to keep current, nothing to skip.
 //!
 //! The rule tables, every finding, every span, the measurement thresholds, the
-//! budget and the typography output are held against that file. Two things are
-//! deliberately not asserted yet:
-//!
-//! - **The report tallies** (`detell.fixes`, `simplify.flags` and so on), and
-//!   `simplify.metrics`, which crisp records after its rewrite pipeline. Both
-//!   land with the rewrite pipelines in slice 2 of `docs/rust.md`.
-//! - **`compression_target` and `insight`** in `__config__`, which the engine
-//!   does not carry yet; see the comment in the thresholds test.
+//! budget, the compression target, the insight lens's sections, code-reference
+//! rules and per-fixture failures, the typography output and the rewrite
+//! pipelines' tallies and metrics are held against that file.
 
 mod common;
 
@@ -177,7 +172,11 @@ fn the_measurement_thresholds_match_the_recorded_contract() {
     assert_eq!(crisp::LONG_SENTENCE, n("long_sentence"));
     assert_eq!(crisp::LONG_WORD_SYLLABLES, n("long_word_syllables"));
     assert_eq!(crisp::MIN_WORDS_TO_SCORE, n("min_words_to_score"));
-    // compression_target and insight are not ported yet: slice 2 of docs/rust.md.
+    assert_eq!(
+        Some(crisp::COMPRESSION_TARGET),
+        config["compression_target"].as_f64(),
+        "compression_target"
+    );
 }
 
 /// `Budget::default()` is crisp's own tuning, so it is crisp's recorded budget.
@@ -210,6 +209,42 @@ fn the_default_budget_matches_the_recorded_contract() {
     assert_eq!(ours, recorded);
 }
 
+/// The insight template and the code signatures it refuses are crisp's, so the
+/// recorded lists are the contract, in order: the order is the report's.
+#[test]
+fn the_insight_config_matches_the_recorded_contract() {
+    let contract = contract();
+    let recorded = &contract["__config__"]["insight"];
+    let names = |key: &str| -> Vec<String> {
+        recorded[key]
+            .as_array()
+            .unwrap_or_else(|| panic!("__config__.insight.{key}"))
+            .iter()
+            .map(|v| v.as_str().expect("a name").to_string())
+            .collect()
+    };
+    assert_eq!(crisp::insight::SECTIONS.to_vec(), names("sections"));
+    let rules: Vec<&str> = crisp::insight::CODE_REFS
+        .iter()
+        .map(|&(_, what)| what)
+        .collect();
+    assert_eq!(rules, names("code_ref_rules"));
+}
+
+/// crisp records the lens's verdict on every fixture, insight or not, so a
+/// rule change shows up even on documents that are not insights.
+#[test]
+fn the_insight_failures_match_the_recorded_contract() {
+    let contract = contract();
+    let mut failed = 0;
+    for (name, text) in fixtures(&contract) {
+        let ours = serde_json::to_value(crisp::insight::check(&text)).expect("a list");
+        assert_eq!(ours, contract[&name]["insight"], "{name}: insight");
+        failed += ours.as_array().map_or(0, Vec::len);
+    }
+    assert!(failed > 10, "only {failed} insight failures compared");
+}
+
 #[test]
 fn the_findings_match_the_recorded_contract() {
     let contract = contract();
@@ -240,21 +275,60 @@ fn the_findings_match_the_recorded_contract() {
     assert!(checked > 50, "only {checked} findings compared");
 }
 
-// `simplify.metrics` in the contract is not asserted yet, and the reason is
-// worth writing down because it looks assertable and isn't. crisp records it
-// from the *end* of its pipeline: typography rewrite, then clutter rewrite, then
-// measure. `measure` here sees the raw text, and the rewrite pipeline lands in
-// slice 2 of docs/rust.md. On `ai-tells.md`
-// those are 7 sentences and 6 sentences, and both are right about their own
-// input.
-//
-// The metrics are still pinned here, transitively and on the raw text:
-// `the_positioned_spans_match_the_recorded_contract` below fixes every sentence
-// and paragraph, and `invariants.rs::segmentation_and_metrics_agree` requires the
-// spans and the metrics to agree on sentence count, paragraph count, max words
-// and total words. Pin the spans, prove the metrics follow. What is left
-// unpinned without the live oracle is the two Flesch numbers, which are a
-// formula over quantities that are pinned.
+/// crisp records its tallies and metrics from the *end* of its pipeline:
+/// typography rewrite, then clutter rewrite, then measure. So they are compared
+/// after the same two rewrites here, not on the raw text: on `ai-tells.md` the
+/// two are 7 sentences and 6, and both are right about their own input.
+#[test]
+fn the_pipeline_tallies_and_metrics_match_the_recorded_contract() {
+    use crisp::report::Simplified;
+    use crisp::rewrite::Rewrite;
+
+    let contract = contract();
+    let counts = |r: &Rewrite| -> (Value, Value) {
+        let fixes = r.fixes.0.iter().map(|&(k, n)| (k.to_string(), n.into()));
+        let flags = r.flags.iter().map(|f| (f.rule.to_string(), f.count.into()));
+        (
+            Value::Object(fixes.collect()),
+            Value::Object(flags.collect()),
+        )
+    };
+    let mut fired = 0;
+
+    for (name, text) in fixtures(&contract) {
+        let recorded = &contract[&name];
+        let detelled = crisp::rewrite::detell(&text);
+        let s = Simplified::new(&detelled.text, None);
+
+        let (fixes, flags) = counts(&detelled);
+        assert_eq!(fixes, recorded["detell"]["fixes"], "{name}: detell.fixes");
+        assert_eq!(flags, recorded["detell"]["flags"], "{name}: detell.flags");
+        let (fixes, flags) = counts(&s.rewrite);
+        assert_eq!(
+            fixes, recorded["simplify"]["fixes"],
+            "{name}: simplify.fixes"
+        );
+        assert_eq!(
+            flags, recorded["simplify"]["flags"],
+            "{name}: simplify.flags"
+        );
+
+        let r = &recorded["simplify"];
+        assert_eq!(
+            crisp::report::metrics_json(&s.metrics),
+            r["metrics"],
+            "{name}: simplify.metrics"
+        );
+        assert_eq!(Value::from(s.metrics.scored), r["scored"], "{name}: scored");
+        assert_eq!(
+            serde_json::to_value(s.metrics.over_budget(&Budget::default())).expect("a list"),
+            r["over_budget"],
+            "{name}: over_budget"
+        );
+        fired += detelled.fixes.total() + s.rewrite.fixes.total();
+    }
+    assert!(fired > 20, "only {fired} fixes recorded and compared");
+}
 
 #[test]
 fn the_positioned_spans_match_the_recorded_contract() {

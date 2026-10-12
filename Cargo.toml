@@ -19,6 +19,15 @@ path = "src/main.rs"
 regex = "1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+# Grammar and spelling in British English (`crisp grammar`, `src/grammar.rs`).
+# Optional because the dictionary is several MB and ink measures every one.
+# Default features off: the thesaurus is for synonym suggestions crisp never
+# shows, and `concurrent` only swaps Rc for Arc.
+harper-core = { version = "~2.11.0", optional = true, default-features = false }
+
+[features]
+default = ["grammar"]
+grammar = ["dep:harper-core"]
 
 [profile.release]
 codegen-units = 1
@@ -27,3 +36,8 @@ opt-level = "s"
 strip = true
 # `panic = "abort"` is deliberately absent: ink will link this crate, and ink
 # catches an engine panic rather than lose the window and the unsaved buffer.
+
+# Harper builds its few hundred lints on every run, which takes seconds
+# unoptimised; optimising the dependencies alone keeps `cargo test` quick.
+[profile.dev.package."*"]
+opt-level = 2

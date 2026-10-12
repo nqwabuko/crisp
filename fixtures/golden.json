@@ -464,7 +464,7 @@
     "detell": {
       "fixes": {},
       "flags": {
-        "word:vocabulary": 1,
+        "word:vocabulary": 2,
         "hedge:the-fact": 1
       },
       "cleaned": "# Insight: DLM capability gaps\n\nPrior to the commencement of the migration, it was determined that there are a\nnumber of limitations in relation to the current implementation of the dynamic\nload management functionality, which, due to the fact that capacity groups are\nmodelled as circuits in the legacy platform, necessitates additional\nconfigurability in terms of how meter values are utilised for the purposes of\nload balancing across the estate.\n\nIn the event that the aforementioned meter values are not received on a regular\nbasis, the allocation of available current is calculated by the platform using a\nfallback which was implemented for the purpose of protecting the site, and it\nshould be noted that this behaviour is not currently surfaced to the operator in\na manner which facilitates rapid diagnosis.\n\nIt may be the case that the prioritisation of visibility improvements would\ndeliver a more holistic outcome. There is a possibility that alignment with the\nsmart charging workstream is required.\n"
@@ -524,6 +524,15 @@
           5,
           59,
           "the fact that"
+        ],
+        [
+          "word:vocabulary",
+          "tell",
+          7,
+          50,
+          7,
+          58,
+          "utilised"
         ],
         [
           "word:vocabulary",

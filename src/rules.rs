@@ -235,6 +235,10 @@ pub static DETELL_FLAG: LazyLock<Vec<FlagRule>> = LazyLock::new(|| {
                 "utilizes",
                 "utilized",
                 "utilizing",
+                "utilise",
+                "utilises",
+                "utilised",
+                "utilising",
                 "meticulous",
                 "meticulously",
                 "bustling",
@@ -249,6 +253,7 @@ pub static DETELL_FLAG: LazyLock<Vec<FlagRule>> = LazyLock::new(|| {
                 "fostering",
                 "cultivate",
                 "endeavor",
+                "endeavour",
                 "paramount",
                 // Later-generation marketing register: same fingerprint, newer words.
                 "showcase",

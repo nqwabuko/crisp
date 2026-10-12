@@ -14,10 +14,15 @@
 //! This crate does not decide the budget for every caller: `Budget::default()`
 //! is crisp's tuning, and every function that judges takes a `&Budget`.
 
+#[cfg(feature = "grammar")]
+pub mod grammar;
+pub mod insight;
+pub mod report;
+pub mod rewrite;
 pub mod rules;
 pub mod text;
 
-use rules::{Bound, Budget, ClutterRule, ComplexityRule, Fix, FlagRule};
+use rules::{Bound, Budget, ClutterRule, ComplexityRule, FlagRule};
 use std::borrow::Cow;
 use std::collections::BTreeMap;
 use text::{Unit, WORD};
@@ -32,6 +37,11 @@ pub const LONG_SENTENCE: usize = 25;
 pub const LONG_WORD_SYLLABLES: usize = 3;
 /// Below this the percentages are noise.
 pub const MIN_WORDS_TO_SCORE: usize = 30;
+/// How much shorter a rewrite has to come out than its `--baseline`, as a
+/// percentage of the source's words. crisp's floor, not a target: every budget
+/// metric is a ratio, so a draft can pass them all and still be twice as long as
+/// it needs to be. `tests/golden.rs` holds it against crisp's recorded value.
+pub const COMPRESSION_TARGET: f64 = 40.0;
 
 // ── findings ─────────────────────────────────────────────────────────────────
 
@@ -42,7 +52,9 @@ pub enum Kind {
     Clutter,
     /// A complexity flag, carrying the hint. Judgement required, so no fix.
     Complexity,
-    /// A typographic or vocabulary tell.
+    /// A typographic or vocabulary tell. Also every `grammar:` finding: like a
+    /// tell, it is FLAG only and never rewritten, though it may carry Harper's
+    /// one suggestion as `fix` and its message as `hint`.
     Tell,
     /// A sentence or paragraph over the budget's length. Not a rule hit: it is a
     /// measurement of a span, it comes from the writer's budget rather than from
@@ -303,6 +315,15 @@ pub struct Metrics {
     /// False when the document is too short for the percentages to mean
     /// anything, in which case only `words` and `sentences` are present.
     pub scored: bool,
+    /// `(words, sentence)` for every sentence over `LONG_SENTENCE` words,
+    /// longest first, ties in document order. Empty when not scored. Kept with
+    /// the metrics rather than re-segmented by the report, so the sentences the
+    /// report lists are the ones `max_sentence_words` counted.
+    #[serde(skip)]
+    pub long_sentences: Vec<(usize, String)>,
+    /// Every sentence the passive rule matched, in document order.
+    #[serde(skip)]
+    pub passive_sentences: Vec<String>,
 }
 
 impl Metrics {
@@ -327,7 +348,7 @@ impl Metrics {
 /// Python's `round(x, 1)`: correct rounding of the binary value, ties to even.
 /// Rust's float formatting agrees, so the two engines report the same number
 /// rather than numbers that differ in the last digit on a tie.
-fn round1(x: f64) -> f64 {
+pub(crate) fn round1(x: f64) -> f64 {
     format!("{x:.1}").parse().expect("formatted floats parse")
 }
 
@@ -350,6 +371,7 @@ pub fn measure(text: &str) -> Metrics {
         return Metrics {
             values,
             scored: false,
+            ..Metrics::default()
         };
     }
 
@@ -361,10 +383,12 @@ pub fn measure(text: &str) -> Metrics {
         .count();
     let lengths: Vec<usize> = sent_words.iter().map(Vec::len).collect();
 
-    let n_passive = sentences
+    let passive_sentences: Vec<String> = sentences
         .iter()
         .filter(|s| rules::PASSIVE.is_match(s))
-        .count();
+        .cloned()
+        .collect();
+    let n_passive = passive_sentences.len();
     let n_ly = words
         .iter()
         .filter(|w| w.to_lowercase().ends_with("ly") && w.chars().count() > 4)
@@ -406,9 +430,19 @@ pub fn measure(text: &str) -> Metrics {
     );
     values.insert("pct_ly_adverbs", pct(n_ly, n_words));
 
+    let mut long_sentences: Vec<(usize, String)> = lengths
+        .iter()
+        .zip(&sentences)
+        .filter(|&(&n, _)| n > LONG_SENTENCE)
+        .map(|(&n, s)| (n, s.clone()))
+        .collect();
+    long_sentences.sort_by_key(|&(n, _)| std::cmp::Reverse(n));
+
     Metrics {
         values,
         scored: true,
+        long_sentences,
+        passive_sentences,
     }
 }
 
@@ -566,22 +600,10 @@ pub fn disagreements(text: &str) -> Vec<String> {
 /// detell's FIX pipeline: the one thing here that changes a document.
 ///
 /// It happens when asked, from its own menu item, and never on a timer. Fenced
-/// blocks and inline code pass through untouched.
+/// blocks and inline code pass through untouched. This is exactly the text
+/// `crisp detell` prints; `rewrite::detell` also says what it changed.
 pub fn typography(text: &str) -> String {
-    let cleaned = text::map_prose(text, |span| {
-        let mut s = span.to_string();
-        for rule in rules::DETELL_FIX.iter() {
-            s = match &rule.fix {
-                Fix::Sub(pat, repl) => pat.replace_all(&s, *repl).into_owned(),
-                Fix::Case(pat, plain) => pat
-                    .replace_all(&s, |c: &regex::Captures| rules::cased(plain, &c[0]))
-                    .into_owned(),
-                Fix::Scan(f) => f(&s),
-            };
-        }
-        s
-    });
-    cleaned.trim_end_matches([' ', '\t']).to_string()
+    rewrite::detell(text).text
 }
 
 // ── the editor's view ───────────────────────────────────────────────────────────

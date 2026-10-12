@@ -42,7 +42,9 @@ the binary what the skill calls.
 
 The Python scripts stay, demoted to test-only oracle, until the Rust binary has
 passed parity on every fixture for one full release. Then they go, and
-`fixtures/golden.json` is the only contract. Until then:
+`fixtures/golden.json` is the only contract. The lens in `src/insight.rs` that
+copies Python's `\w` and `\s` goes with them: from then on Rust's own Unicode
+classes are the contract, and `golden.json` is re-recorded once. Until then:
 
 - `tests/conformance.rs` runs the binary and the Python script on every
   fixture and every mode, and requires identical stdout, identical parsed
@@ -85,6 +87,38 @@ crisp checks style. It has never checked grammar or spelling. `harper-core`
 - crisp's own tell tables list `utilize` and `endeavor` but not `utilise` or
   `endeavour`, so British slop slips through. Both spellings go in, in the
   Python and the Rust, and `golden.py --update` records the change.
+
+### As built (round 2)
+
+- Findings are `Kind::Tell` (FLAG, never rewritten); a new kind would need an
+  arm in every exhaustive match on `Kind`, and a tell already means "flag it".
+- Harper's British dialect alone is not enough. It flags "color" but offers
+  three guesses, so there is no one-click fix, and it accepts Oxford "-ize"
+  everywhere, so "organize" passes. `grammar.rs` adds `grammar:BritishSpelling`:
+  a table of American endings whose rewrite gives a word Harper's dictionary
+  marks British. "-ize"/"-yze" apply to any word (crisp writes "-ise"); the
+  rest only to words Harper marks not-British, so "meter" (the device) stays.
+- Switched off (`OFF` in `grammar.rs`, reason on each): LongSentences, Dashes,
+  NumericRangeEnDash, UseEllipsisCharacter, EllipsisLength, Spaces,
+  NoFrenchSpaces, CommaFixes, QuoteSpacing, UseTitleCase.
+- A grammar finding on exactly the span of a detell or simplify finding is
+  dropped: "utilize" is a tell to cut, not a word to respell.
+- Weight: `harper-core` has no feature to drop its part-of-speech tagger, which
+  brings `burn`; the default build compiles about 250 crates. Dev builds
+  optimise dependencies (`[profile.dev.package."*"]`), because Harper builds its
+  lints on every run and unoptimised that takes 2.5 s.
+- Measured 12 Oct 2026 on Charlie's Mac, release profile (`lto`, `opt-level =
+  "s"`, stripped):
+
+  | | release binary |
+  |---|---|
+  | `--no-default-features` | 1,544,176 bytes (1.5 MB) |
+  | default (`grammar`) | 8,242,144 bytes (7.9 MB) |
+
+  `crisp grammar fixtures/bloated-insight.md` (160 words): 0.3 s wall warm,
+  0.8 s on the first, cold run. `crisp detell` on the same file: under 0.01 s.
+  A one-line input takes the same 0.3 s, so nearly all of it is start-up
+  (Harper's lint group and dictionary), not checking; 7,300 words take 1.9 s.
 
 ## Order
 
