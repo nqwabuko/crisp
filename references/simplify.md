@@ -1,6 +1,6 @@
 # Simplification: reference for the complexity pass
 
-`scripts/simplify.py` does the mechanical half (cuts stock clutter, flags the
+`crisp simplify` does the mechanical half (cuts stock clutter, flags the
 complexity tells, scores the text against a budget). This doc is the judgement
 half: how to actually make a complex draft simple without losing what it said.
 

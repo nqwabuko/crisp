@@ -6,7 +6,7 @@ description: >-
   tighten to the point (Ben Horowitz "good product manager" cadence, lead with
   the point, cut fluff). Always makes the text SHORTER: a measured length gate
   requires the rewrite to cut at least 40% of the words, and that is the floor,
-  not the target. Two deterministic scripts do the mechanical passes every run,
+  not the target. Three deterministic passes do the mechanical work every run,
   including a complexity budget (sentence length, Flesch, passive voice) and the
   length gate that the text must pass; the voice, cutting and simplification
   rewrite then runs twice, each time in a fresh subagent. Use when the user wants text de-slopped, de-AI'd, "made
@@ -23,14 +23,16 @@ description: >-
 
 # crisp
 
-Three-pass text cleaner. Two deterministic passes run every time:
+Three deterministic passes run every time, from one Rust binary:
 
-1. **de-tell** (`detell.py`) strips the typographic AI tells: em dashes, curly
+1. **de-tell** (`crisp detell`) strips the typographic AI tells: em dashes, curly
    quotes, invisible unicode.
-2. **simplify** (`simplify.py`) cuts Zinsser's clutter ("prior to" -> "before")
+2. **simplify** (`crisp simplify`) cuts Zinsser's clutter ("prior to" -> "before")
    and the pure padding ("it should be noted that", "end result"), flags the
    complexity tells (passive voice, buried verbs, filler words, abstraction), and
    **scores the text against a complexity budget and a length gate** it must pass.
+3. **grammar** (`crisp grammar`) flags grammar slips and American spellings, in
+   British English.
 
 Then the judgement pass: the agent cuts, tightens into a crisp, good-PM voice,
 makes the text plain, and acts on what the scripts only *flagged*.
@@ -42,7 +44,7 @@ a 60-word sentence) need judgement, so the agent does those, guided by the flags
 and the scorecard.
 
 **The budget is the point.** "Too complex" is otherwise an opinion you can argue
-with. `simplify.py --check` turns it into a test that exits 1, so the success
+with. `crisp simplify --check` turns it into a test that exits 1, so the success
 criterion is observable rather than a matter of taste.
 
 **Shorter is half the job.** Every budget metric is a ratio, so a draft can pass
@@ -60,10 +62,23 @@ pass has no reason to keep.
 ## Workflow
 
 **First, one branch.** If the text is an insight being filed to Shortcut, add
-`--insight` to every `simplify.py` call below. It adds a structure gate on top of
+`--insight` to every `crisp simplify` call below. It adds a structure gate on top of
 the prose budget: template sections present, no code references, no customer
 numbers. See "The `--insight` flag itself" for what it checks. Everything
 else in this workflow is identical.
+
+### 0. The binary
+
+Every step runs one binary, `~/.claude/skills/crisp/target/release/crisp`. If it
+is missing (a fresh clone, another machine), build it once:
+
+```bash
+~/.cargo/bin/cargo build --release --manifest-path ~/.claude/skills/crisp/Cargo.toml
+```
+
+`crisp detell` and `crisp simplify` take the same flags the old Python scripts
+did. The scripts still exist, but only as the test oracle (see "Measure-only
+mode").
 
 ### 1. Get the text
 Whatever the user wants cleaned. If they didn't paste it inline, it's usually:
@@ -76,7 +91,7 @@ Pipe the text through the script and capture both the cleaned text and the
 report:
 
 ```bash
-python3 ~/.claude/skills/crisp/scripts/detell.py --report < /tmp/crisp-in.txt > /tmp/crisp-clean.txt
+~/.claude/skills/crisp/target/release/crisp detell --report < /tmp/crisp-in.txt > /tmp/crisp-clean.txt
 ```
 
 - stdout = cleaned text (safe typographic fixes applied).
@@ -91,8 +106,8 @@ the script own that pass so it's identical every time.
 Chain the second script. It cuts clutter, flags complexity, and scores:
 
 ```bash
-python3 ~/.claude/skills/crisp/scripts/detell.py < /tmp/crisp-in.txt 2>/dev/null \
-  | python3 ~/.claude/skills/crisp/scripts/simplify.py --report --check \
+~/.claude/skills/crisp/target/release/crisp detell < /tmp/crisp-in.txt 2>/dev/null \
+  | ~/.claude/skills/crisp/target/release/crisp simplify --report --check \
       --baseline /tmp/crisp-in.txt \
   > /tmp/crisp-clean.txt
 ```
@@ -103,11 +118,23 @@ python3 ~/.claude/skills/crisp/scripts/detell.py < /tmp/crisp-in.txt 2>/dev/null
   rewrite is targeted rather than vague.
 - `--baseline` names the source, which is what makes the LENGTH line possible:
   `122 -> 70 words, cut 42.6%   target >= 40.0%`. Always pass it.
-- **Filing an insight?** Add `--insight` to that `simplify.py` call. The report
+- **Filing an insight?** Add `--insight` to that `crisp simplify` call. The report
   gains an `INSIGHT STRUCTURE` block and `--check` fails on a missing section
   or a leaked reference.
 - exit 1 with `--check` = over the complexity budget or under the length target.
   `--json` to parse it (the `compression` block carries the same numbers).
+
+### 2c. Grammar and British spelling (always run)
+
+```bash
+~/.claude/skills/crisp/target/release/crisp grammar --report /tmp/crisp-in.txt >/dev/null
+```
+
+Harper, in British English, run offline. It flags grammar slips ("a issue",
+"their is", doubled words) and American spellings ("organize" -> "organise").
+It only flags: it never changes the text and never fails a gate. The rewrite
+fixes what it raises. A word it doesn't know but is right (a product name, a
+term of art) goes in `dict/words.txt`.
 
 Read the OVER lines, the SHORT line and the offender lists before you rewrite.
 They tell you exactly which sentences are doing the damage. The percentage the
@@ -208,17 +235,18 @@ lists what not to simplify.
   Gmail paste with formatting, hand off to the **paste-ready** skill.
 
 ## Verify your own output
-Before delivering, run the final text back through **both** scripts. Success is
-0 fixes, 0 unjustified flags, and exit 0 on `--check`:
+Before delivering, run the final text back through all three passes. Success is
+0 fixes, 0 unjustified flags, 0 grammar flags, and exit 0 on `--check`:
 
 ```bash
-python3 ~/.claude/skills/crisp/scripts/detell.py --report /tmp/crisp-final.txt >/dev/null
-python3 ~/.claude/skills/crisp/scripts/simplify.py --report --check \
+~/.claude/skills/crisp/target/release/crisp detell --report /tmp/crisp-final.txt >/dev/null
+~/.claude/skills/crisp/target/release/crisp simplify --report --check \
   --baseline /tmp/crisp-in.txt /tmp/crisp-final.txt >/dev/null
 echo "budget exit: $?"
+~/.claude/skills/crisp/target/release/crisp grammar --report /tmp/crisp-final.txt >/dev/null
 
 # filing an insight: same command, plus the structure gate
-python3 ~/.claude/skills/crisp/scripts/simplify.py --report --check --insight \
+~/.claude/skills/crisp/target/release/crisp simplify --report --check --insight \
   --baseline /tmp/crisp-in.txt /tmp/crisp-final.txt >/dev/null
 echo "budget+structure exit: $?"
 ```
@@ -288,7 +316,7 @@ metrics cannot see a missing template section, a leaked file path, or a
 customer's charge point count. So an insight gets a second gate:
 
 ```bash
-python3 ~/.claude/skills/crisp/scripts/simplify.py --report --check --insight \
+~/.claude/skills/crisp/target/release/crisp simplify --report --check --insight \
     --baseline /tmp/crisp-in.txt /tmp/crisp-final.txt >/dev/null
 ```
 
@@ -338,8 +366,8 @@ skill is unaffected.
 **stdout**:
 
 ```bash
-python3 ~/.claude/skills/crisp/scripts/simplify.py --locate draft.md
-python3 ~/.claude/skills/crisp/scripts/detell.py   --locate draft.md
+~/.claude/skills/crisp/target/release/crisp simplify --locate draft.md
+~/.claude/skills/crisp/target/release/crisp detell --locate draft.md
 ```
 
 Each finding carries a range that maps onto the caller's buffer:
@@ -356,7 +384,7 @@ Each finding carries a range that maps onto the caller's buffer:
   `complexity` (carries `hint`, needs judgement), or `tell` (from detell).
 - A range can span lines, because these tells routinely straddle a hard wrap.
   Check `end_line`, don't assume it equals `line`.
-- `simplify.py --locate` also returns `metrics`, `scored` and `over_budget`, and
+- `crisp simplify --locate` also returns `metrics`, `scored` and `over_budget`, and
   honours `--check`, so a live scorecard is one call.
 - Add `--spans` for **positioned sentences and paragraphs**, each with its word
   count. `metrics` tells you the longest sentence is 65 words; this tells you
@@ -374,18 +402,24 @@ Each finding carries a range that maps onto the caller's buffer:
 - Positions are into the **unmodified** input, which is why this mode skips the
   FIX pass. In the normal pipeline the fixes are applied before flags are
   located, so those offsets would not match a buffer. Never mix the two.
-- `detell.py --locate` reports FLAG hits only. Its FIX rules are an ordered
+- `crisp detell --locate` reports FLAG hits only. Its FIX rules are an ordered
   pipeline where later rules tidy after earlier ones, so locating them on
   un-fixed text would mix real hits with artefacts. Typography is a whole-buffer
   rewrite: run the normal mode for it.
 
 Whenever you touch the rule tables, the budget, or the locating arithmetic, run
-both checks. They cover different failure modes:
+the checks from the repo root. They cover different failure modes:
 
 ```bash
-python3 ~/.claude/skills/crisp/scripts/verify-locate.py fixtures/*.md   # ranges are honest
-python3 ~/.claude/skills/crisp/scripts/golden.py                        # behaviour hasn't drifted
+~/.cargo/bin/cargo test                                # Rust == Python oracle, every mode, every fixture
+python3 scripts/verify-locate.py fixtures/*.md         # ranges are honest
+python3 scripts/golden.py                              # behaviour hasn't drifted
 ```
+
+The Python scripts are the **oracle**. `tests/conformance.rs` and
+`tests/insight.rs` run them beside the binary and require identical output, so
+a rule added to one engine and not the other fails the build. They retire once
+the binary has held parity for a release; `docs/rust.md` has the plan.
 
 `verify-locate.py` slices the buffer at every reported range and requires the
 slice to equal the reported text, then checks that nothing inside code was
@@ -408,8 +442,8 @@ edit changes another program's output.
 ## Notes
 - Fenced code blocks and inline `code` pass through both scripts untouched, and
   code is excluded from the complexity scores, so it's safe on mixed prose + code.
-- Both scripts are pure and offline. No network, no writes except the files you
-  redirect to.
+- Every pass is pure and offline, grammar included. No network, no writes
+  except the files you redirect to.
 - Hard-wrapped input is handled: phrases that straddle a newline are still
   matched, and wrapped lines are rejoined before scoring so sentence length is
   measured on real sentences.
@@ -419,11 +453,13 @@ edit changes another program's output.
 - The padding cuts do not know about quotation marks. If the draft quotes
   someone, check their words survived intact and put back anything the script
   trimmed inside the quotes.
-- To extend the tell list, add one line to `FIX_RULES` or `FLAG_RULES` in
-  `scripts/detell.py`. Same for clutter and complexity in `scripts/simplify.py`.
-  The rule tables are the program.
-- The length target lives in `COMPRESSION_TARGET` in `scripts/simplify.py`, one
-  number, next to the budget.
-- The complexity budget lives in one place: the `BUDGET` dict in
-  `scripts/simplify.py`. It's tuned for short business writing (filed insights,
+- To extend the tell list, add the line to `src/rules.rs` **and** to `FIX_RULES`
+  or `FLAG_RULES` in `scripts/detell.py` (clutter and complexity: `src/rules.rs`
+  and `scripts/simplify.py`), then rebuild. The conformance test fails if the
+  two disagree. Add both spellings, British and American. The rule tables are
+  the program.
+- The length target lives in `COMPRESSION_TARGET` (in `src/lib.rs` and
+  `scripts/simplify.py`), one number, next to the budget.
+- The complexity budget lives in `Budget::default` in `src/rules.rs`, mirrored by
+  the `BUDGET` dict in `scripts/simplify.py`. It's tuned for short business writing (filed insights,
   Slack, email, story descriptions). Tune it there, not per run.

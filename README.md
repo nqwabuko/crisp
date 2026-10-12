@@ -10,34 +10,41 @@ and fail it if fewer than a quarter of the words are gone.
 
 ## What it is
 
-Two small, pure, offline Python scripts and the rule tables that drive them.
-No dependencies, no network, no state.
+One pure, offline Rust binary, `crisp`, and the rule tables that drive it. No
+network, no state. Build it with `cargo build --release`.
 
 | | |
 |---|---|
-| `scripts/detell.py` | Strips typographic AI tells (em dashes, curly quotes, invisible unicode). Flags the meaning-changing ones rather than rewriting them. |
-| `scripts/simplify.py` | Cuts Zinsser's clutter ("prior to" to "before") and pure padding ("it should be noted that", "end result"), flags complexity (passive voice, buried verbs, filler, abstraction), and scores against a readability budget and a length gate. |
+| `crisp detell` | Strips typographic AI tells (em dashes, curly quotes, invisible unicode). Flags the meaning-changing ones rather than rewriting them. |
+| `crisp simplify` | Cuts Zinsser's clutter ("prior to" to "before") and pure padding ("it should be noted that", "end result"), flags complexity (passive voice, buried verbs, filler, abstraction), and scores against a readability budget and a length gate. |
+| `crisp grammar` | Flags grammar slips and American spellings, in British English, using [Harper](https://github.com/automattic/harper). Never rewrites. |
 
 The split that matters is **FIX vs FLAG**. A FIX has exactly one correct plain
 equivalent, so a script applies it. A FLAG changes meaning, so the script only
 locates it and says why; a human or an agent decides. The scripts never quietly
 reweight what you said.
 
+`scripts/detell.py` and `scripts/simplify.py` are the original Python. They are
+now the test oracle: the Rust must match them byte for byte. See `docs/rust.md`.
+
 ## Use
 
 ```bash
 # clean a draft and check it against the budget and the length gate
-python3 scripts/detell.py < draft.md 2>/dev/null \
-  | python3 scripts/simplify.py --report --check --baseline draft.md > clean.md
+target/release/crisp detell < draft.md 2>/dev/null \
+  | target/release/crisp simplify --report --check --baseline draft.md > clean.md
 
 # filing an insight: adds the structure gate on top of the budget
-python3 scripts/simplify.py --report --check --insight draft.md
+target/release/crisp simplify --report --check --insight draft.md
 
 # measure only, with ranges: for editors and other programs
-python3 scripts/simplify.py --locate draft.md
+target/release/crisp simplify --locate draft.md
 
 # add positioned sentences and paragraphs, for a live indicator
-python3 scripts/simplify.py --locate --spans draft.md
+target/release/crisp simplify --locate --spans draft.md
+
+# grammar and spelling, British English; text passes through, findings on stderr
+target/release/crisp grammar --report draft.md > /dev/null
 ```
 
 `--locate` returns every finding with a 1-based `line`/`col`/`end_line`/`end_col`
@@ -77,10 +84,11 @@ ln -s "$PWD" ~/.claude/skills/crisp
 
 ## Tests
 
-Two checks, covering different failure modes. Run both after touching a rule
-table, the budget, or the locating arithmetic.
+Three checks, covering different failure modes. Run all three after touching a
+rule table, the budget, or the locating arithmetic.
 
 ```bash
+cargo test                                         # Rust == Python, every mode, every fixture
 python3 scripts/golden.py                          # behaviour hasn't drifted
 python3 scripts/verify-locate.py fixtures/*.md     # ranges are honest
 ```

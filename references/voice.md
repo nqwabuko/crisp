@@ -1,7 +1,7 @@
 # The crisp voice: reference for the rewrite pass
 
 Two jobs, in order: (1) remove the machine fingerprints, (2) make it read like a
-good PM wrote it. `scripts/detell.py` does most of job 1 deterministically. This
+good PM wrote it. `crisp detell` does most of job 1 deterministically. This
 doc is job 2 plus the judgement calls the script deliberately leaves to you.
 
 ---
@@ -23,9 +23,9 @@ rest, because removing them changes meaning. Your job is to act on the flags.
 word or cut:
 delve, tapestry, realm, testament, beacon, landscape, nuanced, multifaceted,
 underscore, pivotal, intricate, myriad, plethora, elevate, holistic, synergy,
-seamless(ly), robust, leverage (use "use"), utilize (use "use"), meticulous,
+seamless(ly), robust, leverage (use "use"), utilise/utilize (use "use"), meticulous,
 vibrant, crucial/vital (usually just cut), harness, unlock, embark, foster,
-cultivate, endeavor, paramount.
+cultivate, endeavour/endeavor, paramount.
 
 **Sentence scaffolds to rewrite:**
 - "It's not just X, it's Y" / "It's not about X, it's about Y", the single most
@@ -141,6 +141,9 @@ output should already match them:
 - One clear ask per person; name the owner.
 - Internal vs external split: for anything customer-facing, strip internal refs,
   jargon, version numbers, and internal metrics; keep it qualitative.
+- **UK English.** Colour, organise, centre, travelling: `-ise`, not `-ize`.
+  `crisp grammar` flags American spellings; fix every one it raises. Leave
+  quoted text and product names as they are.
 
 If the source is a Slack post or email already in the writer's own voice, match
 that cadence over the generic "good PM" tone. The Horowitz rules are the default when there's no
