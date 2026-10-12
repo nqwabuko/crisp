@@ -1,0 +1,29 @@
+[package]
+name = "crisp"
+version = "0.1.0"
+description = "De-slop and simplify prose: crisp's rules as a library and a CLI"
+authors = ["Charlie O'Donoghue"]
+edition = "2024"
+license = "Apache-2.0"
+publish = false
+
+[lib]
+name = "crisp"
+path = "src/lib.rs"
+
+[[bin]]
+name = "crisp"
+path = "src/main.rs"
+
+[dependencies]
+regex = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
+strip = true
+# `panic = "abort"` is deliberately absent: ink will link this crate, and ink
+# catches an engine panic rather than lose the window and the unsaved buffer.
