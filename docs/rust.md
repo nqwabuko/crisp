@@ -58,9 +58,39 @@ passed parity on every fixture for one full release. Then they go, and
 ~/.cargo/bin/cargo fmt --check && ~/.cargo/bin/cargo clippy --all-targets -- -D warnings && ~/.cargo/bin/cargo test && python3 scripts/golden.py
 ```
 
+## Grammar (Harper, UK English)
+
+crisp checks style. It has never checked grammar or spelling. `harper-core`
+(Automattic, Apache-2.0, pure Rust, offline) does, and it has a British dialect.
+
+- `src/grammar.rs`, behind a cargo feature `grammar`, on by default. It's a
+  feature because ink measured every MB it ships, and a dictionary is several.
+- `Dialect::British`, always. American spellings ("color", "organize") are
+  findings with the British form as `fix`.
+- FLAG only, never FIX. Harper's suggestions travel as `fix` for an editor's
+  one-click, but no grammar finding is ever applied by the rewrite pipeline.
+  Same rule as the rest of crisp: a script only rewrites what has one right answer.
+- Rule names are `grammar:<lint>`. Lints that crisp already owns (long
+  sentences, dashes, ellipses, typography) are switched off, listed as data in
+  `grammar.rs` with the reason for each, so nothing is reported twice.
+- Never reports inside code, using the same invariant tests as the other modes.
+- Words Harper doesn't know but are right go in `dict/words.txt`, one per line,
+  compiled in.
+- `crisp grammar [--report|-r] [--json] [--locate] [FILE]`: passes the text
+  through on stdout unchanged, so it fits the existing pipe, and reports on
+  stderr (or JSON on stdout with `--locate`, same shape as the other modes).
+- Python has no grammar, so there's no oracle. Its own tests live in
+  `tests/grammar.rs` with fixtures under `tests/fixtures/grammar/` (outside
+  `fixtures/`, which is the Python golden corpus).
+- crisp's own tell tables list `utilize` and `endeavor` but not `utilise` or
+  `endeavour`, so British slop slips through. Both spellings go in, in the
+  Python and the Rust, and `golden.py --update` records the change.
+
 ## Order
 
 1. Lift the engine; `crisp detell --locate` and `crisp simplify --locate [--spans]` at parity.
 2. The rewrite pipelines (detell FIX, simplify FIX and padding), `--report`, `--json`, `--check`, `--baseline`, `--insight`, all at parity.
-3. SKILL.md and README call the binary; Python documented as the oracle.
+   Grammar (Harper, British) lands in the same round, behind its own subcommand.
+3. SKILL.md and README call the binary, grammar joins the deterministic pass,
+   and `references/voice.md` says UK English. Python documented as the oracle.
 4. Later, separately: ink depends on this crate and deletes `src-tauri/src/prose/`.
