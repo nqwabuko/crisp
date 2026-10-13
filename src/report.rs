@@ -7,9 +7,9 @@
 //! Python's: right-aligned counts, and numbers printed as Python prints an int
 //! or a float.
 
-use crate::rewrite::{self, Rewrite};
-use crate::rules::{Bound, Budget};
-use crate::{COMPRESSION_TARGET, LONG_SENTENCE, MIN_WORDS_TO_SCORE, Metrics};
+use super::rewrite::{self, Rewrite};
+use super::rules::{Bound, Budget};
+use super::{COMPRESSION_TARGET, LONG_SENTENCE, MIN_WORDS_TO_SCORE, Metrics};
 use serde_json::{Map, Value, json};
 
 /// The metrics crisp reports as ints. Every other metric is a `round(x, 1)`
@@ -75,7 +75,7 @@ impl Compression {
     /// Word counts as the metrics count them, so the gate and the scorecard can
     /// never disagree about how long a document is.
     pub fn between(source: &str, rewritten: &str) -> Self {
-        let words = |t: &str| crate::measure(t).get("words").unwrap_or(0.0) as usize;
+        let words = |t: &str| super::measure(t).get("words").unwrap_or(0.0) as usize;
         Compression {
             before: words(source),
             after: words(rewritten),
@@ -88,7 +88,7 @@ impl Compression {
             return 0.0;
         }
         let (b, a) = (self.before as f64, self.after as f64);
-        crate::round1(100.0 * (b - a) / b)
+        super::round1(100.0 * (b - a) / b)
     }
 
     /// Same guard as the scorecard: on a short note the percentage is noise.
@@ -189,7 +189,7 @@ pub struct Simplified {
 impl Simplified {
     pub fn new(text: &str, baseline: Option<&str>) -> Self {
         let rewrite = rewrite::simplify(text);
-        let metrics = crate::measure(&rewrite.text);
+        let metrics = super::measure(&rewrite.text);
         let compression = baseline.map(|source| Compression::between(source, &rewrite.text));
         Simplified {
             rewrite,

@@ -9,8 +9,8 @@
 //! The tallies keep crisp's order, which the report shows: fixes in the order a
 //! rule first fired, flags sorted by count with ties left in table order.
 
-use crate::rules::{self, ClutterRule, ComplexityRule, Fix, FixRule, FlagRule, Guard};
-use crate::text;
+use super::rules::{self, ClutterRule, ComplexityRule, Fix, FixRule, FlagRule, Guard};
+use super::text;
 use regex::{Captures, Regex};
 use std::sync::LazyLock;
 

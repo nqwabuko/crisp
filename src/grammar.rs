@@ -8,7 +8,7 @@
 //! Python has no grammar, so there is no oracle. `tests/grammar.rs` holds this
 //! to its own fixtures under `tests/fixtures/grammar/`.
 
-use crate::{Hit, Kind, text};
+use super::{Hit, Kind, text};
 use harper_core::linting::{LintGroup, Suggestion};
 use harper_core::parsers::Markdown;
 use harper_core::spell::{Dictionary, FstDictionary, MergedDictionary, MutableDictionary};
@@ -235,9 +235,9 @@ pub fn grammar_locate(text: &str) -> Vec<Hit> {
             });
         }
     }
-    let crisp_at: Vec<(usize, usize)> = crate::detell_locate(text)
+    let crisp_at: Vec<(usize, usize)> = super::detell_locate(text)
         .into_iter()
-        .chain(crate::simplify_locate(text))
+        .chain(super::simplify_locate(text))
         .map(|h| (h.start, h.end))
         .collect();
     hits.retain(|h| !crisp_at.contains(&(h.start, h.end)));
