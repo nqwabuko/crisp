@@ -10,7 +10,9 @@ the binary what the skill calls.
 ## Why
 
 - One engine with two consumers (the skill, ink) beats two engines kept honest
-  by a test. ink later depends on this crate and deletes its copy.
+  by a test. crisp is upstream: rules are developed here, and ink carries an
+  unmodified copy of the library files, synced from a crisp commit (see "ink
+  follows upstream" below).
 - The contract has settled: `--locate` and `fixtures/golden.json` are already
   consumed by another program. A settled contract is the point at which a
   typed, compiled, dependency-light implementation pays for itself.
@@ -127,4 +129,25 @@ crisp checks style. It has never checked grammar or spelling. `harper-core`
    Grammar (Harper, British) lands in the same round, behind its own subcommand.
 3. SKILL.md and README call the binary, grammar joins the deterministic pass,
    and `references/voice.md` says UK English. Python documented as the oracle.
-4. Later, separately: ink depends on this crate and deletes `src-tauri/src/prose/`.
+4. ink follows upstream (13 Oct 2026). See below.
+
+## ink follows upstream
+
+Charlie's model is Fedora and RHEL: crisp is upstream, where rules are
+developed, and ink follows it like for like. ink does not depend on this crate,
+so a fresh clone of ink builds with nothing else present.
+
+- ink's `src-tauri/src/prose/upstream/` holds this repo's library files
+  (`lib.rs`, `rules.rs`, `text.rs`, `rewrite.rs`, `report.rs`, `insight.rs`),
+  byte for byte. `grammar.rs` stays out: it sits behind the `grammar` feature,
+  which ink never enables. `main.rs` is the binary and never goes.
+- Nothing inside that directory is edited in ink. An engine change ink needs
+  is made here first, then synced. ink's own code (`guarded`, the Tauri
+  commands, its budget) lives beside the copy in `prose/mod.rs`.
+- `ink/scripts/sync-crisp.sh REF` copies the files and `golden.json` from a
+  crisp commit and records its hash in `prose/upstream/UPSTREAM`. One sync is
+  one ink commit naming the crisp commit.
+- ink's `tests/upstream.rs` checks the copy is byte-identical to crisp at that
+  hash, and notes (without failing) when crisp has moved on.
+- For the copy to compile inside ink, library files use `super::`, never
+  `crate::` (`tests/vendorable.rs`), and ink builds on edition 2024 like crisp.

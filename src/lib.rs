@@ -2,9 +2,12 @@
 //! functions over `&str`. No IO lives here; the binary is the shell around it.
 //!
 //! Lifted from ink's `src-tauri/src/prose/`, where it was first ported from
-//! crisp's `detell.py` and `simplify.py` and proven against them. ink will depend
-//! on this crate and delete its copy, which is why `Unit::Utf16` and `review`
-//! stay: they are ink's view of the same findings.
+//! crisp's `detell.py` and `simplify.py` and proven against them. ink now carries
+//! these library files as an unmodified copy, synced from a crisp commit (crisp
+//! is upstream, ink follows it like for like), which is why `Unit::Utf16` and
+//! `review` stay: they are ink's view of the same findings. Library files reach
+//! each other with `super::`, never `crate::`, because inside ink the crate root
+//! is ink; `tests/vendorable.rs` holds that.
 //!
 //! **The Python scripts stay the oracle** until the binary has held parity for a
 //! full release (see `docs/rust.md`). `tests/golden.rs` holds the engine against
