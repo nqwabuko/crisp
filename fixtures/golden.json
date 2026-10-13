@@ -1,60 +1,60 @@
 {
   "__config__": {
     "budget": {
-      "mean_sentence_words": [
+      "flesch_kincaid_grade": [
         "max",
-        18.0
-      ],
-      "max_sentence_words": [
-        "max",
-        30
-      ],
-      "pct_long_sentences": [
-        "max",
-        15.0
+        12.0
       ],
       "flesch_reading_ease": [
         "min",
         50.0
       ],
-      "flesch_kincaid_grade": [
+      "max_paragraph_words": [
         "max",
-        12.0
+        90
       ],
-      "pct_passive_sentences": [
+      "max_sentence_words": [
         "max",
-        10.0
+        30
+      ],
+      "mean_sentence_words": [
+        "max",
+        18.0
+      ],
+      "pct_long_sentences": [
+        "max",
+        15.0
       ],
       "pct_long_words": [
         "max",
         20.0
       ],
-      "max_paragraph_words": [
-        "max",
-        90
-      ],
       "pct_ly_adverbs": [
         "max",
         4.0
+      ],
+      "pct_passive_sentences": [
+        "max",
+        10.0
       ]
     },
-    "long_sentence": 25,
-    "long_word_syllables": 3,
-    "min_words_to_score": 30,
     "compression_target": 40.0,
     "insight": {
+      "code_ref_rules": [
+        "source file path",
+        "class/static reference",
+        "object property access"
+      ],
       "sections": [
         "Context",
         "Insight Description",
         "Significance",
         "Customer Details"
-      ],
-      "code_ref_rules": [
-        "source file path",
-        "class/static reference",
-        "object property access"
       ]
     },
+    "long_sentence": 25,
+    "long_word_syllables": 3,
+    "min_words_to_score": 30,
     "rules": {
       "detell_fix": [
         "crlf",
@@ -176,50 +176,36 @@
   },
   "ai-tells.md": {
     "detell": {
+      "cleaned": "Certainly! Let's delve into the tapestry of results, it is a testament to\nthe robust landscape. In today's fast-paced world we must leverage synergy.\n\nIt's worth noting that the 3-5 day window is crucial. Feel free to reach out.\n\nOverall, this is a game-changer... I hope this helps.\n",
       "fixes": {
         "curly_single": 1,
         "ellipsis": 1,
-        "endash_range": 1,
-        "em_dash": 1
+        "em_dash": 1,
+        "endash_range": 1
       },
       "flags": {
-        "word:vocabulary": 8,
+        "chat:feel-free": 1,
+        "chat:hope-helps": 1,
+        "chat:preamble": 1,
+        "hedge:filler": 1,
+        "phrase:closer": 1,
         "phrase:dive-in": 1,
+        "phrase:game-changer": 1,
         "phrase:todays-world": 1,
         "phrase:worth-noting": 1,
-        "phrase:closer": 1,
-        "phrase:game-changer": 1,
-        "chat:preamble": 1,
-        "chat:hope-helps": 1,
-        "chat:feel-free": 1,
-        "hedge:filler": 1
-      },
-      "cleaned": "Certainly! Let's delve into the tapestry of results, it is a testament to\nthe robust landscape. In today's fast-paced world we must leverage synergy.\n\nIt's worth noting that the 3-5 day window is crucial. Feel free to reach out.\n\nOverall, this is a game-changer... I hope this helps.\n"
+        "word:vocabulary": 8
+      }
     },
-    "simplify": {
-      "fixes": {
-        "padding:note": 1
+    "insight": [
+      {
+        "check": "sections",
+        "detail": "missing template section(s): Context, Insight Description, Significance, Customer Details"
       },
-      "flags": {
-        "padding": 1
-      },
-      "metrics": {
-        "words": 43,
-        "sentences": 7,
-        "paragraphs": 3,
-        "mean_sentence_words": 6.1,
-        "max_sentence_words": 15,
-        "pct_long_sentences": 0.0,
-        "flesch_reading_ease": 70.7,
-        "flesch_kincaid_grade": 4.9,
-        "pct_passive_sentences": 0.0,
-        "pct_long_words": 16.3,
-        "max_paragraph_words": 24,
-        "pct_ly_adverbs": 2.3
-      },
-      "scored": true,
-      "over_budget": []
-    },
+      {
+        "check": "significance",
+        "detail": "found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line"
+      }
+    ],
     "locate": {
       "detell": [
         [
@@ -379,6 +365,110 @@
         ]
       ]
     },
+    "simplify": {
+      "fixes": {
+        "padding:note": 1
+      },
+      "flags": {
+        "padding": 1
+      },
+      "metrics": {
+        "flesch_kincaid_grade": 4.9,
+        "flesch_reading_ease": 70.7,
+        "max_paragraph_words": 24,
+        "max_sentence_words": 15,
+        "mean_sentence_words": 6.1,
+        "paragraphs": 3,
+        "pct_long_sentences": 0.0,
+        "pct_long_words": 16.3,
+        "pct_ly_adverbs": 2.3,
+        "pct_passive_sentences": 0.0,
+        "sentences": 7,
+        "words": 43
+      },
+      "over_budget": [],
+      "scored": true
+    },
+    "spans": {
+      "paragraphs": [
+        {
+          "col": 1,
+          "end_col": 76,
+          "end_line": 2,
+          "line": 1,
+          "words": 24
+        },
+        {
+          "col": 1,
+          "end_col": 78,
+          "end_line": 4,
+          "line": 4,
+          "words": 14
+        },
+        {
+          "col": 1,
+          "end_col": 52,
+          "end_line": 6,
+          "line": 6,
+          "words": 9
+        }
+      ],
+      "sentences": [
+        {
+          "col": 1,
+          "end_col": 11,
+          "end_line": 1,
+          "line": 1,
+          "words": 1
+        },
+        {
+          "col": 12,
+          "end_col": 22,
+          "end_line": 2,
+          "line": 1,
+          "words": 15
+        },
+        {
+          "col": 23,
+          "end_col": 76,
+          "end_line": 2,
+          "line": 2,
+          "words": 8
+        },
+        {
+          "col": 1,
+          "end_col": 54,
+          "end_line": 4,
+          "line": 4,
+          "words": 9
+        },
+        {
+          "col": 55,
+          "end_col": 78,
+          "end_line": 4,
+          "line": 4,
+          "words": 5
+        },
+        {
+          "col": 1,
+          "end_col": 52,
+          "end_line": 6,
+          "line": 6,
+          "words": 9
+        }
+      ]
+    },
+    "spans_consistent": true
+  },
+  "bloated-insight.md": {
+    "detell": {
+      "cleaned": "# Insight: DLM capability gaps\n\nPrior to the commencement of the migration, it was determined that there are a\nnumber of limitations in relation to the current implementation of the dynamic\nload management functionality, which, due to the fact that capacity groups are\nmodelled as circuits in the legacy platform, necessitates additional\nconfigurability in terms of how meter values are utilised for the purposes of\nload balancing across the estate.\n\nIn the event that the aforementioned meter values are not received on a regular\nbasis, the allocation of available current is calculated by the platform using a\nfallback which was implemented for the purpose of protecting the site, and it\nshould be noted that this behaviour is not currently surfaced to the operator in\na manner which facilitates rapid diagnosis.\n\nIt may be the case that the prioritisation of visibility improvements would\ndeliver a more holistic outcome. There is a possibility that alignment with the\nsmart charging workstream is required.\n",
+      "fixes": {},
+      "flags": {
+        "hedge:the-fact": 1,
+        "word:vocabulary": 2
+      }
+    },
     "insight": [
       {
         "check": "sections",
@@ -389,131 +479,6 @@
         "detail": "found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line"
       }
     ],
-    "spans": {
-      "sentences": [
-        {
-          "words": 1,
-          "line": 1,
-          "col": 1,
-          "end_line": 1,
-          "end_col": 11
-        },
-        {
-          "words": 15,
-          "line": 1,
-          "col": 12,
-          "end_line": 2,
-          "end_col": 22
-        },
-        {
-          "words": 8,
-          "line": 2,
-          "col": 23,
-          "end_line": 2,
-          "end_col": 76
-        },
-        {
-          "words": 9,
-          "line": 4,
-          "col": 1,
-          "end_line": 4,
-          "end_col": 54
-        },
-        {
-          "words": 5,
-          "line": 4,
-          "col": 55,
-          "end_line": 4,
-          "end_col": 78
-        },
-        {
-          "words": 9,
-          "line": 6,
-          "col": 1,
-          "end_line": 6,
-          "end_col": 52
-        }
-      ],
-      "paragraphs": [
-        {
-          "words": 24,
-          "line": 1,
-          "col": 1,
-          "end_line": 2,
-          "end_col": 76
-        },
-        {
-          "words": 14,
-          "line": 4,
-          "col": 1,
-          "end_line": 4,
-          "end_col": 78
-        },
-        {
-          "words": 9,
-          "line": 6,
-          "col": 1,
-          "end_line": 6,
-          "end_col": 52
-        }
-      ]
-    },
-    "spans_consistent": true
-  },
-  "bloated-insight.md": {
-    "detell": {
-      "fixes": {},
-      "flags": {
-        "word:vocabulary": 2,
-        "hedge:the-fact": 1
-      },
-      "cleaned": "# Insight: DLM capability gaps\n\nPrior to the commencement of the migration, it was determined that there are a\nnumber of limitations in relation to the current implementation of the dynamic\nload management functionality, which, due to the fact that capacity groups are\nmodelled as circuits in the legacy platform, necessitates additional\nconfigurability in terms of how meter values are utilised for the purposes of\nload balancing across the estate.\n\nIn the event that the aforementioned meter values are not received on a regular\nbasis, the allocation of available current is calculated by the platform using a\nfallback which was implemented for the purpose of protecting the site, and it\nshould be noted that this behaviour is not currently surfaced to the operator in\na manner which facilitates rapid diagnosis.\n\nIt may be the case that the prioritisation of visibility improvements would\ndeliver a more holistic outcome. There is a possibility that alignment with the\nsmart charging workstream is required.\n"
-    },
-    "simplify": {
-      "fixes": {
-        "clutter:because": 1,
-        "clutter:if": 1,
-        "clutter:before": 1,
-        "clutter:regularly": 1,
-        "padding:note": 1
-      },
-      "flags": {
-        "passive": 6,
-        "abstraction": 6,
-        "nominalisation": 3,
-        "there-is": 2,
-        "in-terms-of": 2,
-        "for-the-purpose": 2,
-        "long-word": 2,
-        "hedge-stack": 2,
-        "it-is-that": 1,
-        "vague-quantity": 1
-      },
-      "metrics": {
-        "words": 143,
-        "sentences": 5,
-        "paragraphs": 4,
-        "mean_sentence_words": 28.6,
-        "max_sentence_words": 60,
-        "pct_long_sentences": 40.0,
-        "flesch_reading_ease": 15.7,
-        "flesch_kincaid_grade": 18.2,
-        "pct_passive_sentences": 60.0,
-        "pct_long_words": 25.2,
-        "max_paragraph_words": 60,
-        "pct_ly_adverbs": 1.4
-      },
-      "scored": true,
-      "over_budget": [
-        "mean_sentence_words",
-        "max_sentence_words",
-        "pct_long_sentences",
-        "flesch_reading_ease",
-        "flesch_kincaid_grade",
-        "pct_passive_sentences",
-        "pct_long_words"
-      ]
-    },
     "locate": {
       "detell": [
         [
@@ -853,6 +818,130 @@
         ]
       ]
     },
+    "simplify": {
+      "fixes": {
+        "clutter:because": 1,
+        "clutter:before": 1,
+        "clutter:if": 1,
+        "clutter:regularly": 1,
+        "padding:note": 1
+      },
+      "flags": {
+        "abstraction": 6,
+        "for-the-purpose": 2,
+        "hedge-stack": 2,
+        "in-terms-of": 2,
+        "it-is-that": 1,
+        "long-word": 2,
+        "nominalisation": 3,
+        "passive": 6,
+        "there-is": 2,
+        "vague-quantity": 1
+      },
+      "metrics": {
+        "flesch_kincaid_grade": 18.2,
+        "flesch_reading_ease": 15.7,
+        "max_paragraph_words": 60,
+        "max_sentence_words": 60,
+        "mean_sentence_words": 28.6,
+        "paragraphs": 4,
+        "pct_long_sentences": 40.0,
+        "pct_long_words": 25.2,
+        "pct_ly_adverbs": 1.4,
+        "pct_passive_sentences": 60.0,
+        "sentences": 5,
+        "words": 143
+      },
+      "over_budget": [
+        "mean_sentence_words",
+        "max_sentence_words",
+        "pct_long_sentences",
+        "flesch_reading_ease",
+        "flesch_kincaid_grade",
+        "pct_passive_sentences",
+        "pct_long_words"
+      ],
+      "scored": true
+    },
+    "spans": {
+      "paragraphs": [
+        {
+          "col": 1,
+          "end_col": 31,
+          "end_line": 1,
+          "line": 1,
+          "words": 4
+        },
+        {
+          "col": 1,
+          "end_col": 34,
+          "end_line": 8,
+          "line": 3,
+          "words": 65
+        },
+        {
+          "col": 1,
+          "end_col": 44,
+          "end_line": 14,
+          "line": 10,
+          "words": 60
+        },
+        {
+          "col": 1,
+          "end_col": 39,
+          "end_line": 18,
+          "line": 16,
+          "words": 30
+        }
+      ],
+      "sentences": [
+        {
+          "col": 1,
+          "end_col": 31,
+          "end_line": 1,
+          "line": 1,
+          "words": 4
+        },
+        {
+          "col": 1,
+          "end_col": 34,
+          "end_line": 8,
+          "line": 3,
+          "words": 65
+        },
+        {
+          "col": 1,
+          "end_col": 44,
+          "end_line": 14,
+          "line": 10,
+          "words": 60
+        },
+        {
+          "col": 1,
+          "end_col": 33,
+          "end_line": 17,
+          "line": 16,
+          "words": 17
+        },
+        {
+          "col": 34,
+          "end_col": 39,
+          "end_line": 18,
+          "line": 17,
+          "words": 13
+        }
+      ]
+    },
+    "spans_consistent": true
+  },
+  "code-mixed.md": {
+    "detell": {
+      "cleaned": "The endpoint returns the current limit. Use `leverage the utilize flag` sparingly.\n\n```python\n# The implementation of the delve tapestry was utilized prior to launch.\ndef facilitate(x):\n    return x\n```\n\nPrior to the review we should ascertain whether the fallback is robust.\n",
+      "fixes": {},
+      "flags": {
+        "word:vocabulary": 1
+      }
+    },
     "insight": [
       {
         "check": "sections",
@@ -863,99 +952,6 @@
         "detail": "found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line"
       }
     ],
-    "spans": {
-      "sentences": [
-        {
-          "words": 4,
-          "line": 1,
-          "col": 1,
-          "end_line": 1,
-          "end_col": 31
-        },
-        {
-          "words": 65,
-          "line": 3,
-          "col": 1,
-          "end_line": 8,
-          "end_col": 34
-        },
-        {
-          "words": 60,
-          "line": 10,
-          "col": 1,
-          "end_line": 14,
-          "end_col": 44
-        },
-        {
-          "words": 17,
-          "line": 16,
-          "col": 1,
-          "end_line": 17,
-          "end_col": 33
-        },
-        {
-          "words": 13,
-          "line": 17,
-          "col": 34,
-          "end_line": 18,
-          "end_col": 39
-        }
-      ],
-      "paragraphs": [
-        {
-          "words": 4,
-          "line": 1,
-          "col": 1,
-          "end_line": 1,
-          "end_col": 31
-        },
-        {
-          "words": 65,
-          "line": 3,
-          "col": 1,
-          "end_line": 8,
-          "end_col": 34
-        },
-        {
-          "words": 60,
-          "line": 10,
-          "col": 1,
-          "end_line": 14,
-          "end_col": 44
-        },
-        {
-          "words": 30,
-          "line": 16,
-          "col": 1,
-          "end_line": 18,
-          "end_col": 39
-        }
-      ]
-    },
-    "spans_consistent": true
-  },
-  "code-mixed.md": {
-    "detell": {
-      "fixes": {},
-      "flags": {
-        "word:vocabulary": 1
-      },
-      "cleaned": "The endpoint returns the current limit. Use `leverage the utilize flag` sparingly.\n\n```python\n# The implementation of the delve tapestry was utilized prior to launch.\ndef facilitate(x):\n    return x\n```\n\nPrior to the review we should ascertain whether the fallback is robust.\n"
-    },
-    "simplify": {
-      "fixes": {
-        "clutter:before": 1
-      },
-      "flags": {
-        "long-word": 1
-      },
-      "metrics": {
-        "words": 19,
-        "sentences": 3
-      },
-      "scored": false,
-      "over_budget": []
-    },
     "locate": {
       "detell": [
         [
@@ -989,6 +985,72 @@
         ]
       ]
     },
+    "simplify": {
+      "fixes": {
+        "clutter:before": 1
+      },
+      "flags": {
+        "long-word": 1
+      },
+      "metrics": {
+        "sentences": 3,
+        "words": 19
+      },
+      "over_budget": [],
+      "scored": false
+    },
+    "spans": {
+      "paragraphs": [
+        {
+          "col": 1,
+          "end_col": 83,
+          "end_line": 1,
+          "line": 1,
+          "words": 8
+        },
+        {
+          "col": 1,
+          "end_col": 72,
+          "end_line": 9,
+          "line": 9,
+          "words": 12
+        }
+      ],
+      "sentences": [
+        {
+          "col": 1,
+          "end_col": 40,
+          "end_line": 1,
+          "line": 1,
+          "words": 6
+        },
+        {
+          "col": 41,
+          "end_col": 83,
+          "end_line": 1,
+          "line": 1,
+          "words": 2
+        },
+        {
+          "col": 1,
+          "end_col": 72,
+          "end_line": 9,
+          "line": 9,
+          "words": 12
+        }
+      ]
+    },
+    "spans_consistent": true
+  },
+  "hard-wrapped.md": {
+    "detell": {
+      "cleaned": "Honestly it is fine but it's not just a fix,\nit's a paradigm shift that we need.\n\nThe values are not received on a regular\nbasis, which happened during the\ncourse of the last quarter and was raised\nby multiple customers.\n",
+      "fixes": {},
+      "flags": {
+        "hedge:filler": 1,
+        "phrase:not-just": 1
+      }
+    },
     "insight": [
       {
         "check": "sections",
@@ -999,88 +1061,6 @@
         "detail": "found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line"
       }
     ],
-    "spans": {
-      "sentences": [
-        {
-          "words": 6,
-          "line": 1,
-          "col": 1,
-          "end_line": 1,
-          "end_col": 40
-        },
-        {
-          "words": 2,
-          "line": 1,
-          "col": 41,
-          "end_line": 1,
-          "end_col": 83
-        },
-        {
-          "words": 12,
-          "line": 9,
-          "col": 1,
-          "end_line": 9,
-          "end_col": 72
-        }
-      ],
-      "paragraphs": [
-        {
-          "words": 8,
-          "line": 1,
-          "col": 1,
-          "end_line": 1,
-          "end_col": 83
-        },
-        {
-          "words": 12,
-          "line": 9,
-          "col": 1,
-          "end_line": 9,
-          "end_col": 72
-        }
-      ]
-    },
-    "spans_consistent": true
-  },
-  "hard-wrapped.md": {
-    "detell": {
-      "fixes": {},
-      "flags": {
-        "phrase:not-just": 1,
-        "hedge:filler": 1
-      },
-      "cleaned": "Honestly it is fine but it's not just a fix,\nit's a paradigm shift that we need.\n\nThe values are not received on a regular\nbasis, which happened during the\ncourse of the last quarter and was raised\nby multiple customers.\n"
-    },
-    "simplify": {
-      "fixes": {
-        "clutter:during": 1,
-        "clutter:regularly": 1
-      },
-      "flags": {
-        "passive": 1,
-        "vague-quantity": 1,
-        "padding": 1
-      },
-      "metrics": {
-        "words": 35,
-        "sentences": 2,
-        "paragraphs": 2,
-        "mean_sentence_words": 17.5,
-        "max_sentence_words": 18,
-        "pct_long_sentences": 0.0,
-        "flesch_reading_ease": 65.8,
-        "flesch_kincaid_grade": 8.4,
-        "pct_passive_sentences": 50.0,
-        "pct_long_words": 14.3,
-        "max_paragraph_words": 18,
-        "pct_ly_adverbs": 5.7
-      },
-      "scored": true,
-      "over_budget": [
-        "pct_passive_sentences",
-        "pct_ly_adverbs"
-      ]
-    },
     "locate": {
       "detell": [
         [
@@ -1150,47 +1130,67 @@
         ]
       ]
     },
-    "insight": [
-      {
-        "check": "sections",
-        "detail": "missing template section(s): Context, Insight Description, Significance, Customer Details"
+    "simplify": {
+      "fixes": {
+        "clutter:during": 1,
+        "clutter:regularly": 1
       },
-      {
-        "check": "significance",
-        "detail": "found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line"
-      }
-    ],
-    "spans": {
-      "sentences": [
-        {
-          "words": 17,
-          "line": 1,
-          "col": 1,
-          "end_line": 2,
-          "end_col": 36
-        },
-        {
-          "words": 24,
-          "line": 4,
-          "col": 1,
-          "end_line": 7,
-          "end_col": 23
-        }
+      "flags": {
+        "padding": 1,
+        "passive": 1,
+        "vague-quantity": 1
+      },
+      "metrics": {
+        "flesch_kincaid_grade": 8.4,
+        "flesch_reading_ease": 65.8,
+        "max_paragraph_words": 18,
+        "max_sentence_words": 18,
+        "mean_sentence_words": 17.5,
+        "paragraphs": 2,
+        "pct_long_sentences": 0.0,
+        "pct_long_words": 14.3,
+        "pct_ly_adverbs": 5.7,
+        "pct_passive_sentences": 50.0,
+        "sentences": 2,
+        "words": 35
+      },
+      "over_budget": [
+        "pct_passive_sentences",
+        "pct_ly_adverbs"
       ],
+      "scored": true
+    },
+    "spans": {
       "paragraphs": [
         {
-          "words": 17,
-          "line": 1,
           "col": 1,
+          "end_col": 36,
           "end_line": 2,
-          "end_col": 36
+          "line": 1,
+          "words": 17
         },
         {
-          "words": 24,
-          "line": 4,
           "col": 1,
+          "end_col": 23,
           "end_line": 7,
-          "end_col": 23
+          "line": 4,
+          "words": 24
+        }
+      ],
+      "sentences": [
+        {
+          "col": 1,
+          "end_col": 36,
+          "end_line": 2,
+          "line": 1,
+          "words": 17
+        },
+        {
+          "col": 1,
+          "end_col": 23,
+          "end_line": 7,
+          "line": 4,
+          "words": 24
         }
       ]
     },
@@ -1198,35 +1198,9 @@
   },
   "insight-ask-buried.md": {
     "detell": {
+      "cleaned": "# INSIGHT\n\n**Context**\nDana at Halcyon asked for boot-time configuration refresh across 18,000 residential chargers. The platform cannot react to a charger event today without customer-hosted middleware sitting in between.\n\n**Insight Description**\nThe gap is that `TriggerKindEnum` in `core/modules-marketplace/app-manifest/src/Enums/TriggerKindEnum.php:7-12` has only four cases. Nine listeners hang off `ChargePointBootNotificationReceived`, registered in `core/app/Providers/EventServiceProvider.php:1090`. The write path exists via `ConnectorService::updatePowerOptions` and `$chargePoint->load_group_id`.\n\n**Significance**\nHigh\n\n**Customer Details**\nCustomer Name(s): Halcyon Energy\n",
       "fixes": {},
-      "flags": {},
-      "cleaned": "# INSIGHT\n\n**Context**\nDana at Halcyon asked for boot-time configuration refresh across 18,000 residential chargers. The platform cannot react to a charger event today without customer-hosted middleware sitting in between.\n\n**Insight Description**\nThe gap is that `TriggerKindEnum` in `core/modules-marketplace/app-manifest/src/Enums/TriggerKindEnum.php:7-12` has only four cases. Nine listeners hang off `ChargePointBootNotificationReceived`, registered in `core/app/Providers/EventServiceProvider.php:1090`. The write path exists via `ConnectorService::updatePowerOptions` and `$chargePoint->load_group_id`.\n\n**Significance**\nHigh\n\n**Customer Details**\nCustomer Name(s): Halcyon Energy\n"
-    },
-    "simplify": {
-      "fixes": {},
-      "flags": {},
-      "metrics": {
-        "words": 60,
-        "sentences": 8,
-        "paragraphs": 5,
-        "mean_sentence_words": 7.5,
-        "max_sentence_words": 15,
-        "pct_long_sentences": 0.0,
-        "flesch_reading_ease": 46.9,
-        "flesch_kincaid_grade": 8.6,
-        "pct_passive_sentences": 0.0,
-        "pct_long_words": 18.3,
-        "max_paragraph_words": 27,
-        "pct_ly_adverbs": 0.0
-      },
-      "scored": true,
-      "over_budget": [
-        "flesch_reading_ease"
-      ]
-    },
-    "locate": {
-      "detell": [],
-      "simplify": []
+      "flags": {}
     },
     "insight": [
       {
@@ -1246,100 +1220,126 @@
         "detail": "customer estate size: \"18,000 residential chargers\" — describe it qualitatively instead (\"a large estate\"); the number is the customer's to disclose"
       }
     ],
-    "spans": {
-      "sentences": [
-        {
-          "words": 1,
-          "line": 1,
-          "col": 1,
-          "end_line": 1,
-          "end_col": 10
-        },
-        {
-          "words": 12,
-          "line": 3,
-          "col": 3,
-          "end_line": 4,
-          "end_col": 94
-        },
-        {
-          "words": 15,
-          "line": 4,
-          "col": 95,
-          "end_line": 4,
-          "end_col": 200
-        },
-        {
-          "words": 11,
-          "line": 6,
-          "col": 3,
-          "end_line": 7,
-          "end_col": 133
-        },
-        {
-          "words": 6,
-          "line": 7,
-          "col": 134,
-          "end_line": 7,
-          "end_col": 262
-        },
-        {
-          "words": 6,
-          "line": 7,
-          "col": 263,
-          "end_line": 7,
-          "end_col": 362
-        },
-        {
-          "words": 2,
-          "line": 9,
-          "col": 3,
-          "end_line": 10,
-          "end_col": 5
-        },
-        {
-          "words": 7,
-          "line": 12,
-          "col": 3,
-          "end_line": 13,
-          "end_col": 33
-        }
+    "locate": {
+      "detell": [],
+      "simplify": []
+    },
+    "simplify": {
+      "fixes": {},
+      "flags": {},
+      "metrics": {
+        "flesch_kincaid_grade": 8.6,
+        "flesch_reading_ease": 46.9,
+        "max_paragraph_words": 27,
+        "max_sentence_words": 15,
+        "mean_sentence_words": 7.5,
+        "paragraphs": 5,
+        "pct_long_sentences": 0.0,
+        "pct_long_words": 18.3,
+        "pct_ly_adverbs": 0.0,
+        "pct_passive_sentences": 0.0,
+        "sentences": 8,
+        "words": 60
+      },
+      "over_budget": [
+        "flesch_reading_ease"
       ],
+      "scored": true
+    },
+    "spans": {
       "paragraphs": [
         {
-          "words": 1,
-          "line": 1,
           "col": 1,
+          "end_col": 10,
           "end_line": 1,
-          "end_col": 10
+          "line": 1,
+          "words": 1
         },
         {
-          "words": 27,
-          "line": 3,
           "col": 1,
+          "end_col": 200,
           "end_line": 4,
-          "end_col": 200
+          "line": 3,
+          "words": 27
         },
         {
-          "words": 23,
-          "line": 6,
           "col": 1,
+          "end_col": 362,
           "end_line": 7,
-          "end_col": 362
+          "line": 6,
+          "words": 23
         },
         {
-          "words": 2,
-          "line": 9,
           "col": 1,
+          "end_col": 5,
           "end_line": 10,
-          "end_col": 5
+          "line": 9,
+          "words": 2
         },
         {
-          "words": 7,
-          "line": 12,
           "col": 1,
+          "end_col": 33,
           "end_line": 13,
-          "end_col": 33
+          "line": 12,
+          "words": 7
+        }
+      ],
+      "sentences": [
+        {
+          "col": 1,
+          "end_col": 10,
+          "end_line": 1,
+          "line": 1,
+          "words": 1
+        },
+        {
+          "col": 3,
+          "end_col": 94,
+          "end_line": 4,
+          "line": 3,
+          "words": 12
+        },
+        {
+          "col": 95,
+          "end_col": 200,
+          "end_line": 4,
+          "line": 4,
+          "words": 15
+        },
+        {
+          "col": 3,
+          "end_col": 133,
+          "end_line": 7,
+          "line": 6,
+          "words": 11
+        },
+        {
+          "col": 134,
+          "end_col": 262,
+          "end_line": 7,
+          "line": 7,
+          "words": 6
+        },
+        {
+          "col": 263,
+          "end_col": 362,
+          "end_line": 7,
+          "line": 7,
+          "words": 6
+        },
+        {
+          "col": 3,
+          "end_col": 5,
+          "end_line": 10,
+          "line": 9,
+          "words": 2
+        },
+        {
+          "col": 3,
+          "end_col": 33,
+          "end_line": 13,
+          "line": 12,
+          "words": 7
         }
       ]
     },
@@ -1347,33 +1347,9 @@
   },
   "insight-ask-first.md": {
     "detell": {
+      "cleaned": "**The ask**\n\nA general workflow builder for the marketplace, like IFTTT: watch for a trigger, then do something. Halcyon is the first example. When a charger boots, send a DataTransfer, then use the response to update the charger and EVSE records.\n\n# INSIGHT\n\n**Context**\n\nDana Whitfield (Product Manager, Halcyon Energy) asked on 2026-09-09 that the platform read a charger's real configuration each time it boots, and keep our record in step. Halcyon's residential migration is around 18,000 units, and the drivers moving across want Dynamic Load Management and Power Sharing.\n\nThe charger, not the platform, is the source of truth. A driver can change the maximum current with a physical switch on the unit. When our record drifts, load management runs on the wrong numbers and breaks the one feature they migrated for.\n\n**Insight Description**\n\nThe platform can tell a customer that something happened on a charger, but cannot act on it. We already ask the charger for its configuration after boot, then send the result out as a webhook. Customers can write values back through the API, and we already run their code as marketplace apps. Nothing joins them up.\n\nSo Halcyon's only route is to keep a service running around the clock, catching that webhook and calling us back to write the result. That is the middleware they are paying us to take over.\n\nThis request keeps coming back. Brightline Fleet asked in 2025, and Cavendish Motors asked for event-driven throttling. Halcyon named two more of their own uses on the call: credit card handling, and Halcyon Ultra sending user details.\n\n**Significance**\n\nHigh\n\nHalcyon's residential migration is around 18,000 chargers and gates the second contract. Not Critical, because Halcyon can host the middleware themselves. But that asks them to keep running the system they are replacing.\n\n**Customer Details**\nCustomer Name(s): Halcyon Energy, Canada\nURL (tenant environment): https://halcyon.tenant.example.com/\n",
       "fixes": {},
-      "flags": {},
-      "cleaned": "**The ask**\n\nA general workflow builder for the marketplace, like IFTTT: watch for a trigger, then do something. Halcyon is the first example. When a charger boots, send a DataTransfer, then use the response to update the charger and EVSE records.\n\n# INSIGHT\n\n**Context**\n\nDana Whitfield (Product Manager, Halcyon Energy) asked on 2026-09-09 that the platform read a charger's real configuration each time it boots, and keep our record in step. Halcyon's residential migration is around 18,000 units, and the drivers moving across want Dynamic Load Management and Power Sharing.\n\nThe charger, not the platform, is the source of truth. A driver can change the maximum current with a physical switch on the unit. When our record drifts, load management runs on the wrong numbers and breaks the one feature they migrated for.\n\n**Insight Description**\n\nThe platform can tell a customer that something happened on a charger, but cannot act on it. We already ask the charger for its configuration after boot, then send the result out as a webhook. Customers can write values back through the API, and we already run their code as marketplace apps. Nothing joins them up.\n\nSo Halcyon's only route is to keep a service running around the clock, catching that webhook and calling us back to write the result. That is the middleware they are paying us to take over.\n\nThis request keeps coming back. Brightline Fleet asked in 2025, and Cavendish Motors asked for event-driven throttling. Halcyon named two more of their own uses on the call: credit card handling, and Halcyon Ultra sending user details.\n\n**Significance**\n\nHigh\n\nHalcyon's residential migration is around 18,000 chargers and gates the second contract. Not Critical, because Halcyon can host the middleware themselves. But that asks them to keep running the system they are replacing.\n\n**Customer Details**\nCustomer Name(s): Halcyon Energy, Canada\nURL (tenant environment): https://halcyon.tenant.example.com/\n"
-    },
-    "simplify": {
-      "fixes": {},
-      "flags": {},
-      "metrics": {
-        "words": 305,
-        "sentences": 27,
-        "paragraphs": 14,
-        "mean_sentence_words": 11.3,
-        "max_sentence_words": 26,
-        "pct_long_sentences": 3.7,
-        "flesch_reading_ease": 63.9,
-        "flesch_kincaid_grade": 7.2,
-        "pct_passive_sentences": 0.0,
-        "pct_long_words": 12.1,
-        "max_paragraph_words": 56,
-        "pct_ly_adverbs": 0.0
-      },
-      "scored": true,
-      "over_budget": []
-    },
-    "locate": {
-      "detell": [],
-      "simplify": []
+      "flags": {}
     },
     "insight": [
       {
@@ -1385,296 +1361,320 @@
         "detail": "customer estate size: \"18,000 chargers\" — describe it qualitatively instead (\"a large estate\"); the number is the customer's to disclose"
       }
     ],
+    "locate": {
+      "detell": [],
+      "simplify": []
+    },
+    "simplify": {
+      "fixes": {},
+      "flags": {},
+      "metrics": {
+        "flesch_kincaid_grade": 7.2,
+        "flesch_reading_ease": 63.9,
+        "max_paragraph_words": 56,
+        "max_sentence_words": 26,
+        "mean_sentence_words": 11.3,
+        "paragraphs": 14,
+        "pct_long_sentences": 3.7,
+        "pct_long_words": 12.1,
+        "pct_ly_adverbs": 0.0,
+        "pct_passive_sentences": 0.0,
+        "sentences": 27,
+        "words": 305
+      },
+      "over_budget": [],
+      "scored": true
+    },
     "spans": {
-      "sentences": [
-        {
-          "words": 2,
-          "line": 1,
-          "col": 3,
-          "end_line": 1,
-          "end_col": 10
-        },
-        {
-          "words": 16,
-          "line": 3,
-          "col": 1,
-          "end_line": 3,
-          "end_col": 100
-        },
-        {
-          "words": 5,
-          "line": 3,
-          "col": 101,
-          "end_line": 3,
-          "end_col": 130
-        },
-        {
-          "words": 18,
-          "line": 3,
-          "col": 131,
-          "end_line": 3,
-          "end_col": 235
-        },
-        {
-          "words": 1,
-          "line": 5,
-          "col": 1,
-          "end_line": 5,
-          "end_col": 10
-        },
-        {
-          "words": 1,
-          "line": 7,
-          "col": 3,
-          "end_line": 7,
-          "end_col": 10
-        },
-        {
-          "words": 26,
-          "line": 9,
-          "col": 1,
-          "end_line": 9,
-          "end_col": 172
-        },
-        {
-          "words": 18,
-          "line": 9,
-          "col": 173,
-          "end_line": 9,
-          "end_col": 306
-        },
-        {
-          "words": 10,
-          "line": 11,
-          "col": 1,
-          "end_line": 11,
-          "end_col": 55
-        },
-        {
-          "words": 14,
-          "line": 11,
-          "col": 56,
-          "end_line": 11,
-          "end_col": 131
-        },
-        {
-          "words": 19,
-          "line": 11,
-          "col": 132,
-          "end_line": 11,
-          "end_col": 243
-        },
-        {
-          "words": 2,
-          "line": 13,
-          "col": 3,
-          "end_line": 13,
-          "end_col": 22
-        },
-        {
-          "words": 17,
-          "line": 15,
-          "col": 1,
-          "end_line": 15,
-          "end_col": 93
-        },
-        {
-          "words": 18,
-          "line": 15,
-          "col": 94,
-          "end_line": 15,
-          "end_col": 193
-        },
-        {
-          "words": 17,
-          "line": 15,
-          "col": 194,
-          "end_line": 15,
-          "end_col": 293
-        },
-        {
-          "words": 4,
-          "line": 15,
-          "col": 294,
-          "end_line": 15,
-          "end_col": 316
-        },
-        {
-          "words": 24,
-          "line": 17,
-          "col": 1,
-          "end_line": 17,
-          "end_col": 134
-        },
-        {
-          "words": 11,
-          "line": 17,
-          "col": 135,
-          "end_line": 17,
-          "end_col": 190
-        },
-        {
-          "words": 5,
-          "line": 19,
-          "col": 1,
-          "end_line": 19,
-          "end_col": 32
-        },
-        {
-          "words": 11,
-          "line": 19,
-          "col": 33,
-          "end_line": 19,
-          "end_col": 120
-        },
-        {
-          "words": 20,
-          "line": 19,
-          "col": 121,
-          "end_line": 19,
-          "end_col": 236
-        },
-        {
-          "words": 1,
-          "line": 21,
-          "col": 3,
-          "end_line": 21,
-          "end_col": 15
-        },
-        {
-          "words": 1,
-          "line": 23,
-          "col": 1,
-          "end_line": 23,
-          "end_col": 5
-        },
-        {
-          "words": 11,
-          "line": 25,
-          "col": 1,
-          "end_line": 25,
-          "end_col": 89
-        },
-        {
-          "words": 9,
-          "line": 25,
-          "col": 90,
-          "end_line": 25,
-          "end_col": 155
-        },
-        {
-          "words": 12,
-          "line": 25,
-          "col": 156,
-          "end_line": 25,
-          "end_col": 221
-        },
-        {
-          "words": 12,
-          "line": 27,
-          "col": 3,
-          "end_line": 29,
-          "end_col": 62
-        }
-      ],
       "paragraphs": [
         {
-          "words": 2,
-          "line": 1,
           "col": 1,
+          "end_col": 12,
           "end_line": 1,
-          "end_col": 12
+          "line": 1,
+          "words": 2
         },
         {
-          "words": 39,
-          "line": 3,
           "col": 1,
+          "end_col": 235,
           "end_line": 3,
-          "end_col": 235
+          "line": 3,
+          "words": 39
         },
         {
-          "words": 1,
-          "line": 5,
           "col": 1,
+          "end_col": 10,
           "end_line": 5,
-          "end_col": 10
+          "line": 5,
+          "words": 1
         },
         {
-          "words": 1,
-          "line": 7,
           "col": 1,
+          "end_col": 12,
           "end_line": 7,
-          "end_col": 12
+          "line": 7,
+          "words": 1
         },
         {
-          "words": 44,
-          "line": 9,
           "col": 1,
+          "end_col": 306,
           "end_line": 9,
-          "end_col": 306
+          "line": 9,
+          "words": 44
         },
         {
-          "words": 43,
-          "line": 11,
           "col": 1,
+          "end_col": 243,
           "end_line": 11,
-          "end_col": 243
+          "line": 11,
+          "words": 43
         },
         {
-          "words": 2,
-          "line": 13,
           "col": 1,
+          "end_col": 24,
           "end_line": 13,
-          "end_col": 24
+          "line": 13,
+          "words": 2
         },
         {
-          "words": 56,
-          "line": 15,
           "col": 1,
+          "end_col": 316,
           "end_line": 15,
-          "end_col": 316
+          "line": 15,
+          "words": 56
         },
         {
-          "words": 35,
-          "line": 17,
           "col": 1,
+          "end_col": 190,
           "end_line": 17,
-          "end_col": 190
+          "line": 17,
+          "words": 35
         },
         {
-          "words": 36,
-          "line": 19,
           "col": 1,
+          "end_col": 236,
           "end_line": 19,
-          "end_col": 236
+          "line": 19,
+          "words": 36
         },
         {
-          "words": 1,
-          "line": 21,
           "col": 1,
+          "end_col": 17,
           "end_line": 21,
-          "end_col": 17
+          "line": 21,
+          "words": 1
         },
         {
-          "words": 1,
-          "line": 23,
           "col": 1,
+          "end_col": 5,
           "end_line": 23,
-          "end_col": 5
+          "line": 23,
+          "words": 1
         },
         {
-          "words": 32,
-          "line": 25,
           "col": 1,
+          "end_col": 221,
           "end_line": 25,
-          "end_col": 221
+          "line": 25,
+          "words": 32
         },
         {
-          "words": 12,
-          "line": 27,
           "col": 1,
+          "end_col": 62,
           "end_line": 29,
-          "end_col": 62
+          "line": 27,
+          "words": 12
+        }
+      ],
+      "sentences": [
+        {
+          "col": 3,
+          "end_col": 10,
+          "end_line": 1,
+          "line": 1,
+          "words": 2
+        },
+        {
+          "col": 1,
+          "end_col": 100,
+          "end_line": 3,
+          "line": 3,
+          "words": 16
+        },
+        {
+          "col": 101,
+          "end_col": 130,
+          "end_line": 3,
+          "line": 3,
+          "words": 5
+        },
+        {
+          "col": 131,
+          "end_col": 235,
+          "end_line": 3,
+          "line": 3,
+          "words": 18
+        },
+        {
+          "col": 1,
+          "end_col": 10,
+          "end_line": 5,
+          "line": 5,
+          "words": 1
+        },
+        {
+          "col": 3,
+          "end_col": 10,
+          "end_line": 7,
+          "line": 7,
+          "words": 1
+        },
+        {
+          "col": 1,
+          "end_col": 172,
+          "end_line": 9,
+          "line": 9,
+          "words": 26
+        },
+        {
+          "col": 173,
+          "end_col": 306,
+          "end_line": 9,
+          "line": 9,
+          "words": 18
+        },
+        {
+          "col": 1,
+          "end_col": 55,
+          "end_line": 11,
+          "line": 11,
+          "words": 10
+        },
+        {
+          "col": 56,
+          "end_col": 131,
+          "end_line": 11,
+          "line": 11,
+          "words": 14
+        },
+        {
+          "col": 132,
+          "end_col": 243,
+          "end_line": 11,
+          "line": 11,
+          "words": 19
+        },
+        {
+          "col": 3,
+          "end_col": 22,
+          "end_line": 13,
+          "line": 13,
+          "words": 2
+        },
+        {
+          "col": 1,
+          "end_col": 93,
+          "end_line": 15,
+          "line": 15,
+          "words": 17
+        },
+        {
+          "col": 94,
+          "end_col": 193,
+          "end_line": 15,
+          "line": 15,
+          "words": 18
+        },
+        {
+          "col": 194,
+          "end_col": 293,
+          "end_line": 15,
+          "line": 15,
+          "words": 17
+        },
+        {
+          "col": 294,
+          "end_col": 316,
+          "end_line": 15,
+          "line": 15,
+          "words": 4
+        },
+        {
+          "col": 1,
+          "end_col": 134,
+          "end_line": 17,
+          "line": 17,
+          "words": 24
+        },
+        {
+          "col": 135,
+          "end_col": 190,
+          "end_line": 17,
+          "line": 17,
+          "words": 11
+        },
+        {
+          "col": 1,
+          "end_col": 32,
+          "end_line": 19,
+          "line": 19,
+          "words": 5
+        },
+        {
+          "col": 33,
+          "end_col": 120,
+          "end_line": 19,
+          "line": 19,
+          "words": 11
+        },
+        {
+          "col": 121,
+          "end_col": 236,
+          "end_line": 19,
+          "line": 19,
+          "words": 20
+        },
+        {
+          "col": 3,
+          "end_col": 15,
+          "end_line": 21,
+          "line": 21,
+          "words": 1
+        },
+        {
+          "col": 1,
+          "end_col": 5,
+          "end_line": 23,
+          "line": 23,
+          "words": 1
+        },
+        {
+          "col": 1,
+          "end_col": 89,
+          "end_line": 25,
+          "line": 25,
+          "words": 11
+        },
+        {
+          "col": 90,
+          "end_col": 155,
+          "end_line": 25,
+          "line": 25,
+          "words": 9
+        },
+        {
+          "col": 156,
+          "end_col": 221,
+          "end_line": 25,
+          "line": 25,
+          "words": 12
+        },
+        {
+          "col": 3,
+          "end_col": 62,
+          "end_line": 29,
+          "line": 27,
+          "words": 12
         }
       ]
     },
@@ -1682,49 +1682,36 @@
   },
   "modern-slop.md": {
     "detell": {
+      "cleaned": "Here's a quick rundown of the pilot. In an era where drivers expect instant\ncharging, our streamlined onboarding plays a crucial role, and the curated\ntariff library showcases what a cutting-edge platform can do.\n\nThis is more than just a config change. That is where the new roaming layer\ncomes in: it empowers operators, boasts state-of-the-art failover, and the\nresults resonate across an ever-evolving market.\n\nWhether you're a CPO or an eMSP, it is important to remember that the\ntransformative gains are arguably somewhat overstated. Clearly this pitch\nresonates, and obviously the rollout will certainly land.\n\nNext we'll walk through the rollout. Key takeaway: I'd be happy to help. As an\nAI assistant I would call this profound, innovative work. Make no mistake, the\nunparalleled results speak for themselves. To wrap up, we spearhead the\nrevolutionary rebuild.\n",
       "fixes": {},
       "flags": {
-        "word:vocabulary": 16,
-        "hedge:filler": 6,
-        "phrase:worth-noting": 1,
-        "phrase:closer": 1,
-        "phrase:plays-role": 1,
-        "phrase:more-than": 1,
-        "phrase:in-a-world": 1,
-        "phrase:this-is-where": 1,
-        "phrase:whether-youre": 1,
-        "phrase:we-will": 1,
-        "phrase:takeaway": 1,
-        "phrase:no-denying": 1,
-        "chat:happy-to": 1,
         "chat:as-an-ai": 1,
-        "chat:heres-summary": 1
-      },
-      "cleaned": "Here's a quick rundown of the pilot. In an era where drivers expect instant\ncharging, our streamlined onboarding plays a crucial role, and the curated\ntariff library showcases what a cutting-edge platform can do.\n\nThis is more than just a config change. That is where the new roaming layer\ncomes in: it empowers operators, boasts state-of-the-art failover, and the\nresults resonate across an ever-evolving market.\n\nWhether you're a CPO or an eMSP, it is important to remember that the\ntransformative gains are arguably somewhat overstated. Clearly this pitch\nresonates, and obviously the rollout will certainly land.\n\nNext we'll walk through the rollout. Key takeaway: I'd be happy to help. As an\nAI assistant I would call this profound, innovative work. Make no mistake, the\nunparalleled results speak for themselves. To wrap up, we spearhead the\nrevolutionary rebuild.\n"
+        "chat:happy-to": 1,
+        "chat:heres-summary": 1,
+        "hedge:filler": 6,
+        "phrase:closer": 1,
+        "phrase:in-a-world": 1,
+        "phrase:more-than": 1,
+        "phrase:no-denying": 1,
+        "phrase:plays-role": 1,
+        "phrase:takeaway": 1,
+        "phrase:this-is-where": 1,
+        "phrase:we-will": 1,
+        "phrase:whether-youre": 1,
+        "phrase:worth-noting": 1,
+        "word:vocabulary": 16
+      }
     },
-    "simplify": {
-      "fixes": {},
-      "flags": {
-        "padding": 5,
-        "audience-briefing": 1
+    "insight": [
+      {
+        "check": "sections",
+        "detail": "missing template section(s): Context, Insight Description, Significance, Customer Details"
       },
-      "metrics": {
-        "words": 137,
-        "sentences": 11,
-        "paragraphs": 4,
-        "mean_sentence_words": 12.5,
-        "max_sentence_words": 27,
-        "pct_long_sentences": 9.1,
-        "flesch_reading_ease": 56.5,
-        "flesch_kincaid_grade": 8.5,
-        "pct_passive_sentences": 0.0,
-        "pct_long_words": 16.8,
-        "max_paragraph_words": 41,
-        "pct_ly_adverbs": 2.9
-      },
-      "scored": true,
-      "over_budget": []
-    },
+      {
+        "check": "significance",
+        "detail": "found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line"
+      }
+    ],
     "locate": {
       "detell": [
         [
@@ -2100,6 +2087,155 @@
         ]
       ]
     },
+    "simplify": {
+      "fixes": {},
+      "flags": {
+        "audience-briefing": 1,
+        "padding": 5
+      },
+      "metrics": {
+        "flesch_kincaid_grade": 8.5,
+        "flesch_reading_ease": 56.5,
+        "max_paragraph_words": 41,
+        "max_sentence_words": 27,
+        "mean_sentence_words": 12.5,
+        "paragraphs": 4,
+        "pct_long_sentences": 9.1,
+        "pct_long_words": 16.8,
+        "pct_ly_adverbs": 2.9,
+        "pct_passive_sentences": 0.0,
+        "sentences": 11,
+        "words": 137
+      },
+      "over_budget": [],
+      "scored": true
+    },
+    "spans": {
+      "paragraphs": [
+        {
+          "col": 1,
+          "end_col": 62,
+          "end_line": 3,
+          "line": 1,
+          "words": 34
+        },
+        {
+          "col": 1,
+          "end_col": 49,
+          "end_line": 7,
+          "line": 5,
+          "words": 31
+        },
+        {
+          "col": 1,
+          "end_col": 58,
+          "end_line": 11,
+          "line": 9,
+          "words": 31
+        },
+        {
+          "col": 1,
+          "end_col": 23,
+          "end_line": 16,
+          "line": 13,
+          "words": 41
+        }
+      ],
+      "sentences": [
+        {
+          "col": 1,
+          "end_col": 37,
+          "end_line": 1,
+          "line": 1,
+          "words": 7
+        },
+        {
+          "col": 38,
+          "end_col": 62,
+          "end_line": 3,
+          "line": 1,
+          "words": 27
+        },
+        {
+          "col": 1,
+          "end_col": 40,
+          "end_line": 5,
+          "line": 5,
+          "words": 8
+        },
+        {
+          "col": 41,
+          "end_col": 49,
+          "end_line": 7,
+          "line": 5,
+          "words": 23
+        },
+        {
+          "col": 1,
+          "end_col": 55,
+          "end_line": 10,
+          "line": 9,
+          "words": 20
+        },
+        {
+          "col": 56,
+          "end_col": 58,
+          "end_line": 11,
+          "line": 10,
+          "words": 11
+        },
+        {
+          "col": 1,
+          "end_col": 37,
+          "end_line": 13,
+          "line": 13,
+          "words": 6
+        },
+        {
+          "col": 38,
+          "end_col": 73,
+          "end_line": 13,
+          "line": 13,
+          "words": 7
+        },
+        {
+          "col": 74,
+          "end_col": 58,
+          "end_line": 14,
+          "line": 13,
+          "words": 11
+        },
+        {
+          "col": 59,
+          "end_col": 43,
+          "end_line": 15,
+          "line": 14,
+          "words": 9
+        },
+        {
+          "col": 44,
+          "end_col": 23,
+          "end_line": 16,
+          "line": 15,
+          "words": 8
+        }
+      ]
+    },
+    "spans_consistent": true
+  },
+  "padded.md": {
+    "detell": {
+      "cleaned": "# Padding and redundancy\n\nIt should be noted that the depot rollout was signed off prior to the\ndeadline. At the end of the day, the end result is that we can basically plan\nahead for phase two, which is absolutely essential.\n\nNeedless to say, the past history here is quite complex. It is worth noting that\nthe two teams collaborated together in close proximity to go-live, and the\nmigration script was really just a very simple change to `tariff_id`.\n\nThe customer said, \"needless to say, it broke\", and it did. As such, we reverted\nback and completely eliminated the retry loop:\n\n```python\n# padding words inside code must survive: it should be noted that basically\nresult = very_simple(x)\n```\n\nThat said, the added bonus is a brief summary in the console, so obviously the\noperator can see which limit actually applied.\n",
+      "fixes": {
+        "em_dash": 1
+      },
+      "flags": {
+        "hedge:filler": 7,
+        "phrase:end-of-day": 1,
+        "phrase:needless": 2,
+        "phrase:worth-noting": 1
+      }
+    },
     "insight": [
       {
         "check": "sections",
@@ -2110,173 +2246,6 @@
         "detail": "found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line"
       }
     ],
-    "spans": {
-      "sentences": [
-        {
-          "words": 7,
-          "line": 1,
-          "col": 1,
-          "end_line": 1,
-          "end_col": 37
-        },
-        {
-          "words": 27,
-          "line": 1,
-          "col": 38,
-          "end_line": 3,
-          "end_col": 62
-        },
-        {
-          "words": 8,
-          "line": 5,
-          "col": 1,
-          "end_line": 5,
-          "end_col": 40
-        },
-        {
-          "words": 23,
-          "line": 5,
-          "col": 41,
-          "end_line": 7,
-          "end_col": 49
-        },
-        {
-          "words": 20,
-          "line": 9,
-          "col": 1,
-          "end_line": 10,
-          "end_col": 55
-        },
-        {
-          "words": 11,
-          "line": 10,
-          "col": 56,
-          "end_line": 11,
-          "end_col": 58
-        },
-        {
-          "words": 6,
-          "line": 13,
-          "col": 1,
-          "end_line": 13,
-          "end_col": 37
-        },
-        {
-          "words": 7,
-          "line": 13,
-          "col": 38,
-          "end_line": 13,
-          "end_col": 73
-        },
-        {
-          "words": 11,
-          "line": 13,
-          "col": 74,
-          "end_line": 14,
-          "end_col": 58
-        },
-        {
-          "words": 9,
-          "line": 14,
-          "col": 59,
-          "end_line": 15,
-          "end_col": 43
-        },
-        {
-          "words": 8,
-          "line": 15,
-          "col": 44,
-          "end_line": 16,
-          "end_col": 23
-        }
-      ],
-      "paragraphs": [
-        {
-          "words": 34,
-          "line": 1,
-          "col": 1,
-          "end_line": 3,
-          "end_col": 62
-        },
-        {
-          "words": 31,
-          "line": 5,
-          "col": 1,
-          "end_line": 7,
-          "end_col": 49
-        },
-        {
-          "words": 31,
-          "line": 9,
-          "col": 1,
-          "end_line": 11,
-          "end_col": 58
-        },
-        {
-          "words": 41,
-          "line": 13,
-          "col": 1,
-          "end_line": 16,
-          "end_col": 23
-        }
-      ]
-    },
-    "spans_consistent": true
-  },
-  "padded.md": {
-    "detell": {
-      "fixes": {
-        "em_dash": 1
-      },
-      "flags": {
-        "hedge:filler": 7,
-        "phrase:needless": 2,
-        "phrase:worth-noting": 1,
-        "phrase:end-of-day": 1
-      },
-      "cleaned": "# Padding and redundancy\n\nIt should be noted that the depot rollout was signed off prior to the\ndeadline. At the end of the day, the end result is that we can basically plan\nahead for phase two, which is absolutely essential.\n\nNeedless to say, the past history here is quite complex. It is worth noting that\nthe two teams collaborated together in close proximity to go-live, and the\nmigration script was really just a very simple change to `tariff_id`.\n\nThe customer said, \"needless to say, it broke\", and it did. As such, we reverted\nback and completely eliminated the retry loop:\n\n```python\n# padding words inside code must survive: it should be noted that basically\nresult = very_simple(x)\n```\n\nThat said, the added bonus is a brief summary in the console, so obviously the\noperator can see which limit actually applied.\n"
-    },
-    "simplify": {
-      "fixes": {
-        "clutter:before": 1,
-        "clutter:result": 1,
-        "clutter:history": 1,
-        "clutter:plan": 1,
-        "clutter:together": 1,
-        "clutter:essential": 1,
-        "clutter:near": 1,
-        "padding:note": 2,
-        "padding:fact": 2,
-        "padding:ultimately": 1,
-        "clutter:revert": 1,
-        "clutter:eliminate": 1,
-        "clutter:bonus": 1,
-        "clutter:summary": 1
-      },
-      "flags": {
-        "padding": 9,
-        "passive": 1
-      },
-      "metrics": {
-        "words": 87,
-        "sentences": 8,
-        "paragraphs": 5,
-        "mean_sentence_words": 10.9,
-        "max_sentence_words": 20,
-        "pct_long_sentences": 0.0,
-        "flesch_reading_ease": 64.5,
-        "flesch_kincaid_grade": 7.0,
-        "pct_passive_sentences": 12.5,
-        "pct_long_words": 14.9,
-        "max_paragraph_words": 24,
-        "pct_ly_adverbs": 4.6
-      },
-      "scored": true,
-      "over_budget": [
-        "pct_passive_sentences",
-        "pct_ly_adverbs"
-      ]
-    },
     "locate": {
       "detell": [
         [
@@ -2652,110 +2621,141 @@
         ]
       ]
     },
-    "insight": [
-      {
-        "check": "sections",
-        "detail": "missing template section(s): Context, Insight Description, Significance, Customer Details"
+    "simplify": {
+      "fixes": {
+        "clutter:before": 1,
+        "clutter:bonus": 1,
+        "clutter:eliminate": 1,
+        "clutter:essential": 1,
+        "clutter:history": 1,
+        "clutter:near": 1,
+        "clutter:plan": 1,
+        "clutter:result": 1,
+        "clutter:revert": 1,
+        "clutter:summary": 1,
+        "clutter:together": 1,
+        "padding:fact": 2,
+        "padding:note": 2,
+        "padding:ultimately": 1
       },
-      {
-        "check": "significance",
-        "detail": "found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line"
-      }
-    ],
-    "spans": {
-      "sentences": [
-        {
-          "words": 3,
-          "line": 1,
-          "col": 1,
-          "end_line": 1,
-          "end_col": 25
-        },
-        {
-          "words": 15,
-          "line": 3,
-          "col": 1,
-          "end_line": 4,
-          "end_col": 10
-        },
-        {
-          "words": 23,
-          "line": 4,
-          "col": 11,
-          "end_line": 5,
-          "end_col": 52
-        },
-        {
-          "words": 10,
-          "line": 7,
-          "col": 1,
-          "end_line": 7,
-          "end_col": 57
-        },
-        {
-          "words": 27,
-          "line": 7,
-          "col": 58,
-          "end_line": 9,
-          "end_col": 70
-        },
-        {
-          "words": 11,
-          "line": 11,
-          "col": 1,
-          "end_line": 11,
-          "end_col": 61
-        },
-        {
-          "words": 11,
-          "line": 11,
-          "col": 62,
-          "end_line": 12,
-          "end_col": 47
-        },
-        {
-          "words": 22,
-          "line": 19,
-          "col": 1,
-          "end_line": 20,
-          "end_col": 47
-        }
+      "flags": {
+        "padding": 9,
+        "passive": 1
+      },
+      "metrics": {
+        "flesch_kincaid_grade": 7.0,
+        "flesch_reading_ease": 64.5,
+        "max_paragraph_words": 24,
+        "max_sentence_words": 20,
+        "mean_sentence_words": 10.9,
+        "paragraphs": 5,
+        "pct_long_sentences": 0.0,
+        "pct_long_words": 14.9,
+        "pct_ly_adverbs": 4.6,
+        "pct_passive_sentences": 12.5,
+        "sentences": 8,
+        "words": 87
+      },
+      "over_budget": [
+        "pct_passive_sentences",
+        "pct_ly_adverbs"
       ],
+      "scored": true
+    },
+    "spans": {
       "paragraphs": [
         {
-          "words": 3,
-          "line": 1,
           "col": 1,
+          "end_col": 25,
           "end_line": 1,
-          "end_col": 25
+          "line": 1,
+          "words": 3
         },
         {
-          "words": 38,
-          "line": 3,
           "col": 1,
+          "end_col": 52,
           "end_line": 5,
-          "end_col": 52
+          "line": 3,
+          "words": 38
         },
         {
-          "words": 37,
-          "line": 7,
           "col": 1,
+          "end_col": 70,
           "end_line": 9,
-          "end_col": 70
+          "line": 7,
+          "words": 37
         },
         {
-          "words": 22,
-          "line": 11,
           "col": 1,
+          "end_col": 47,
           "end_line": 12,
-          "end_col": 47
+          "line": 11,
+          "words": 22
         },
         {
-          "words": 22,
-          "line": 19,
           "col": 1,
+          "end_col": 47,
           "end_line": 20,
-          "end_col": 47
+          "line": 19,
+          "words": 22
+        }
+      ],
+      "sentences": [
+        {
+          "col": 1,
+          "end_col": 25,
+          "end_line": 1,
+          "line": 1,
+          "words": 3
+        },
+        {
+          "col": 1,
+          "end_col": 10,
+          "end_line": 4,
+          "line": 3,
+          "words": 15
+        },
+        {
+          "col": 11,
+          "end_col": 52,
+          "end_line": 5,
+          "line": 4,
+          "words": 23
+        },
+        {
+          "col": 1,
+          "end_col": 57,
+          "end_line": 7,
+          "line": 7,
+          "words": 10
+        },
+        {
+          "col": 58,
+          "end_col": 70,
+          "end_line": 9,
+          "line": 7,
+          "words": 27
+        },
+        {
+          "col": 1,
+          "end_col": 61,
+          "end_line": 11,
+          "line": 11,
+          "words": 11
+        },
+        {
+          "col": 62,
+          "end_col": 47,
+          "end_line": 12,
+          "line": 11,
+          "words": 11
+        },
+        {
+          "col": 1,
+          "end_col": 47,
+          "end_line": 20,
+          "line": 19,
+          "words": 22
         }
       ]
     },
@@ -2763,33 +2763,9 @@
   },
   "plain-rewrite.md": {
     "detell": {
+      "cleaned": "# Insight: operators can't see why DLM throttled a charger\n\nLegacy capacity groups map to circuits in our model. When a charger stops\nsending meter values, the platform falls back to a safe current limit to\nprotect the site. That's the right call. The problem is we never tell the\noperator we did it.\n\nSo the charger throttles, the driver complains, and the operator has no way to\nsee the cause. They end up reading comm logs to work out which capacity group\nwent into fallback. Four customers raised this last quarter.\n\nWe should surface fallback state on the capacity group itself. I'd sequence it\nwith the smart charging work rather than as a one-off.\n",
       "fixes": {},
-      "flags": {},
-      "cleaned": "# Insight: operators can't see why DLM throttled a charger\n\nLegacy capacity groups map to circuits in our model. When a charger stops\nsending meter values, the platform falls back to a safe current limit to\nprotect the site. That's the right call. The problem is we never tell the\noperator we did it.\n\nSo the charger throttles, the driver complains, and the operator has no way to\nsee the cause. They end up reading comm logs to work out which capacity group\nwent into fallback. Four customers raised this last quarter.\n\nWe should surface fallback state on the capacity group itself. I'd sequence it\nwith the smart charging work rather than as a one-off.\n"
-    },
-    "simplify": {
-      "fixes": {},
-      "flags": {},
-      "metrics": {
-        "words": 114,
-        "sentences": 10,
-        "paragraphs": 4,
-        "mean_sentence_words": 11.4,
-        "max_sentence_words": 20,
-        "pct_long_sentences": 0.0,
-        "flesch_reading_ease": 72.8,
-        "flesch_kincaid_grade": 5.9,
-        "pct_passive_sentences": 0.0,
-        "pct_long_words": 7.0,
-        "max_paragraph_words": 44,
-        "pct_ly_adverbs": 0.0
-      },
-      "scored": true,
-      "over_budget": []
-    },
-    "locate": {
-      "detell": [],
-      "simplify": []
+      "flags": {}
     },
     "insight": [
       {
@@ -2801,107 +2777,131 @@
         "detail": "found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line"
       }
     ],
+    "locate": {
+      "detell": [],
+      "simplify": []
+    },
+    "simplify": {
+      "fixes": {},
+      "flags": {},
+      "metrics": {
+        "flesch_kincaid_grade": 5.9,
+        "flesch_reading_ease": 72.8,
+        "max_paragraph_words": 44,
+        "max_sentence_words": 20,
+        "mean_sentence_words": 11.4,
+        "paragraphs": 4,
+        "pct_long_sentences": 0.0,
+        "pct_long_words": 7.0,
+        "pct_ly_adverbs": 0.0,
+        "pct_passive_sentences": 0.0,
+        "sentences": 10,
+        "words": 114
+      },
+      "over_budget": [],
+      "scored": true
+    },
     "spans": {
-      "sentences": [
-        {
-          "words": 9,
-          "line": 1,
-          "col": 1,
-          "end_line": 1,
-          "end_col": 59
-        },
-        {
-          "words": 9,
-          "line": 3,
-          "col": 1,
-          "end_line": 3,
-          "end_col": 53
-        },
-        {
-          "words": 20,
-          "line": 3,
-          "col": 54,
-          "end_line": 5,
-          "end_col": 18
-        },
-        {
-          "words": 4,
-          "line": 5,
-          "col": 19,
-          "end_line": 5,
-          "end_col": 41
-        },
-        {
-          "words": 11,
-          "line": 5,
-          "col": 42,
-          "end_line": 6,
-          "end_col": 20
-        },
-        {
-          "words": 17,
-          "line": 8,
-          "col": 1,
-          "end_line": 9,
-          "end_col": 15
-        },
-        {
-          "words": 15,
-          "line": 9,
-          "col": 16,
-          "end_line": 10,
-          "end_col": 20
-        },
-        {
-          "words": 6,
-          "line": 10,
-          "col": 21,
-          "end_line": 10,
-          "end_col": 61
-        },
-        {
-          "words": 10,
-          "line": 12,
-          "col": 1,
-          "end_line": 12,
-          "end_col": 63
-        },
-        {
-          "words": 13,
-          "line": 12,
-          "col": 64,
-          "end_line": 13,
-          "end_col": 55
-        }
-      ],
       "paragraphs": [
         {
-          "words": 9,
-          "line": 1,
           "col": 1,
+          "end_col": 59,
           "end_line": 1,
-          "end_col": 59
+          "line": 1,
+          "words": 9
         },
         {
-          "words": 44,
-          "line": 3,
           "col": 1,
+          "end_col": 20,
           "end_line": 6,
-          "end_col": 20
+          "line": 3,
+          "words": 44
         },
         {
-          "words": 38,
-          "line": 8,
           "col": 1,
+          "end_col": 61,
           "end_line": 10,
-          "end_col": 61
+          "line": 8,
+          "words": 38
         },
         {
-          "words": 23,
-          "line": 12,
           "col": 1,
+          "end_col": 55,
           "end_line": 13,
-          "end_col": 55
+          "line": 12,
+          "words": 23
+        }
+      ],
+      "sentences": [
+        {
+          "col": 1,
+          "end_col": 59,
+          "end_line": 1,
+          "line": 1,
+          "words": 9
+        },
+        {
+          "col": 1,
+          "end_col": 53,
+          "end_line": 3,
+          "line": 3,
+          "words": 9
+        },
+        {
+          "col": 54,
+          "end_col": 18,
+          "end_line": 5,
+          "line": 3,
+          "words": 20
+        },
+        {
+          "col": 19,
+          "end_col": 41,
+          "end_line": 5,
+          "line": 5,
+          "words": 4
+        },
+        {
+          "col": 42,
+          "end_col": 20,
+          "end_line": 6,
+          "line": 5,
+          "words": 11
+        },
+        {
+          "col": 1,
+          "end_col": 15,
+          "end_line": 9,
+          "line": 8,
+          "words": 17
+        },
+        {
+          "col": 16,
+          "end_col": 20,
+          "end_line": 10,
+          "line": 9,
+          "words": 15
+        },
+        {
+          "col": 21,
+          "end_col": 61,
+          "end_line": 10,
+          "line": 10,
+          "words": 6
+        },
+        {
+          "col": 1,
+          "end_col": 63,
+          "end_line": 12,
+          "line": 12,
+          "words": 10
+        },
+        {
+          "col": 64,
+          "end_col": 55,
+          "end_line": 13,
+          "line": 12,
+          "words": 13
         }
       ]
     },
@@ -2909,33 +2909,9 @@
   },
   "slack-post.md": {
     "detell": {
+      "cleaned": "Morning all. Quick update on the pilot site 🙏\n\n* Tariff pricing is live on the web app\n* The currency fix went out Tuesday\n* Payment terminals arrive Thursday, [tracking here](https://example.com/x)\n\n@Sam can you confirm the terminal IDs before Thursday? I'll pick up the pricing\nchecks myself.\n",
       "fixes": {},
-      "flags": {},
-      "cleaned": "Morning all. Quick update on the pilot site 🙏\n\n* Tariff pricing is live on the web app\n* The currency fix went out Tuesday\n* Payment terminals arrive Thursday, [tracking here](https://example.com/x)\n\n@Sam can you confirm the terminal IDs before Thursday? I'll pick up the pricing\nchecks myself.\n"
-    },
-    "simplify": {
-      "fixes": {},
-      "flags": {},
-      "metrics": {
-        "words": 44,
-        "sentences": 7,
-        "paragraphs": 5,
-        "mean_sentence_words": 6.3,
-        "max_sentence_words": 9,
-        "pct_long_sentences": 0.0,
-        "flesch_reading_ease": 75.5,
-        "flesch_kincaid_grade": 4.3,
-        "pct_passive_sentences": 0.0,
-        "pct_long_words": 6.8,
-        "max_paragraph_words": 16,
-        "pct_ly_adverbs": 0.0
-      },
-      "scored": true,
-      "over_budget": []
-    },
-    "locate": {
-      "detell": [],
-      "simplify": []
+      "flags": {}
     },
     "insight": [
       {
@@ -2947,93 +2923,117 @@
         "detail": "found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line"
       }
     ],
+    "locate": {
+      "detell": [],
+      "simplify": []
+    },
+    "simplify": {
+      "fixes": {},
+      "flags": {},
+      "metrics": {
+        "flesch_kincaid_grade": 4.3,
+        "flesch_reading_ease": 75.5,
+        "max_paragraph_words": 16,
+        "max_sentence_words": 9,
+        "mean_sentence_words": 6.3,
+        "paragraphs": 5,
+        "pct_long_sentences": 0.0,
+        "pct_long_words": 6.8,
+        "pct_ly_adverbs": 0.0,
+        "pct_passive_sentences": 0.0,
+        "sentences": 7,
+        "words": 44
+      },
+      "over_budget": [],
+      "scored": true
+    },
     "spans": {
-      "sentences": [
-        {
-          "words": 2,
-          "line": 1,
-          "col": 1,
-          "end_line": 1,
-          "end_col": 13
-        },
-        {
-          "words": 6,
-          "line": 1,
-          "col": 14,
-          "end_line": 1,
-          "end_col": 46
-        },
-        {
-          "words": 8,
-          "line": 3,
-          "col": 3,
-          "end_line": 3,
-          "end_col": 40
-        },
-        {
-          "words": 6,
-          "line": 4,
-          "col": 3,
-          "end_line": 4,
-          "end_col": 36
-        },
-        {
-          "words": 6,
-          "line": 5,
-          "col": 3,
-          "end_line": 5,
-          "end_col": 76
-        },
-        {
-          "words": 9,
-          "line": 7,
-          "col": 1,
-          "end_line": 7,
-          "end_col": 55
-        },
-        {
-          "words": 7,
-          "line": 7,
-          "col": 56,
-          "end_line": 8,
-          "end_col": 15
-        }
-      ],
       "paragraphs": [
         {
-          "words": 8,
-          "line": 1,
           "col": 1,
+          "end_col": 46,
           "end_line": 1,
-          "end_col": 46
+          "line": 1,
+          "words": 8
         },
         {
-          "words": 8,
-          "line": 3,
           "col": 1,
+          "end_col": 40,
           "end_line": 3,
-          "end_col": 40
+          "line": 3,
+          "words": 8
         },
         {
-          "words": 6,
-          "line": 4,
           "col": 1,
+          "end_col": 36,
           "end_line": 4,
-          "end_col": 36
+          "line": 4,
+          "words": 6
         },
         {
-          "words": 6,
-          "line": 5,
           "col": 1,
+          "end_col": 76,
           "end_line": 5,
-          "end_col": 76
+          "line": 5,
+          "words": 6
         },
         {
-          "words": 16,
-          "line": 7,
           "col": 1,
+          "end_col": 15,
           "end_line": 8,
-          "end_col": 15
+          "line": 7,
+          "words": 16
+        }
+      ],
+      "sentences": [
+        {
+          "col": 1,
+          "end_col": 13,
+          "end_line": 1,
+          "line": 1,
+          "words": 2
+        },
+        {
+          "col": 14,
+          "end_col": 46,
+          "end_line": 1,
+          "line": 1,
+          "words": 6
+        },
+        {
+          "col": 3,
+          "end_col": 40,
+          "end_line": 3,
+          "line": 3,
+          "words": 8
+        },
+        {
+          "col": 3,
+          "end_col": 36,
+          "end_line": 4,
+          "line": 4,
+          "words": 6
+        },
+        {
+          "col": 3,
+          "end_col": 76,
+          "end_line": 5,
+          "line": 5,
+          "words": 6
+        },
+        {
+          "col": 1,
+          "end_col": 55,
+          "end_line": 7,
+          "line": 7,
+          "words": 9
+        },
+        {
+          "col": 56,
+          "end_col": 15,
+          "end_line": 8,
+          "line": 7,
+          "words": 7
         }
       ]
     },
@@ -3041,22 +3041,20 @@
   },
   "too-short.md": {
     "detell": {
+      "cleaned": "Ship it Friday. Prior to the demo.\n",
       "fixes": {},
-      "flags": {},
-      "cleaned": "Ship it Friday. Prior to the demo.\n"
+      "flags": {}
     },
-    "simplify": {
-      "fixes": {
-        "clutter:before": 1
+    "insight": [
+      {
+        "check": "sections",
+        "detail": "missing template section(s): Context, Insight Description, Significance, Customer Details"
       },
-      "flags": {},
-      "metrics": {
-        "words": 6,
-        "sentences": 2
-      },
-      "scored": false,
-      "over_budget": []
-    },
+      {
+        "check": "significance",
+        "detail": "found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line"
+      }
+    ],
     "locate": {
       "detell": [],
       "simplify": [
@@ -3071,40 +3069,42 @@
         ]
       ]
     },
-    "insight": [
-      {
-        "check": "sections",
-        "detail": "missing template section(s): Context, Insight Description, Significance, Customer Details"
+    "simplify": {
+      "fixes": {
+        "clutter:before": 1
       },
-      {
-        "check": "significance",
-        "detail": "found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line"
-      }
-    ],
+      "flags": {},
+      "metrics": {
+        "sentences": 2,
+        "words": 6
+      },
+      "over_budget": [],
+      "scored": false
+    },
     "spans": {
-      "sentences": [
-        {
-          "words": 3,
-          "line": 1,
-          "col": 1,
-          "end_line": 1,
-          "end_col": 16
-        },
-        {
-          "words": 4,
-          "line": 1,
-          "col": 17,
-          "end_line": 1,
-          "end_col": 35
-        }
-      ],
       "paragraphs": [
         {
-          "words": 7,
-          "line": 1,
           "col": 1,
+          "end_col": 35,
           "end_line": 1,
-          "end_col": 35
+          "line": 1,
+          "words": 7
+        }
+      ],
+      "sentences": [
+        {
+          "col": 1,
+          "end_col": 16,
+          "end_line": 1,
+          "line": 1,
+          "words": 3
+        },
+        {
+          "col": 17,
+          "end_col": 35,
+          "end_line": 1,
+          "line": 1,
+          "words": 4
         }
       ]
     },

@@ -364,3 +364,189 @@ fn the_typography_rewrite_matches_the_recorded_contract() {
         assert_eq!(crisp::typography(&text), recorded, "{name}: typography");
     }
 }
+
+// ── the recorder ─────────────────────────────────────────────────────────────
+
+/// Everything a consumer can observe, for one fixture, in the contract's shape.
+///
+/// The Rust side of what `scripts/golden.py` records. The rewrites run as a
+/// pipeline (typography, then clutter, then measure), so the tallies and metrics
+/// describe the end of it; the ranges and spans describe the raw text.
+fn record(text: &str) -> Value {
+    use crisp::report::{Simplified, metrics_json};
+    use crisp::rewrite::Rewrite;
+    use serde_json::json;
+
+    let counts = |r: &Rewrite| -> (Value, Value) {
+        let fixes = r.fixes.0.iter().map(|&(k, n)| (k.to_string(), n.into()));
+        let flags = r.flags.iter().map(|f| (f.rule.to_string(), f.count.into()));
+        (
+            Value::Object(fixes.collect()),
+            Value::Object(flags.collect()),
+        )
+    };
+    let rows = |hits| -> Vec<Value> {
+        crisp::positioned(text, hits, Unit::CodePoints)
+            .iter()
+            .map(|f| {
+                let kind = match f.kind {
+                    Kind::Clutter => "clutter",
+                    Kind::Complexity => "complexity",
+                    Kind::Tell => "tell",
+                    Kind::Length => unreachable!("locate never emits a length finding"),
+                };
+                json!([f.rule, kind, f.line, f.col, f.end_line, f.end_col, f.text])
+            })
+            .collect()
+    };
+    let span_rows = |spans: &[Span]| -> Vec<Value> {
+        spans
+            .iter()
+            .map(|s| {
+                json!({"words": s.words, "line": s.line, "col": s.col,
+                            "end_line": s.end_line, "end_col": s.end_col})
+            })
+            .collect()
+    };
+
+    let detelled = crisp::rewrite::detell(text);
+    let s = Simplified::new(&detelled.text, None);
+    let (d_fixes, d_flags) = counts(&detelled);
+    let (s_fixes, s_flags) = counts(&s.rewrite);
+    let spans = crisp::spans(text, Unit::CodePoints);
+    let disagreements = crisp::disagreements(text);
+
+    json!({
+        "detell": {"fixes": d_fixes, "flags": d_flags, "cleaned": detelled.text},
+        "simplify": {
+            "fixes": s_fixes,
+            "flags": s_flags,
+            "metrics": metrics_json(&s.metrics),
+            "scored": s.metrics.scored,
+            "over_budget": s.metrics.over_budget(&Budget::default()),
+        },
+        "locate": {
+            "detell": rows(crisp::detell_locate(text)),
+            "simplify": rows(crisp::simplify_locate(text)),
+        },
+        "insight": crisp::insight::check(text),
+        "spans": {
+            "sentences": span_rows(&spans.sentences),
+            "paragraphs": span_rows(&spans.paragraphs),
+        },
+        "spans_consistent": if disagreements.is_empty() { json!(true) } else { json!(disagreements) },
+    })
+}
+
+/// The tunables, pinned directly, so a threshold can't move with no fixture
+/// straddling it.
+fn record_config() -> Value {
+    use crisp::report::metric_value;
+    use serde_json::json;
+
+    let budget: serde_json::Map<String, Value> = Budget::default()
+        .limits
+        .iter()
+        .map(|&(key, bound)| {
+            let (dir, limit) = match bound {
+                Bound::Max(l) => ("max", l),
+                Bound::Min(l) => ("min", l),
+            };
+            (key.to_string(), json!([dir, metric_value(key, limit)]))
+        })
+        .collect();
+    // simplify's FIX table is the clutter rules, then the same `run_spaces`
+    // cleanup detell ends with.
+    let mut simplify_fix: Vec<&str> = crisp::rules::CLUTTER.iter().map(|r| r.name).collect();
+    simplify_fix.push("run_spaces");
+
+    json!({
+        "budget": budget,
+        "long_sentence": crisp::LONG_SENTENCE,
+        "long_word_syllables": crisp::LONG_WORD_SYLLABLES,
+        "min_words_to_score": crisp::MIN_WORDS_TO_SCORE,
+        "compression_target": crisp::COMPRESSION_TARGET,
+        "insight": {
+            "sections": crisp::insight::SECTIONS,
+            "code_ref_rules": crisp::insight::CODE_REFS.iter().map(|&(_, what)| what).collect::<Vec<_>>(),
+        },
+        "rules": {
+            "detell_fix": crisp::rules::DETELL_FIX.iter().map(|r| r.name).collect::<Vec<_>>(),
+            "detell_flag": crisp::rules::DETELL_FLAG.iter().map(|r| r.name).collect::<Vec<_>>(),
+            "simplify_fix": simplify_fix,
+            "simplify_flag": crisp::rules::COMPLEXITY.iter().map(|r| r.name).collect::<Vec<_>>(),
+        },
+    })
+}
+
+fn record_all() -> Value {
+    let mut out = serde_json::Map::new();
+    out.insert("__config__".into(), record_config());
+    for path in common::fixture_paths() {
+        let name = path.file_name().unwrap().to_string_lossy().into_owned();
+        out.insert(name, record(&common::read(&path)));
+    }
+    Value::Object(out)
+}
+
+/// Every leaf that differs, as `path: recorded -> engine`. Order-sensitive in
+/// lists, as the contract is.
+fn leaf_diff(was: &Value, now: &Value, path: &str, out: &mut Vec<String>) {
+    match (was, now) {
+        (Value::Object(a), Value::Object(b)) => {
+            let keys: std::collections::BTreeSet<_> = a.keys().chain(b.keys()).collect();
+            for k in keys {
+                let missing = Value::String("<missing>".into());
+                leaf_diff(
+                    a.get(k).unwrap_or(&missing),
+                    b.get(k).unwrap_or(&missing),
+                    &format!("{path}.{k}"),
+                    out,
+                );
+            }
+        }
+        (Value::Array(a), Value::Array(b)) => {
+            if a.len() != b.len() {
+                out.push(format!("{path}: {} items -> {}", a.len(), b.len()));
+            }
+            for (i, (x, y)) in a.iter().zip(b).enumerate() {
+                leaf_diff(x, y, &format!("{path}[{i}]"), out);
+            }
+        }
+        _ if was != now => out.push(format!("{path}: {was} -> {now}")),
+        _ => {}
+    }
+}
+
+/// The whole contract, recorded by the engine, equals the file.
+///
+/// `CRISP_UPDATE_GOLDEN=1 cargo test --test golden` re-records it instead. That
+/// is a decision, not a build step: the git diff on golden.json is the review.
+#[test]
+fn the_engine_records_exactly_the_contract() {
+    let now = record_all();
+    if std::env::var("CRISP_UPDATE_GOLDEN").is_ok_and(|v| v == "1") {
+        let path = common::fixtures_dir().join("golden.json");
+        let body = serde_json::to_string_pretty(&now).expect("serialises") + "\n";
+        std::fs::write(&path, body).expect("golden.json is writable");
+        eprintln!(
+            "recorded {} -> {}",
+            now.as_object().unwrap().len() - 1,
+            path.display()
+        );
+        return;
+    }
+    let mut drift = Vec::new();
+    leaf_diff(&contract(), &now, "", &mut drift);
+    assert!(
+        drift.is_empty(),
+        "golden: DRIFT in {} field(s). Intended? CRISP_UPDATE_GOLDEN=1 re-records it.\n{}",
+        drift.len(),
+        drift
+            .iter()
+            .take(40)
+            .cloned()
+            .collect::<Vec<_>>()
+            .join("\n")
+    );
+}

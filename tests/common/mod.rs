@@ -34,6 +34,11 @@ pub fn corpus() -> Vec<PathBuf> {
     paths
 }
 
+/// The recorded fixtures alone, sorted: what `golden.json` holds an entry for.
+pub fn fixture_paths() -> Vec<PathBuf> {
+    markdown_in(fixtures_dir())
+}
+
 fn markdown_in(dir: PathBuf) -> Vec<PathBuf> {
     let Ok(entries) = std::fs::read_dir(dir) else {
         return Vec::new();
