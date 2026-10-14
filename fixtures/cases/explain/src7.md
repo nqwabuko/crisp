@@ -1,0 +1,1 @@
+The pump stops because the valve shuts, so the loop cools, and if the loop cools the boiler fires again, which means the cycle repeats every few minutes while the house is occupied. Nobody notices it. The bills show it.

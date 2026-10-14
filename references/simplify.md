@@ -223,10 +223,12 @@ built it: the audience cut in SKILL.md (step 0) still comes first.
 
 **What the gate measures.** `crisp simplify --baseline` scores each source
 paragraph on joints, definitions, unpacked lists and anticipations per sentence,
-less its padding. A paragraph at 0.4 or more is explanation and owes no cut; 40%
-applies to the rest, and a source that is all explanation may grow. Two checks
-then fail the run however short it is: joints per sentence fell (`JOINTS
-[LOST]`), or a list the source unpacked is no longer unpacked (`LISTS
+less its padding. A paragraph at 0.4 or more is explanation and owes no cut,
+and may grow up to 1.5x; 40% applies to the rest. Only the source is scored, so
+dressing padding up with "because" in the rewrite changes nothing. Two checks
+then fail the run however short it is: a joint went missing from a source
+sentence that survived, meaning half its content words are still there (`JOINTS
+[LOST]`), or a list the source unpacked lost one of its parts (`LISTS
 [LOST]`). Outside a baseline, `PROMISED, NOT UNPACKED` lists every "has N parts"
 with no parts after it. The checks are blunt by design: a list shown in a
 figure, or one deliberately deferred to a later chapter, reads as unpacked to a

@@ -1,0 +1,10 @@
+Our team has worked on this for a long time. We have talked to many people about it. They all had views on the queue. The meetings were long and full of ideas.
+
+```
+if ready then go else wait
+while busy do sleep
+unless done retry
+if a then b
+```
+
+We wrote notes after each one. The notes went into a shared folder. The folder is now quite large and needs a tidy.

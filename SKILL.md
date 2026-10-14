@@ -206,10 +206,12 @@ a passage that explains (a mechanism, a cause, a term the reader has not met):
   parts: a, b and c"), so never cut the unpacking;
 - a step-by-step mechanism keeps one sentence per step, in order;
 - a sentence that anticipates the reader's confusion stays.
-An explanatory passage owes the length gate nothing, and may come out longer. The
-gate knows this: it scores each source paragraph, asks 40% only of the ones that
-are not explaining, and fails the run if joints per sentence fell (`JOINTS
-[LOST]`) or an unpacked list lost its parts (`LISTS [LOST]`).
+An explanatory passage owes the 40% cut nothing, and may come out up to 1.5x
+longer. The gate knows this: it scores each source paragraph, asks 40% only of
+the ones that are not explaining, and fails the run if a joint went missing from
+a sentence that survived (`JOINTS [LOST]`) or an unpacked list lost a part
+(`LISTS [LOST]`). Restoring an explanation that was cut too far (2-6x growth) is
+writing, not editing: run that rewrite without `--baseline`.
 `references/simplify.md` Part E has the why and the sources.
 4. **Words.** Only now. Every filler the `padding` flag lists, every intensifier,
    every "in fact", every stacked adjective.

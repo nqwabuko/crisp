@@ -9,7 +9,7 @@
 
 use super::rewrite::{self, Rewrite};
 use super::rules::{Bound, Budget};
-use super::{COMPRESSION_TARGET, LONG_SENTENCE, MIN_WORDS_TO_SCORE, Metrics};
+use super::{COMPRESSION_TARGET, EXPLANATION_GROWTH, LONG_SENTENCE, MIN_WORDS_TO_SCORE, Metrics};
 use serde_json::{Map, Value, json};
 
 /// The metrics crisp reports as ints. Every other metric is a `round(x, 1)`
@@ -64,19 +64,23 @@ fn truncate(s: &str, n: usize) -> String {
 // ── the length gate ──────────────────────────────────────────────────────────
 
 /// How much shorter the text got, against the source it came from.
+///
+/// The cut is owed by padding, not by explanation. The source's paragraphs are
+/// scored (`explain::paragraphs`); when none explains, the rewrite must cut
+/// `COMPRESSION_TARGET` percent, as it always has. When some do, the rewrite may
+/// be at most what is left of the rest after that cut, plus the explanation at
+/// up to `EXPLANATION_GROWTH` times its length: explanation may grow, padding
+/// pays for it, and only the source is scored, so dressing padding up as
+/// explanation in the rewrite changes nothing.
 #[derive(Clone, Copy, PartialEq, Debug)]
 pub struct Compression {
     pub before: usize,
     pub after: usize,
+    /// The cut owed, as a percentage of the whole source: `COMPRESSION_TARGET`
+    /// on the share that is not explaining.
     pub target: f64,
     /// The share of the source's words in explanatory paragraphs, 0 to 1.
-    /// Padding pays for explanation: the target is `COMPRESSION_TARGET` on the
-    /// rest, and a source that is all explanation owes no cut and may grow.
     pub explaining: f64,
-    /// Words outside explanatory paragraphs, in the source and the rewrite.
-    /// When the source explains, cutting these by `COMPRESSION_TARGET` also
-    /// passes, whatever the explanation did: it may grow.
-    pub rest: (usize, usize),
 }
 
 impl Compression {
@@ -85,19 +89,11 @@ impl Compression {
     pub fn between(source: &str, rewritten: &str) -> Self {
         let words = |t: &str| super::measure(t).get("words").unwrap_or(0.0) as usize;
         let explaining = super::round1(100.0 * super::explain::explanatory_share(source)) / 100.0;
-        let rest = |t: &str| -> usize {
-            super::explain::paragraphs(t)
-                .iter()
-                .filter(|p| !p.explanatory)
-                .map(|p| p.words)
-                .sum()
-        };
         Compression {
             before: words(source),
             after: words(rewritten),
             target: super::round1(COMPRESSION_TARGET * (1.0 - explaining)),
             explaining,
-            rest: (rest(source), rest(rewritten)),
         }
     }
 
@@ -114,32 +110,42 @@ impl Compression {
         self.before >= MIN_WORDS_TO_SCORE
     }
 
-    /// How much of the non-explanatory text went, as a percentage of it.
-    pub fn rest_cut_pct(&self) -> f64 {
-        let (b, a) = self.rest;
-        if b == 0 {
-            return 0.0;
-        }
-        super::round1(100.0 * (b as f64 - a as f64) / b as f64)
+    /// The source's words in explanatory paragraphs, and in the rest.
+    pub fn split(&self) -> (usize, usize) {
+        let explaining = (self.before as f64 * self.explaining).round() as usize;
+        (explaining, self.before - explaining)
+    }
+
+    /// The longest the rewrite may be when the source explains.
+    pub fn limit(&self) -> usize {
+        let (explaining, rest) = self.split();
+        (rest as f64 * (1.0 - COMPRESSION_TARGET / 100.0) + explaining as f64 * EXPLANATION_GROWTH)
+            .floor() as usize
     }
 
     pub fn ok(&self) -> bool {
-        !self.scored()
-            || self.target == 0.0
-            || self.cut_pct() >= self.target
-            || (self.explaining > 0.0 && self.rest_cut_pct() >= COMPRESSION_TARGET)
+        if !self.scored() {
+            return true;
+        }
+        if self.explaining == 0.0 {
+            return self.cut_pct() >= self.target;
+        }
+        self.after <= self.limit()
     }
 
     fn json(&self) -> Value {
+        let explains = self.explaining > 0.0;
+        let (explaining, rest) = self.split();
         json!({
             "before": self.before,
             "after": self.after,
             "cut_pct": self.cut_pct(),
             "target": self.target,
             "explaining": self.explaining,
-            "rest_before": self.rest.0,
-            "rest_after": self.rest.1,
-            "rest_cut_pct": self.rest_cut_pct(),
+            "explaining_words": explaining,
+            "rest_words": rest,
+            "limit": explains.then(|| self.limit()),
+            "growth": EXPLANATION_GROWTH,
             "scored": self.scored(),
             "ok": self.ok(),
         })
@@ -149,103 +155,111 @@ impl Compression {
 // ── explanation ──────────────────────────────────────────────────────────────
 
 /// What a rewrite did to the source's explanation: its joints (cause, contrast
-/// and condition connectives, per sentence) and its promised lists. Shortening
-/// may delete whole sentences, which keeps the density; it may not delete the
-/// "because" between two claims that both survive, which lowers it.
+/// and condition connectives) in the sentences that survived, and its lists.
 #[derive(Clone, PartialEq, Debug)]
 pub struct Explanation {
-    pub joints_before: (usize, usize),
-    pub joints_after: (usize, usize),
-    pub unpacked_before: usize,
-    pub unpacked_after: usize,
+    /// Every joint in the source; below `MIN_JOINTS_TO_GATE` it is not gated.
+    pub joints_source: usize,
+    /// The joints in source sentences that survive the rewrite.
+    pub joints_required: usize,
+    /// The joints the rewrite has.
+    pub joints_after: usize,
+    /// Each list the source unpacked that lost parts, with the parts.
+    pub lost: Vec<(String, Vec<String>)>,
     pub unkept_before: usize,
-    pub unkept_after: usize,
+    /// Promises in the rewrite with no parts after them.
+    pub unkept_after: Vec<String>,
 }
 
-/// Below this many joints in the source, a density is noise and is not gated.
+/// Below this many joints in the source, it is not gated: one lost "so" in a
+/// three-sentence note is noise, not a broken explanation.
 pub const MIN_JOINTS_TO_GATE: usize = 3;
 
 impl Explanation {
     pub fn between(source: &str, rewritten: &str) -> Self {
-        let (jb, sb, _) = super::explain::joint_density(source);
-        let (ja, sa, _) = super::explain::joint_density(rewritten);
-        let tally = |t: &str| {
-            let p = super::explain::promises(t);
-            let kept = p.iter().filter(|x| x.unpacked).count();
-            (kept, p.len() - kept)
-        };
-        let (kb, ub) = tally(source);
-        let (ka, ua) = tally(rewritten);
+        let (joints_required, joints_after) = super::explain::surviving_joints(source, rewritten);
         Explanation {
-            joints_before: (jb, sb),
-            joints_after: (ja, sa),
-            unpacked_before: kb,
-            unpacked_after: ka,
-            unkept_before: ub,
-            unkept_after: ua,
+            joints_source: super::explain::joints(source).len(),
+            joints_required,
+            joints_after,
+            lost: super::explain::lost_parts(source, rewritten),
+            unkept_before: super::explain::promises(source)
+                .iter()
+                .filter(|p| !p.unpacked)
+                .count(),
+            unkept_after: super::explain::unkept(source, rewritten)
+                .into_iter()
+                .map(|p| p.text)
+                .collect(),
         }
-    }
-
-    fn per_sentence((n, s): (usize, usize)) -> f64 {
-        (n as f64 / s.max(1) as f64 * 100.0).round() / 100.0
     }
 
     pub fn joints_gated(&self) -> bool {
-        self.joints_before.0 >= MIN_JOINTS_TO_GATE
+        self.joints_source >= MIN_JOINTS_TO_GATE
     }
 
-    /// Joints per sentence did not fall, compared exactly rather than rounded.
     pub fn joints_ok(&self) -> bool {
-        let ((jb, sb), (ja, sa)) = (self.joints_before, self.joints_after);
-        !self.joints_gated() || ja * sb.max(1) >= jb * sa.max(1)
+        !self.joints_gated() || self.joints_after >= self.joints_required
     }
 
-    /// Every list the source unpacked is still unpacked, and no new promise
-    /// arrived without its list.
+    /// Every list the source unpacked kept its parts, and no new promise
+    /// arrived without its parts.
     pub fn lists_ok(&self) -> bool {
-        self.unpacked_after >= self.unpacked_before && self.unkept_after <= self.unkept_before
+        self.lost.is_empty() && self.unkept_after.len() <= self.unkept_before
     }
 
-    fn lines(&self) -> Vec<String> {
+    fn lines(&self, source_lists: usize) -> Vec<String> {
         let mut l = Vec::new();
         if self.joints_gated() {
             l.push(format!(
-                "JOINTS  [{}]  {} -> {} (because/so/but/if...), {} -> {} per sentence",
+                "JOINTS  [{}]  {} in the sentences that survived, {} in the rewrite (because/so/but/if...)",
                 if self.joints_ok() { "PASS" } else { "LOST" },
-                self.joints_before.0,
-                self.joints_after.0,
-                py_float(Self::per_sentence(self.joints_before)),
-                py_float(Self::per_sentence(self.joints_after)),
+                self.joints_required,
+                self.joints_after,
             ));
         }
-        if self.unpacked_before + self.unkept_before + self.unpacked_after + self.unkept_after > 0 {
+        for (list, missing) in &self.lost {
             l.push(format!(
-                "LISTS   [{}]  promised lists unpacked {} -> {}, left unpacked {} -> {}",
-                if self.lists_ok() { "PASS" } else { "LOST" },
-                self.unpacked_before,
-                self.unpacked_after,
-                self.unkept_before,
-                self.unkept_after,
+                "LISTS   [LOST]  \"{list}\" lost: {}",
+                missing.join(", ")
+            ));
+        }
+        if self.unkept_after.len() > self.unkept_before {
+            l.push(format!(
+                "LISTS   [LOST]  promised, not unpacked: {}",
+                self.unkept_after
+                    .iter()
+                    .map(|t| format!("\"{t}\""))
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            ));
+        }
+        if self.lists_ok() && source_lists > 0 {
+            l.push(format!(
+                "LISTS   [PASS]  {source_lists} unpacked list(s), every part kept"
             ));
         }
         l
     }
 
     fn json(&self) -> Value {
+        let lost: Vec<Value> = self
+            .lost
+            .iter()
+            .map(|(list, missing)| json!({"list": list, "missing": missing}))
+            .collect();
         json!({
             "joints": {
-                "before": self.joints_before.0,
-                "after": self.joints_after.0,
-                "before_per_sentence": Self::per_sentence(self.joints_before),
-                "after_per_sentence": Self::per_sentence(self.joints_after),
+                "source": self.joints_source,
+                "required": self.joints_required,
+                "after": self.joints_after,
                 "gated": self.joints_gated(),
                 "ok": self.joints_ok(),
             },
             "lists": {
-                "unpacked_before": self.unpacked_before,
-                "unpacked_after": self.unpacked_after,
-                "unkept_before": self.unkept_before,
-                "unkept_after": self.unkept_after,
+                "lost": lost,
+                "promised_not_unpacked_before": self.unkept_before,
+                "promised_not_unpacked_after": self.unkept_after,
                 "ok": self.lists_ok(),
             },
         })
@@ -326,6 +340,8 @@ pub struct Simplified {
     pub compression: Option<Compression>,
     /// Also only with a baseline: what the rewrite kept of the explanation.
     pub explanation: Option<Explanation>,
+    /// How many lists the baseline unpacked, for the report's PASS line.
+    pub source_lists: usize,
 }
 
 impl Simplified {
@@ -334,11 +350,18 @@ impl Simplified {
         let metrics = super::measure(&rewrite.text);
         let compression = baseline.map(|source| Compression::between(source, &rewrite.text));
         let explanation = baseline.map(|source| Explanation::between(source, &rewrite.text));
+        let source_lists = baseline.map_or(0, |source| {
+            super::explain::promises(source)
+                .iter()
+                .filter(|p| p.unpacked)
+                .count()
+        });
         Simplified {
             rewrite,
             metrics,
             compression,
             explanation,
+            source_lists,
         }
     }
 
@@ -377,41 +400,44 @@ fn length_lines(c: Option<Compression>) -> Vec<String> {
             c.before, c.after
         )];
     }
-    let mut l = vec![format!(
-        "LENGTH  [{}]  {} -> {} words, cut {}%   target >= {}%",
-        if c.ok() { "PASS" } else { "SHORT" },
-        c.before,
-        c.after,
-        py_float(c.cut_pct()),
-        py_float(c.target)
-    )];
-    if c.explaining > 0.0 {
-        l.push(format!(
-            "        {}% of the source explains: no cut owed there, {}% on the rest{}",
-            py_float(super::round1(100.0 * c.explaining)),
-            py_float(COMPRESSION_TARGET),
-            if c.target == 0.0 {
-                " (none), and it may grow"
-            } else {
-                ""
-            }
-        ));
-        if c.target > 0.0 && c.cut_pct() < c.target {
-            l.push(format!(
-                "        the rest: {} -> {} words, cut {}% (passes at {}% whatever the explanation did)",
-                c.rest.0,
-                c.rest.1,
-                py_float(c.rest_cut_pct()),
-                py_float(COMPRESSION_TARGET)
-            ));
-        }
+    let verdict = match (c.ok(), c.after > c.before) {
+        (true, _) => "PASS",
+        (false, true) => "LONG",
+        (false, false) => "SHORT",
+    };
+    if c.explaining == 0.0 {
+        return vec![format!(
+            "LENGTH  [{verdict}]  {} -> {} words, cut {}%   target >= {}%",
+            c.before,
+            c.after,
+            py_float(c.cut_pct()),
+            py_float(c.target)
+        )];
     }
-    l
+    let (explaining, rest) = c.split();
+    vec![
+        format!(
+            "LENGTH  [{verdict}]  {} -> {} words, at most {}",
+            c.before,
+            c.after,
+            c.limit()
+        ),
+        format!(
+            "        {}% of the source explains ({explaining} words, may grow {}x); the rest ({rest} words) owes a {}% cut",
+            py_float(super::round1(100.0 * c.explaining)),
+            py_float(EXPLANATION_GROWTH),
+            py_float(COMPRESSION_TARGET)
+        ),
+    ]
 }
 
-/// Promises in the text with no list after them, for the rewrite to unpack.
-fn unkept_lines(text: &str) -> Vec<String> {
-    let unkept: Vec<_> = super::explain::promises(text)
+/// The explanation gates with a baseline; without one, the promises in the
+/// text that have no parts after them, for the rewrite to unpack.
+fn explanation_lines(s: &Simplified) -> Vec<String> {
+    if let Some(e) = &s.explanation {
+        return e.lines(s.source_lists);
+    }
+    let unkept: Vec<_> = super::explain::promises(&s.rewrite.text)
         .into_iter()
         .filter(|p| !p.unpacked)
         .collect();
@@ -464,8 +490,7 @@ pub fn simplify_text(s: &Simplified, budget: &Budget) -> String {
             m.get("words").unwrap_or(0.0) as usize
         ));
         l.extend(length_lines(s.compression));
-        l.extend(s.explanation.iter().flat_map(Explanation::lines));
-        l.extend(unkept_lines(&s.rewrite.text));
+        l.extend(explanation_lines(s));
         let mut over: Vec<&str> = Vec::new();
         if s.short() {
             over.push("length");
@@ -500,7 +525,7 @@ pub fn simplify_text(s: &Simplified, budget: &Budget) -> String {
     }
 
     l.extend(length_lines(s.compression));
-    l.extend(s.explanation.iter().flat_map(Explanation::lines));
+    l.extend(explanation_lines(s));
 
     if !m.long_sentences.is_empty() {
         l.push(format!(
@@ -516,8 +541,6 @@ pub fn simplify_text(s: &Simplified, budget: &Budget) -> String {
             l.push(format!("       {}", truncate(sentence, 72)));
         }
     }
-
-    l.extend(unkept_lines(&s.rewrite.text));
 
     let mut over: Vec<&str> = m.over_budget(budget);
     if s.short() {
@@ -600,41 +623,50 @@ mod tests {
     }
 
     #[test]
-    fn padding_pays_for_explanation() {
+    fn padding_pays_for_explanation_and_explanation_may_grow_to_its_cap() {
         let all_padding = Compression {
             before: 100,
             after: 70,
             target: 40.0,
             explaining: 0.0,
-            rest: (100, 70),
         };
         assert!(!all_padding.ok());
-        // A source that is all explanation owes no cut, and may grow.
-        let all_explaining = Compression {
-            after: 160,
+        // All explanation: no cut owed, growth up to 1.5x.
+        let grows = Compression {
+            after: 150,
             target: 0.0,
             explaining: 1.0,
             ..all_padding
         };
-        assert!(all_explaining.ok());
-        // Mixed: the rewrite cut little overall because its explanation grew,
-        // but it cut the padding by more than the target, so it passes.
-        let grew = Compression {
-            before: 169,
-            after: 156,
-            target: 9.0,
-            explaining: 0.775,
-            rest: (42, 4),
-        };
-        assert!(grew.cut_pct() < grew.target && grew.ok());
-        assert_eq!(
-            length_lines(Some(all_explaining))[1],
-            "        100.0% of the source explains: no cut owed there, 40.0% on the rest (none), and it may grow"
+        assert_eq!(grows.limit(), 150);
+        assert!(grows.ok());
+        assert!(
+            !Compression {
+                after: 151,
+                ..grows
+            }
+            .ok()
         );
+        assert_eq!(
+            length_lines(Some(Compression {
+                after: 151,
+                ..grows
+            }))[0],
+            "LENGTH  [LONG]  100 -> 151 words, at most 150"
+        );
+        // Half and half: 50 x 0.6 + 50 x 1.5.
+        let mixed = Compression {
+            target: 20.0,
+            explaining: 0.5,
+            after: 105,
+            ..all_padding
+        };
+        assert_eq!(mixed.limit(), 105);
+        assert!(mixed.ok());
     }
 
     #[test]
-    fn a_cut_joint_between_surviving_claims_fails_and_a_cut_sentence_does_not() {
+    fn a_joint_lost_between_kept_claims_fails_and_a_cut_sentence_does_not() {
         let source = "It stalls because the lock is held. The queue grows, so alerts fire late. \
                       If the worker dies, nothing drains it. We are excited about this.";
         let joints_cut = "It stalls. The lock is held. The queue grows. Alerts fire late. \
@@ -646,11 +678,12 @@ mod tests {
     }
 
     #[test]
-    fn a_list_the_source_unpacked_must_stay_unpacked() {
+    fn a_list_the_source_unpacked_must_keep_its_parts() {
         let source = "The gate has three parts: a key, a lock and a hinge.";
-        let lost = "The gate has three parts.";
-        let kept = "Three parts make the gate: a key, a lock, a hinge. It has three parts: key, lock, hinge.";
-        assert!(!Explanation::between(source, lost).lists_ok());
+        let lost = Explanation::between(source, "The gate has three parts.");
+        assert_eq!(lost.lost[0].1, ["key", "lock", "hinge"]);
+        assert!(!lost.lists_ok());
+        let kept = "The gate is a key, a lock and a hinge.";
         assert!(Explanation::between(source, kept).lists_ok());
     }
 
@@ -672,7 +705,6 @@ mod tests {
             after: 114,
             target: COMPRESSION_TARGET,
             explaining: 0.0,
-            rest: (159, 114),
         };
         assert_eq!(c.cut_pct(), 28.3);
         assert!(!c.ok());

@@ -64,9 +64,9 @@ it is usually the biggest win available.
 The 40% is owed by padding, not by explanation. With `--baseline`, each source
 paragraph is scored on its joints (because, so, but, if...), definitions,
 unpacked lists and anticipations per sentence, less its padding; explanatory
-paragraphs owe no cut and may grow. Two more lines then gate the rewrite:
-`JOINTS` fails if joints per sentence fell, and `LISTS` fails if "it has three
-parts" lost its parts. The research behind this is in
+paragraphs owe no cut and may grow up to 1.5x. Two more lines then gate the
+rewrite: `JOINTS` fails if a joint went missing from a source sentence that
+survived, and `LISTS` fails if "it has three parts" lost one of its parts. The research behind this is in
 `references/simplify.md` Part E.
 
 `--insight` adds a structure gate for a document being filed to the product

@@ -46,6 +46,12 @@ pub const MIN_WORDS_TO_SCORE: usize = 30;
 /// it needs to be. `tests/golden.rs` holds it against crisp's recorded value.
 pub const COMPRESSION_TARGET: f64 = 40.0;
 
+/// How far an explanation may grow in a rewrite, as a multiple of its length in
+/// the source. Explanation owes no cut and may come out longer (the joints and
+/// unpackings a cut removed often need putting back), but unbounded growth let
+/// padding dressed up as explanation through, so it is capped.
+pub const EXPLANATION_GROWTH: f64 = 1.5;
+
 // ── findings ─────────────────────────────────────────────────────────────────
 
 #[derive(Clone, Copy, PartialEq, Debug, serde::Serialize)]

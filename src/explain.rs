@@ -14,14 +14,16 @@
 //!
 //! So this module measures, and `report` gates on it:
 //!
-//! - **Joints**: cause, contrast and condition connectives. Their density per
-//!   sentence may not fall in a rewrite. Deleting a padding sentence raises it;
-//!   deleting a "because" between two surviving claims lowers it.
-//! - **Promised lists**: "has five parts" must be followed by the five. One the
-//!   source unpacked must stay unpacked.
+//! - **Joints**: cause, contrast and condition connectives. Every joint in a
+//!   source sentence that survives the rewrite must still be there (counted
+//!   across the rewrite, so splitting a sentence or moving a joint is fine;
+//!   deleting a padding sentence takes its joints with it).
+//! - **Promised lists**: "has five parts" must be followed by the five. A list
+//!   the source unpacked must keep every one of its parts.
 //! - **Explanatory paragraphs**: dense in joints, definitions, unpackings and
-//!   anticipations ("you might wonder why"). They owe the length gate nothing;
-//!   padding pays for them.
+//!   anticipations ("you might wonder why"). They owe the 40% cut nothing and
+//!   may grow, within `EXPLANATION_GROWTH`; padding pays for them. Scored on the
+//!   source only, so a rewrite cannot dress padding up to dodge the cut.
 //!
 //! The word lists are British English, and code never counts.
 
@@ -85,9 +87,19 @@ static SO_NOT: LazyLock<Regex> = LazyLock::new(|| {
 });
 static SINCE_TIME: LazyLock<Regex> = LazyLock::new(|| {
     re(
-        r"(?i)^\s+(?:\d|then\b|last\b|yesterday\b|january|february|march|april|may\b|june|july|august|september|october|november|december)",
+        r"(?i)^\s+(?:\d|then\b|last\b|yesterday\b|january|february|march|april|may\b|june|july|august|september|october|november|december|monday|tuesday|wednesday|thursday|friday|saturday|sunday)",
     )
 });
+/// Words before a `but` that make it "except" or "only", not a contrast:
+/// "all but done", "nothing but trouble".
+const BUT_NOT: [&str; 6] = [
+    "all",
+    "nothing",
+    "anything",
+    "none",
+    "everything",
+    "everyone",
+];
 
 fn re(pattern: &str) -> Regex {
     Regex::new(pattern).expect("an explain pattern should compile")
@@ -116,7 +128,24 @@ pub fn joints(text: &str) -> Vec<(Joint, usize)> {
                         && !before.to_lowercase().ends_with(" or")
                 }
                 "since" => !SINCE_TIME.is_match(after),
-                "once" => !before.to_lowercase().ends_with("at"),
+                // A condition only when it opens a clause: "Once it lands, ship",
+                // not "he once worked here" or "at once".
+                "once" => {
+                    before.is_empty()
+                        || before.ends_with([',', '.', ';', ':', '!', '?'])
+                        || before.to_lowercase().ends_with(" and")
+                }
+                "but" => {
+                    let b = before.to_lowercase();
+                    !BUT_NOT
+                        .iter()
+                        .any(|w| b.ends_with(&format!(" {w}")) || b == *w)
+                }
+                // "for a while", "worth while": a stretch of time, not a contrast.
+                "while" => {
+                    let b = before.to_lowercase();
+                    !(b.ends_with(" a") || b == "a" || b.ends_with("worth"))
+                }
                 "yet" => {
                     let b = before.to_lowercase();
                     !(b.ends_with("not")
@@ -146,12 +175,16 @@ static PROMISE: LazyLock<Regex> = LazyLock::new(|| {
         r"(?i)\b(?:has|have|had|takes?|comes? in|falls? into|needs?|in|are|of)\s+(two|three|four|five|six|seven|eight|nine|ten|[2-9]|1[0-9])\s+(?:main\s+|key\s+|separate\s+|distinct\s+)?(parts|steps|stages|reasons|ways|components|elements|kinds|types|phases|rules|principles|questions|regimes|outcomes|needs|moves|pieces|layers|levels|jobs|forces|ingredients|conditions)\b",
     )
 });
-static LIST_ITEM: LazyLock<Regex> = LazyLock::new(|| re(r"(?m)^\s{0,3}(?:[-*+]|\d+[.)])\s+\S"));
-static ORDINAL: LazyLock<Regex> = LazyLock::new(|| {
+static LIST_ITEM_TEXT: LazyLock<Regex> =
+    LazyLock::new(|| re(r"(?m)^\s{0,3}(?:[-*+]|\d+[.)])\s+(\S.*)$"));
+static ORDINAL_OPENER: LazyLock<Regex> = LazyLock::new(|| {
     re(
-        r"(?i)\b(?:first(?:ly)?|second(?:ly)?|third(?:ly)?|fourth|fifth|sixth|seventh|eighth|ninth|tenth|finally|lastly)\b",
+        r"(?i)^\s*(?:first(?:ly)?|second(?:ly)?|third(?:ly)?|fourth|fifth|sixth|seventh|eighth|ninth|tenth|finally|lastly)\b",
     )
 });
+/// What separates the things in "three parts: a key, a lock and a hinge".
+static LIST_SEP: LazyLock<Regex> = LazyLock::new(|| re(r"\s*(?:,|;|\band\b|\bor\b)\s*"));
+static ARTICLE: LazyLock<Regex> = LazyLock::new(|| re(r"(?i)^(?:a|an|the|and|or)\s+"));
 static BOLD: LazyLock<Regex> = LazyLock::new(|| re(r"\*\*[^*\n]+\*\*"));
 
 /// A count of things the text promises ("it has five parts"), and whether the
@@ -160,8 +193,13 @@ static BOLD: LazyLock<Regex> = LazyLock::new(|| re(r"\*\*[^*\n]+\*\*"));
 pub struct Promise {
     pub text: String,
     pub count: usize,
+    /// What is counted ("parts", "steps"), lower case.
+    pub noun: String,
     pub start: usize,
+    pub end: usize,
     pub unpacked: bool,
+    /// The things themselves, as found, when unpacked.
+    pub items: Vec<String>,
 }
 
 fn number(word: &str) -> usize {
@@ -188,26 +226,71 @@ pub fn promises(text: &str) -> Vec<Promise> {
             let whole = c.get(0).expect("a match");
             let count = number(&c[1]);
             let window = reach(&prose, whole.end());
-            let sentence_end = window.find(['.', '!', '?', '\n']).unwrap_or(window.len());
-            let colon_list = window[..sentence_end].find(':').is_some_and(|at| {
-                let tail = &window[at + 1..sentence_end];
-                let seps = tail.matches([',', ';']).count()
-                    + tail.matches(" and ").count()
-                    + tail.matches(" or ").count();
-                seps + 1 >= count
-            });
-            let unpacked = colon_list
-                || LIST_ITEM.find_iter(window).count() >= count
-                || ORDINAL.find_iter(window).count() >= count
-                || BOLD.find_iter(window).count() >= count;
+            let items = unpacking(window, count);
             Promise {
                 text: text[whole.start()..whole.end()].to_string(),
                 count,
+                noun: c[2].to_lowercase(),
                 start: whole.start(),
-                unpacked,
+                end: whole.end(),
+                unpacked: items.is_some(),
+                items: items.unwrap_or_default(),
             }
         })
         .collect()
+}
+
+/// The `count` things that follow a promise, if they do: a colon list in the
+/// same sentence (which may be hard-wrapped), or `count` list items, sentences
+/// opening on an ordinal ("First… Second…") or bold terms in reach.
+fn unpacking(window: &str, count: usize) -> Option<Vec<String>> {
+    let sentence = &window[..sentence_end(window)];
+    if let Some(at) = sentence.find(':') {
+        let parts: Vec<String> = LIST_SEP
+            .split(&sentence[at + 1..])
+            .map(|p| ARTICLE.replace(p.trim(), "").trim().to_string())
+            .filter(|p| !p.is_empty())
+            .collect();
+        if parts.len() >= count {
+            return Some(parts);
+        }
+    }
+    let found: Vec<String> = LIST_ITEM_TEXT
+        .captures_iter(window)
+        .map(|c| c[1].trim().to_string())
+        .collect();
+    if found.len() >= count {
+        return Some(found);
+    }
+    let ordinals: Vec<String> = text::split_sentences(window)
+        .into_iter()
+        .filter(|s| ORDINAL_OPENER.is_match(s))
+        .collect();
+    if ordinals.len() >= count {
+        return Some(ordinals);
+    }
+    let bold: Vec<String> = BOLD
+        .find_iter(window)
+        .map(|m| m.as_str().trim_matches('*').to_string())
+        .collect();
+    (bold.len() >= count).then_some(bold)
+}
+
+/// Where the sentence starting the window ends: a full stop, question or
+/// exclamation mark before whitespace, or a blank line. A single newline is a
+/// hard wrap, not an end.
+fn sentence_end(window: &str) -> usize {
+    let b = window.as_bytes();
+    for i in 0..b.len() {
+        let next_is_space = b.get(i + 1).is_none_or(|c| c.is_ascii_whitespace());
+        if matches!(b[i], b'.' | b'!' | b'?') && next_is_space {
+            return i;
+        }
+        if b[i] == b'\n' && b.get(i + 1) == Some(&b'\n') {
+            return i;
+        }
+    }
+    window.len()
 }
 
 /// From `at` to the end of the next block after the current paragraph: the
@@ -268,15 +351,17 @@ pub const EXPLANATORY_DENSITY: f64 = 0.4;
 /// The paragraphs of `text`, scored. Headings, fences and lists count as part of
 /// the paragraph they sit in, as the metrics count them.
 pub fn paragraphs(text: &str) -> Vec<Paragraph> {
-    text::split_paragraphs(text)
+    // Code is masked first: paragraph splitting drops fence lines, after which
+    // a fenced `if`/`while` would read as prose joints.
+    text::split_paragraphs(&mask_code(text))
         .iter()
         .map(|p| {
-            let words = text::count_words(&text::strip_code(p));
-            let sentences = text::split_sentences(&text::plain(p)).len().max(1);
+            let words = text::count_words(p);
+            let sentences = text::split_sentences(p).len().max(1);
             let joints = joints(p).len();
-            let definitions = DEFINITION.find_iter(&mask_code(p)).count();
+            let definitions = DEFINITION.find_iter(p).count();
             let promises = promises(p).iter().filter(|x| x.unpacked).count();
-            let anticipations = ANTICIPATION.find_iter(&mask_code(p)).count();
+            let anticipations = ANTICIPATION.find_iter(p).count();
             let padding = super::simplify_locate(p)
                 .iter()
                 .chain(super::detell_locate(p).iter())
@@ -312,11 +397,175 @@ pub fn explanatory_share(text: &str) -> f64 {
     explaining as f64 / total as f64
 }
 
-/// Joints per sentence over a whole document.
-pub fn joint_density(text: &str) -> (usize, usize, f64) {
-    let n = joints(text).len();
-    let sentences = text::split_sentences(&text::plain(text)).len().max(1);
-    (n, sentences, n as f64 / sentences as f64)
+// ── what a rewrite kept ──────────────────────────────────────────────────────
+
+/// Words too common to say whether a sentence survived.
+const STOP: &[&str] = &[
+    "the",
+    "and",
+    "that",
+    "this",
+    "with",
+    "from",
+    "have",
+    "has",
+    "had",
+    "are",
+    "was",
+    "were",
+    "for",
+    "not",
+    "but",
+    "its",
+    "it's",
+    "they",
+    "them",
+    "their",
+    "there",
+    "then",
+    "than",
+    "what",
+    "when",
+    "which",
+    "who",
+    "will",
+    "would",
+    "can",
+    "could",
+    "should",
+    "into",
+    "onto",
+    "our",
+    "your",
+    "you",
+    "she",
+    "his",
+    "her",
+    "all",
+    "any",
+    "each",
+    "been",
+    "being",
+    "does",
+    "did",
+    "just",
+    "only",
+    "also",
+    "very",
+    "more",
+    "most",
+    "some",
+    "such",
+    "because",
+    "since",
+    "while",
+    "until",
+    "unless",
+    "though",
+    "although",
+    "however",
+    "therefore",
+    "thus",
+    "hence",
+];
+
+/// A text's content words, lower-cased and lightly stemmed ("heats" and
+/// "heat" are one word to a reader): three letters or more, not a stop word.
+fn content(text: &str) -> Vec<String> {
+    text::WORD
+        .find_iter(text)
+        .map(|m| m.as_str().to_lowercase())
+        .filter(|w| w.chars().count() >= 3 && !STOP.contains(&w.as_str()))
+        .map(|w| stem(&w))
+        .collect()
+}
+
+/// Strip one regular English ending, keeping at least four letters.
+fn stem(word: &str) -> String {
+    for end in ["ing", "ed", "es", "s"] {
+        if let Some(root) = word.strip_suffix(end)
+            && root.chars().count() >= 4
+        {
+            return root.to_string();
+        }
+    }
+    word.to_string()
+}
+
+/// A source sentence survives a rewrite when at least half its content words
+/// are still in the rewrite. At 0.6, a rewrite that trimmed details as well as
+/// joints ("so the sensor learns about each burst late" to "The sensor learns
+/// late") excused itself: the sentence no longer counted as kept.
+pub const SURVIVES: f64 = 0.5;
+
+/// The joints in the source's sentences that survive the rewrite, and the
+/// joints the rewrite has. The rewrite must have at least as many: a sentence
+/// that was cut takes its joints with it, but a "so" turned into "and" between
+/// two claims that both stayed is a lost joint. Counted across the whole
+/// rewrite, so splitting a sentence, or moving a joint, keeps it.
+pub fn surviving_joints(source: &str, rewrite: &str) -> (usize, usize) {
+    let kept: std::collections::HashSet<String> =
+        content(&text::strip_code(rewrite)).into_iter().collect();
+    let required = text::split_sentences(&text::strip_code(source))
+        .iter()
+        .filter(|sentence| {
+            let words = content(sentence);
+            !words.is_empty()
+                && words.iter().filter(|w| kept.contains(*w)).count() as f64
+                    >= SURVIVES * words.len() as f64
+        })
+        .map(|sentence| joints(sentence).len())
+        .sum();
+    (required, joints(rewrite).len())
+}
+
+/// Every list the source unpacked, with the parts the rewrite no longer has.
+/// A part is kept if any of its content words is still in the rewrite.
+pub fn lost_parts(source: &str, rewrite: &str) -> Vec<(String, Vec<String>)> {
+    let kept: std::collections::HashSet<String> =
+        content(&text::strip_code(rewrite)).into_iter().collect();
+    promises(source)
+        .into_iter()
+        .filter(|p| p.unpacked)
+        .filter_map(|p| {
+            let missing: Vec<String> = p
+                .items
+                .iter()
+                .filter(|item| {
+                    let words = content(item);
+                    !words.is_empty() && !words.iter().any(|w| kept.contains(w))
+                })
+                .cloned()
+                .collect();
+            (!missing.is_empty()).then_some((p.text, missing))
+        })
+        .collect()
+}
+
+/// Promises in the rewrite with no parts after them, less those whose parts
+/// the source listed and the rewrite gives within reach in its own words ("The
+/// gate has three parts. The key turns, the lock holds, the hinge swings").
+pub fn unkept(source: &str, rewrite: &str) -> Vec<Promise> {
+    let listed: Vec<Promise> = promises(source)
+        .into_iter()
+        .filter(|p| p.unpacked)
+        .collect();
+    let prose = mask_code(rewrite);
+    promises(rewrite)
+        .into_iter()
+        .filter(|p| !p.unpacked)
+        .filter(|p| {
+            let near: std::collections::HashSet<String> =
+                content(reach(&prose, p.end)).into_iter().collect();
+            !listed.iter().any(|l| {
+                l.noun == p.noun
+                    && l.count == p.count
+                    && l.items
+                        .iter()
+                        .all(|item| content(item).iter().any(|w| near.contains(w)))
+            })
+        })
+        .collect()
 }
 
 #[cfg(test)]
@@ -353,6 +602,28 @@ mod tests {
             kinds("Do it at once. Once it lands, ship."),
             [Joint::Condition]
         );
+    }
+
+    #[test]
+    fn idioms_that_link_nothing_are_not_joints() {
+        for text in [
+            "Wait for a while.",
+            "He once worked here.",
+            "It is all but done.",
+            "Nothing but trouble.",
+            "It has run since Monday.",
+        ] {
+            assert!(kinds(text).is_empty(), "{text:?}");
+        }
+        assert_eq!(kinds("It held, but only just."), [Joint::Contrast]);
+        assert_eq!(kinds("Once it lands, ship."), [Joint::Condition]);
+    }
+
+    #[test]
+    fn a_colon_list_may_be_hard_wrapped() {
+        let p = promises("The gate has three parts:\na key, a lock and a hinge. It works.");
+        assert!(p[0].unpacked);
+        assert_eq!(p[0].items, ["key", "lock", "hinge"]);
     }
 
     #[test]

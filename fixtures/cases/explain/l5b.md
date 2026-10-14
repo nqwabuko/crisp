@@ -1,0 +1,2 @@
+The gate has three parts:
+a key, a lock and a hinge. Each part wears at its own rate, and the hinge goes first.

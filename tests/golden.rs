@@ -466,6 +466,12 @@ fn record_config() -> Value {
         "long_word_syllables": crisp::LONG_WORD_SYLLABLES,
         "min_words_to_score": crisp::MIN_WORDS_TO_SCORE,
         "compression_target": crisp::COMPRESSION_TARGET,
+        "explanation": {
+            "growth": crisp::EXPLANATION_GROWTH,
+            "density": crisp::explain::EXPLANATORY_DENSITY,
+            "survives": crisp::explain::SURVIVES,
+            "min_joints": crisp::report::MIN_JOINTS_TO_GATE,
+        },
         "insight": {
             "sections": crisp::insight::SECTIONS,
             "code_ref_rules": crisp::insight::CODE_REFS.iter().map(|&(_, what)| what).collect::<Vec<_>>(),
