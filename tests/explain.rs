@@ -108,3 +108,16 @@ fn trimming_details_does_not_excuse_a_lost_joint() {
     assert!(line(&r, "JOINTS").contains("[LOST]"), "{r}");
     assert_eq!(code, 1);
 }
+
+#[test]
+fn a_faithful_explanation_passes_the_sentence_budget_on_joined_sentences() {
+    // Its two long sentences join short clauses with "so" and "which means";
+    // the budget excuses them, and the report says so rather than hiding it.
+    let (r, code) = gate("explanatory.md", "cases/explanatory-kept.md");
+    assert!(r.contains("JOINED SENTENCES"), "{r}");
+    assert!(
+        line(&r, "  [PASS]  max_sentence_words").contains("without joined"),
+        "{r}"
+    );
+    assert_eq!(code, 0, "{r}");
+}

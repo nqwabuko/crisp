@@ -215,6 +215,18 @@ has and ends on what is new (Williams, *Style: Lessons in Clarity and Grace*;
 Gopen & Swan, "The Science of Scientific Writing", *American Scientist* 78,
 1990). Cutting the first half of a sentence often cuts the link back.
 
+**6. Long because joined is not long because stacked.** What overloads a
+reader is a long run with nowhere to rest, not a word count. A causal joint is a
+resting point: Pearson (1974-75, *Reading Research Quarterly*) found a "because"
+clause often helped recall, and Davison & Kantor (1982) found texts split to fit
+a readability formula were sometimes harder. So in an explanatory paragraph, a
+sentence over the 25-word line is excused from the sentence budget when every
+clause between its joints (and any `;` or `:`) is within 25 words and the whole
+is within 45. The report lists it under `JOINED SENTENCES`, and the scorecard
+keeps the true length beside what the budget judged. A sentence that strings
+clauses with "and", "which" and "in terms of" is still long, and so is any long
+sentence outside an explanation.
+
 **Calibrate to the reader.** Expert readers learn more from slightly less
 cohesive text (McNamara, Kintsch, Songer & Kintsch 1996, *Cognition and
 Instruction* 14), and too many connectives read as condescending (Pinker again).

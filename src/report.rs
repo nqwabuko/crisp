@@ -512,13 +512,21 @@ pub fn simplify_text(s: &Simplified, budget: &Budget) -> String {
     ));
     for &(key, bound) in &budget.limits {
         let Some(v) = m.get(key) else { continue };
+        let judged = m.judged(key).unwrap_or(v);
         let (arrow, limit) = match bound {
             Bound::Max(x) => ("<=", x),
             Bound::Min(x) => (">=", x),
         };
+        // A joined explanatory sentence is excused: the row keeps the true
+        // value and says what the budget judged instead.
+        let excused = if judged == v {
+            String::new()
+        } else {
+            format!("   ({} without joined sentences)", metric_text(key, judged))
+        };
         l.push(format!(
-            "  [{}]  {key:<22} {:>7}   budget {arrow} {}",
-            if bound.ok(v) { "PASS" } else { "OVER" },
+            "  [{}]  {key:<22} {:>7}   budget {arrow} {}{excused}",
+            if bound.ok(judged) { "PASS" } else { "OVER" },
             metric_text(key, v),
             metric_text(key, limit)
         ));
@@ -532,6 +540,14 @@ pub fn simplify_text(s: &Simplified, budget: &Budget) -> String {
             "LONGEST SENTENCES (over {LONG_SENTENCE} words, cut or split):"
         ));
         for (n, sentence) in m.long_sentences.iter().take(5) {
+            l.push(format!("  {n:>3}w  {}", truncate(sentence, 72)));
+        }
+    }
+    if !m.joined_sentences.is_empty() {
+        l.push(format!(
+            "JOINED SENTENCES (explanation, every clause within {LONG_SENTENCE} words: excused):"
+        ));
+        for (n, sentence) in m.joined_sentences.iter().take(5) {
             l.push(format!("  {n:>3}w  {}", truncate(sentence, 72)));
         }
     }
@@ -577,6 +593,13 @@ pub fn simplify_json(s: &Simplified, budget: &Budget) -> Value {
         "scored": s.metrics.scored,
         "over_budget": s.metrics.over_budget(budget),
         "long_sentences": long,
+        "joined_sentences": s
+            .metrics
+            .joined_sentences
+            .iter()
+            .take(5)
+            .map(|(n, text)| json!({"words": n, "text": text}))
+            .collect::<Vec<_>>(),
         "total_fixes": r.fixes.total(),
         "total_flags": r.total_flags(),
         "compression": s.compression.map(|c| c.json()),

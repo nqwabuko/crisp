@@ -313,6 +313,7 @@
             "detail": "class/static reference: café::run"
           }
         ],
+        "joined_sentences": [],
         "long_sentences": [],
         "metrics": {
           "flesch_kincaid_grade": 2.5,
@@ -349,6 +350,7 @@
             "detail": "customer estate size: \"18,000 chargers\" — describe it qualitatively instead (\"a large estate\"); the number is the customer's to disclose"
           }
         ],
+        "joined_sentences": [],
         "long_sentences": [],
         "metrics": {
           "flesch_kincaid_grade": 3.0,
@@ -380,6 +382,7 @@
         "fixes": {},
         "flags": [],
         "insight": [],
+        "joined_sentences": [],
         "long_sentences": [],
         "metrics": {
           "flesch_kincaid_grade": 3.3,
@@ -416,6 +419,7 @@
             "detail": "found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line"
           }
         ],
+        "joined_sentences": [],
         "long_sentences": [],
         "metrics": {
           "flesch_kincaid_grade": 3.3,
@@ -447,6 +451,7 @@
         "fixes": {},
         "flags": [],
         "insight": [],
+        "joined_sentences": [],
         "long_sentences": [],
         "metrics": {
           "sentences": 4,
@@ -1450,7 +1455,7 @@
       "stdout": "**Context** x. **Insight Description** y.\n\nLow\n\n**Significance**, **Customer Details**: z.\n"
     },
     "simplify --json --check --baseline fixtures/explanatory.md fixtures/cases/explanatory-kept.md": {
-      "exit": 1,
+      "exit": 0,
       "stderr": {
         "compression": {
           "after": 156,
@@ -1492,7 +1497,7 @@
           }
         ],
         "insight": null,
-        "long_sentences": [
+        "joined_sentences": [
           {
             "text": "The boiler heats water, the water heats the radiator, and only then does the radiator heat the air, so the sensor learns about each burst of heat minutes after it was paid for.",
             "words": 33
@@ -1502,6 +1507,7 @@
             "words": 27
           }
         ],
+        "long_sentences": [],
         "metrics": {
           "flesch_kincaid_grade": 6.6,
           "flesch_reading_ease": 75.5,
@@ -1516,10 +1522,7 @@
           "sentences": 10,
           "words": 156
         },
-        "over_budget": [
-          "max_sentence_words",
-          "pct_long_sentences"
-        ],
+        "over_budget": [],
         "promised_not_unpacked": [],
         "scored": true,
         "total_fixes": 0,
@@ -1570,6 +1573,7 @@
         "fixes": {},
         "flags": [],
         "insight": null,
+        "joined_sentences": [],
         "long_sentences": [],
         "metrics": {
           "flesch_kincaid_grade": 2.8,
@@ -1630,6 +1634,7 @@
         "fixes": {},
         "flags": [],
         "insight": null,
+        "joined_sentences": [],
         "long_sentences": [],
         "metrics": {
           "flesch_kincaid_grade": 4.4,
@@ -1689,6 +1694,7 @@
           }
         ],
         "insight": null,
+        "joined_sentences": [],
         "long_sentences": [],
         "metrics": {
           "flesch_kincaid_grade": 8.4,
@@ -1744,6 +1750,7 @@
           }
         ],
         "insight": null,
+        "joined_sentences": [],
         "long_sentences": [],
         "metrics": {
           "flesch_kincaid_grade": 3.4,
@@ -2089,8 +2096,8 @@
       }
     },
     "simplify --report --check --baseline fixtures/explanatory.md fixtures/cases/explanatory-kept.md": {
-      "exit": 1,
-      "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED (needs the rewrite pass, 1):\n    1  passive  -> passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")\n         . ...st of heat minutes after it was paid for.  It works in two steps...\nSCORECARD  (156 words, 10 sentences, 4 paragraphs):\n  [PASS]  mean_sentence_words       15.6   budget <= 18.0\n  [OVER]  max_sentence_words          33   budget <= 30\n  [OVER]  pct_long_sentences        20.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       75.5   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       6.6   budget <= 12.0\n  [PASS]  pct_passive_sentences     10.0   budget <= 10.0\n  [PASS]  pct_long_words             7.7   budget <= 20.0\n  [PASS]  max_paragraph_words         68   budget <= 90\n  [PASS]  pct_ly_adverbs             0.0   budget <= 4.0\nLENGTH  [PASS]  169 -> 156 words, at most 219\n        77.5% of the source explains (131 words, may grow 1.5x); the rest (38 words) owes a 40.0% cut\nJOINTS  [PASS]  3 in the sentences that survived, 4 in the rewrite (because/so/but/if...)\nLISTS   [PASS]  2 unpacked list(s), every part kept\nLONGEST SENTENCES (over 25 words, cut or split):\n   33w  The boiler heats water, the water heats the radiator, and only then d...\n   27w  Second, the heat already stored in the water and the radiator keeps a...\nPASSIVE SENTENCES (name the actor):\n       The boiler heats water, the water heats the radiator, and only then d...\nVERDICT: OVER BUDGET on max_sentence_words, pct_long_sentences\n=============================================\n",
+      "exit": 0,
+      "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED (needs the rewrite pass, 1):\n    1  passive  -> passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")\n         . ...st of heat minutes after it was paid for.  It works in two steps...\nSCORECARD  (156 words, 10 sentences, 4 paragraphs):\n  [PASS]  mean_sentence_words       15.6   budget <= 18.0\n  [PASS]  max_sentence_words          33   budget <= 30   (22 without joined sentences)\n  [PASS]  pct_long_sentences        20.0   budget <= 15.0   (0.0 without joined sentences)\n  [PASS]  flesch_reading_ease       75.5   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       6.6   budget <= 12.0\n  [PASS]  pct_passive_sentences     10.0   budget <= 10.0\n  [PASS]  pct_long_words             7.7   budget <= 20.0\n  [PASS]  max_paragraph_words         68   budget <= 90\n  [PASS]  pct_ly_adverbs             0.0   budget <= 4.0\nLENGTH  [PASS]  169 -> 156 words, at most 219\n        77.5% of the source explains (131 words, may grow 1.5x); the rest (38 words) owes a 40.0% cut\nJOINTS  [PASS]  3 in the sentences that survived, 4 in the rewrite (because/so/but/if...)\nLISTS   [PASS]  2 unpacked list(s), every part kept\nJOINED SENTENCES (explanation, every clause within 25 words: excused):\n   33w  The boiler heats water, the water heats the radiator, and only then d...\n   27w  Second, the heat already stored in the water and the radiator keeps a...\nPASSIVE SENTENCES (name the actor):\n       The boiler heats water, the water heats the radiator, and only then d...\nVERDICT: within budget\n=============================================\n",
       "stdout": "# Why the radiator overshoots\n\nA thermostat loop has three parts: a sensor, a controller and a boiler. The\nsensor reads the room, the controller compares it with the setting, and the\nboiler adds heat when the room is cold.\n\nYou might wonder why the room ends up warmer than the setting. The answer is\ndelay. The boiler heats water, the water heats the radiator, and only then does\nthe radiator heat the air, so the sensor learns about each burst of heat\nminutes after it was paid for.\n\nIt works in two steps. First, the controller keeps the boiler on until the\nsensor says the room is warm enough. Second, the heat already stored in the\nwater and the radiator keeps arriving after the boiler stops, which means the\nroom carries on warming past the setting. That stored heat is the overshoot:\nthe loop acted on old news, because news of the room always arrives late.\n"
     },
     "simplify --report --check --baseline fixtures/explanatory.md fixtures/cases/explanatory-overcut.md": {
@@ -2167,6 +2174,7 @@
     "explanation": {
       "density": 0.4,
       "growth": 1.5,
+      "joined_max_words": 45,
       "min_joints": 3,
       "survives": 0.5
     },
@@ -2447,6 +2455,7 @@
             "detail": "found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line"
           }
         ],
+        "joined_sentences": [],
         "long_sentences": [],
         "metrics": {
           "flesch_kincaid_grade": 4.9,
@@ -2516,6 +2525,7 @@
           }
         ],
         "insight": null,
+        "joined_sentences": [],
         "long_sentences": [],
         "metrics": {
           "flesch_kincaid_grade": 4.9,
@@ -2995,6 +3005,7 @@
             "detail": "found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line"
           }
         ],
+        "joined_sentences": [],
         "long_sentences": [
           {
             "text": "Before the commencement of the migration, it was determined that there are a number of limitations in relation to the current implementation of the dynamic load management functionality, which, because capacity groups are modelled as circuits in the legacy platform, necessitates additional configurability in terms of how meter values are utilised for the purposes of load balancing across the estate.",
@@ -3168,6 +3179,7 @@
           }
         ],
         "insight": null,
+        "joined_sentences": [],
         "long_sentences": [
           {
             "text": "Before the commencement of the migration, it was determined that there are a number of limitations in relation to the current implementation of the dynamic load management functionality, which, because capacity groups are modelled as circuits in the legacy platform, necessitates additional configurability in terms of how meter values are utilised for the purposes of load balancing across the estate.",
@@ -3757,6 +3769,7 @@
             "detail": "found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line"
           }
         ],
+        "joined_sentences": [],
         "long_sentences": [],
         "metrics": {
           "sentences": 3,
@@ -3816,6 +3829,7 @@
           }
         ],
         "insight": null,
+        "joined_sentences": [],
         "long_sentences": [],
         "metrics": {
           "sentences": 3,
@@ -4045,7 +4059,7 @@
             "detail": "found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line"
           }
         ],
-        "long_sentences": [
+        "joined_sentences": [
           {
             "text": "The boiler heats water, the water heats the radiator, and only then does the radiator heat the air, so the sensor learns about each burst of heat minutes after it was paid for.",
             "words": 33
@@ -4055,6 +4069,7 @@
             "words": 26
           }
         ],
+        "long_sentences": [],
         "metrics": {
           "flesch_kincaid_grade": 7.0,
           "flesch_reading_ease": 73.1,
@@ -4069,10 +4084,7 @@
           "sentences": 10,
           "words": 159
         },
-        "over_budget": [
-          "max_sentence_words",
-          "pct_long_sentences"
-        ],
+        "over_budget": [],
         "promised_not_unpacked": [],
         "scored": true,
         "total_fixes": 2,
@@ -4080,7 +4092,7 @@
       },
       "simplify --check --baseline --insight --report": {
         "exit": 1,
-        "stderr": "== simplify report ==========================\nCLUTTER CUT (auto, 2):\n    1  padding:note\n    1  padding:ultimately\nFLAGGED (needs the rewrite pass, 4):\n    2  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . ...ast the setting.  This is a really very common issue that a lo...\n         . ...setting.  This is a really very common issue that a lot of...\n    1  passive  -> passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")\n         . ...st of heat minutes after it was paid for.  It works in two steps...\n    1  it-is-that  -> delayed subject: say who does what\n         . ...ave with their heating, and it is something that we all experience.\nSCORECARD  (159 words, 10 sentences, 5 paragraphs):\n  [PASS]  mean_sentence_words       15.9   budget <= 18.0\n  [OVER]  max_sentence_words          33   budget <= 30\n  [OVER]  pct_long_sentences        20.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       73.1   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       7.0   budget <= 12.0\n  [PASS]  pct_passive_sentences     10.0   budget <= 10.0\n  [PASS]  pct_long_words             8.2   budget <= 20.0\n  [PASS]  max_paragraph_words         49   budget <= 90\n  [PASS]  pct_ly_adverbs             0.6   budget <= 4.0\nLENGTH  [PASS]  169 -> 159 words, at most 219\n        77.5% of the source explains (131 words, may grow 1.5x); the rest (38 words) owes a 40.0% cut\nJOINTS  [PASS]  3 in the sentences that survived, 3 in the rewrite (because/so/but/if...)\nLISTS   [PASS]  2 unpacked list(s), every part kept\nLONGEST SENTENCES (over 25 words, cut or split):\n   33w  The boiler heats water, the water heats the radiator, and only then d...\n   26w  Second, the heat already in the water and the radiator keeps arriving...\nPASSIVE SENTENCES (name the actor):\n       The boiler heats water, the water heats the radiator, and only then d...\nINSIGHT STRUCTURE  [FAIL] (2):\n  [FAIL]  sections           missing template section(s): Context, Insight Description, Significance, Customer Details\n  [FAIL]  significance       found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line\nVERDICT: OVER BUDGET on max_sentence_words, pct_long_sentences, insight structure\n=============================================\n",
+        "stderr": "== simplify report ==========================\nCLUTTER CUT (auto, 2):\n    1  padding:note\n    1  padding:ultimately\nFLAGGED (needs the rewrite pass, 4):\n    2  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . ...ast the setting.  This is a really very common issue that a lo...\n         . ...setting.  This is a really very common issue that a lot of...\n    1  passive  -> passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")\n         . ...st of heat minutes after it was paid for.  It works in two steps...\n    1  it-is-that  -> delayed subject: say who does what\n         . ...ave with their heating, and it is something that we all experience.\nSCORECARD  (159 words, 10 sentences, 5 paragraphs):\n  [PASS]  mean_sentence_words       15.9   budget <= 18.0\n  [PASS]  max_sentence_words          33   budget <= 30   (24 without joined sentences)\n  [PASS]  pct_long_sentences        20.0   budget <= 15.0   (0.0 without joined sentences)\n  [PASS]  flesch_reading_ease       73.1   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       7.0   budget <= 12.0\n  [PASS]  pct_passive_sentences     10.0   budget <= 10.0\n  [PASS]  pct_long_words             8.2   budget <= 20.0\n  [PASS]  max_paragraph_words         49   budget <= 90\n  [PASS]  pct_ly_adverbs             0.6   budget <= 4.0\nLENGTH  [PASS]  169 -> 159 words, at most 219\n        77.5% of the source explains (131 words, may grow 1.5x); the rest (38 words) owes a 40.0% cut\nJOINTS  [PASS]  3 in the sentences that survived, 3 in the rewrite (because/so/but/if...)\nLISTS   [PASS]  2 unpacked list(s), every part kept\nJOINED SENTENCES (explanation, every clause within 25 words: excused):\n   33w  The boiler heats water, the water heats the radiator, and only then d...\n   26w  Second, the heat already in the water and the radiator keeps arriving...\nPASSIVE SENTENCES (name the actor):\n       The boiler heats water, the water heats the radiator, and only then d...\nINSIGHT STRUCTURE  [FAIL] (2):\n  [FAIL]  sections           missing template section(s): Context, Insight Description, Significance, Customer Details\n  [FAIL]  significance       found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line\nVERDICT: OVER BUDGET on insight structure\n=============================================\n",
         "stdout": "# Why the radiator overshoots\n\nA thermostat loop has three parts: a sensor, a controller and a boiler. The\nsensor reads the room, the controller compares it with the setting, and the\nboiler adds heat when the room is cold.\n\nYou might wonder why the room ends up warmer than the setting. The answer is\ndelay. The boiler heats water, the water heats the radiator, and only then does\nthe radiator heat the air, so the sensor learns about each burst of heat\nminutes after it was paid for.\n\nIt works in two steps. First, the controller keeps the boiler on until the\nsensor says the room is warm enough. Second, the heat already in the water and\nthe radiator keeps arriving after the boiler stops, which means the room\ncarries on warming past the setting.\n\nThis is a really very common\nissue that a lot of people have with their heating, and it is something that we\nall experience.\n"
       },
       "simplify --check --baseline --json": {
@@ -4144,7 +4156,7 @@
           }
         ],
         "insight": null,
-        "long_sentences": [
+        "joined_sentences": [
           {
             "text": "The boiler heats water, the water heats the radiator, and only then does the radiator heat the air, so the sensor learns about each burst of heat minutes after it was paid for.",
             "words": 33
@@ -4154,6 +4166,7 @@
             "words": 26
           }
         ],
+        "long_sentences": [],
         "metrics": {
           "flesch_kincaid_grade": 7.0,
           "flesch_reading_ease": 73.1,
@@ -4168,18 +4181,15 @@
           "sentences": 10,
           "words": 159
         },
-        "over_budget": [
-          "max_sentence_words",
-          "pct_long_sentences"
-        ],
+        "over_budget": [],
         "promised_not_unpacked": [],
         "scored": true,
         "total_fixes": 2,
         "total_flags": 4
       },
       "simplify --check --baseline --report": {
-        "exit": 1,
-        "stderr": "== simplify report ==========================\nCLUTTER CUT (auto, 2):\n    1  padding:note\n    1  padding:ultimately\nFLAGGED (needs the rewrite pass, 4):\n    2  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . ...ast the setting.  This is a really very common issue that a lo...\n         . ...setting.  This is a really very common issue that a lot of...\n    1  passive  -> passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")\n         . ...st of heat minutes after it was paid for.  It works in two steps...\n    1  it-is-that  -> delayed subject: say who does what\n         . ...ave with their heating, and it is something that we all experience.\nSCORECARD  (159 words, 10 sentences, 5 paragraphs):\n  [PASS]  mean_sentence_words       15.9   budget <= 18.0\n  [OVER]  max_sentence_words          33   budget <= 30\n  [OVER]  pct_long_sentences        20.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       73.1   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       7.0   budget <= 12.0\n  [PASS]  pct_passive_sentences     10.0   budget <= 10.0\n  [PASS]  pct_long_words             8.2   budget <= 20.0\n  [PASS]  max_paragraph_words         49   budget <= 90\n  [PASS]  pct_ly_adverbs             0.6   budget <= 4.0\nLENGTH  [PASS]  169 -> 159 words, at most 219\n        77.5% of the source explains (131 words, may grow 1.5x); the rest (38 words) owes a 40.0% cut\nJOINTS  [PASS]  3 in the sentences that survived, 3 in the rewrite (because/so/but/if...)\nLISTS   [PASS]  2 unpacked list(s), every part kept\nLONGEST SENTENCES (over 25 words, cut or split):\n   33w  The boiler heats water, the water heats the radiator, and only then d...\n   26w  Second, the heat already in the water and the radiator keeps arriving...\nPASSIVE SENTENCES (name the actor):\n       The boiler heats water, the water heats the radiator, and only then d...\nVERDICT: OVER BUDGET on max_sentence_words, pct_long_sentences\n=============================================\n",
+        "exit": 0,
+        "stderr": "== simplify report ==========================\nCLUTTER CUT (auto, 2):\n    1  padding:note\n    1  padding:ultimately\nFLAGGED (needs the rewrite pass, 4):\n    2  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . ...ast the setting.  This is a really very common issue that a lo...\n         . ...setting.  This is a really very common issue that a lot of...\n    1  passive  -> passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")\n         . ...st of heat minutes after it was paid for.  It works in two steps...\n    1  it-is-that  -> delayed subject: say who does what\n         . ...ave with their heating, and it is something that we all experience.\nSCORECARD  (159 words, 10 sentences, 5 paragraphs):\n  [PASS]  mean_sentence_words       15.9   budget <= 18.0\n  [PASS]  max_sentence_words          33   budget <= 30   (24 without joined sentences)\n  [PASS]  pct_long_sentences        20.0   budget <= 15.0   (0.0 without joined sentences)\n  [PASS]  flesch_reading_ease       73.1   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       7.0   budget <= 12.0\n  [PASS]  pct_passive_sentences     10.0   budget <= 10.0\n  [PASS]  pct_long_words             8.2   budget <= 20.0\n  [PASS]  max_paragraph_words         49   budget <= 90\n  [PASS]  pct_ly_adverbs             0.6   budget <= 4.0\nLENGTH  [PASS]  169 -> 159 words, at most 219\n        77.5% of the source explains (131 words, may grow 1.5x); the rest (38 words) owes a 40.0% cut\nJOINTS  [PASS]  3 in the sentences that survived, 3 in the rewrite (because/so/but/if...)\nLISTS   [PASS]  2 unpacked list(s), every part kept\nJOINED SENTENCES (explanation, every clause within 25 words: excused):\n   33w  The boiler heats water, the water heats the radiator, and only then d...\n   26w  Second, the heat already in the water and the radiator keeps arriving...\nPASSIVE SENTENCES (name the actor):\n       The boiler heats water, the water heats the radiator, and only then d...\nVERDICT: within budget\n=============================================\n",
         "stdout": "# Why the radiator overshoots\n\nA thermostat loop has three parts: a sensor, a controller and a boiler. The\nsensor reads the room, the controller compares it with the setting, and the\nboiler adds heat when the room is cold.\n\nYou might wonder why the room ends up warmer than the setting. The answer is\ndelay. The boiler heats water, the water heats the radiator, and only then does\nthe radiator heat the air, so the sensor learns about each burst of heat\nminutes after it was paid for.\n\nIt works in two steps. First, the controller keeps the boiler on until the\nsensor says the room is warm enough. Second, the heat already in the water and\nthe radiator keeps arriving after the boiler stops, which means the room\ncarries on warming past the setting.\n\nThis is a really very common\nissue that a lot of people have with their heating, and it is something that we\nall experience.\n"
       }
     },
@@ -4322,10 +4332,7 @@
         "sentences": 10,
         "words": 159
       },
-      "over_budget": [
-        "max_sentence_words",
-        "pct_long_sentences"
-      ],
+      "over_budget": [],
       "scored": true
     },
     "spans": {
@@ -4537,6 +4544,7 @@
             "detail": "found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line"
           }
         ],
+        "joined_sentences": [],
         "long_sentences": [],
         "metrics": {
           "flesch_kincaid_grade": 8.4,
@@ -4626,6 +4634,7 @@
           }
         ],
         "insight": null,
+        "joined_sentences": [],
         "long_sentences": [],
         "metrics": {
           "flesch_kincaid_grade": 8.4,
@@ -4870,6 +4879,7 @@
             "detail": "customer estate size: \"18,000 residential chargers\" — describe it qualitatively instead (\"a large estate\"); the number is the customer's to disclose"
           }
         ],
+        "joined_sentences": [],
         "long_sentences": [],
         "metrics": {
           "flesch_kincaid_grade": 8.6,
@@ -4930,6 +4940,7 @@
         "fixes": {},
         "flags": [],
         "insight": null,
+        "joined_sentences": [],
         "long_sentences": [],
         "metrics": {
           "flesch_kincaid_grade": 8.6,
@@ -5160,6 +5171,7 @@
             "detail": "customer estate size: \"18,000 chargers\" — describe it qualitatively instead (\"a large estate\"); the number is the customer's to disclose"
           }
         ],
+        "joined_sentences": [],
         "long_sentences": [
           {
             "text": "Dana Whitfield (Product Manager, Halcyon Energy) asked on 2026-09-09 that the platform read a charger's real configuration each time it boots, and keep our record in step.",
@@ -5223,6 +5235,7 @@
         "fixes": {},
         "flags": [],
         "insight": null,
+        "joined_sentences": [],
         "long_sentences": [
           {
             "text": "Dana Whitfield (Product Manager, Halcyon Energy) asked on 2026-09-09 that the platform read a charger's real configuration each time it boots, and keep our record in step.",
@@ -5771,6 +5784,7 @@
             "detail": "found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line"
           }
         ],
+        "joined_sentences": [],
         "long_sentences": [
           {
             "text": "In an era where drivers expect instant charging, our streamlined onboarding plays a crucial role, and the curated tariff library showcases what a cutting-edge platform can do.",
@@ -5853,6 +5867,7 @@
           }
         ],
         "insight": null,
+        "joined_sentences": [],
         "long_sentences": [
           {
             "text": "In an era where drivers expect instant charging, our streamlined onboarding plays a crucial role, and the curated tariff library showcases what a cutting-edge platform can do.",
@@ -6548,6 +6563,7 @@
             "detail": "found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line"
           }
         ],
+        "joined_sentences": [],
         "long_sentences": [],
         "metrics": {
           "flesch_kincaid_grade": 7.0,
@@ -6643,6 +6659,7 @@
           }
         ],
         "insight": null,
+        "joined_sentences": [],
         "long_sentences": [],
         "metrics": {
           "flesch_kincaid_grade": 7.0,
@@ -7263,6 +7280,7 @@
             "detail": "found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line"
           }
         ],
+        "joined_sentences": [],
         "long_sentences": [],
         "metrics": {
           "flesch_kincaid_grade": 5.9,
@@ -7321,6 +7339,7 @@
         "fixes": {},
         "flags": [],
         "insight": null,
+        "joined_sentences": [],
         "long_sentences": [],
         "metrics": {
           "flesch_kincaid_grade": 5.9,
@@ -7546,6 +7565,7 @@
             "detail": "found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line"
           }
         ],
+        "joined_sentences": [],
         "long_sentences": [],
         "metrics": {
           "flesch_kincaid_grade": 4.3,
@@ -7604,6 +7624,7 @@
         "fixes": {},
         "flags": [],
         "insight": null,
+        "joined_sentences": [],
         "long_sentences": [],
         "metrics": {
           "flesch_kincaid_grade": 4.3,
@@ -7817,6 +7838,7 @@
             "detail": "found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line"
           }
         ],
+        "joined_sentences": [],
         "long_sentences": [],
         "metrics": {
           "sentences": 2,
@@ -7867,6 +7889,7 @@
         },
         "flags": [],
         "insight": null,
+        "joined_sentences": [],
         "long_sentences": [],
         "metrics": {
           "sentences": 2,

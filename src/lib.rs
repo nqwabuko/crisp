@@ -333,11 +333,31 @@ pub struct Metrics {
     /// Every sentence the passive rule matched, in document order.
     #[serde(skip)]
     pub passive_sentences: Vec<String>,
+    /// Long sentences excused from the sentence budget: in an explanatory
+    /// paragraph, and joined rather than stacked (`explain::joined`). Not in
+    /// `long_sentences`. `values` still reports the true lengths, which the
+    /// spans and ink's live indicator agree with; only the verdict excuses them.
+    #[serde(skip)]
+    pub joined_sentences: Vec<(usize, String)>,
+    /// `max_sentence_words` and `pct_long_sentences` as the budget judges them,
+    /// joined sentences left out. Equal to the reported values when none are.
+    #[serde(skip)]
+    pub judged: Option<(f64, f64)>,
 }
 
 impl Metrics {
     pub fn get(&self, key: &str) -> Option<f64> {
         self.values.get(key).copied()
+    }
+
+    /// A metric as the budget judges it: the reported value, except that joined
+    /// explanatory sentences do not count against the sentence-length limits.
+    pub fn judged(&self, key: &str) -> Option<f64> {
+        match (key, self.judged) {
+            ("max_sentence_words", Some((max, _))) => Some(max),
+            ("pct_long_sentences", Some((_, pct))) => Some(pct),
+            _ => self.get(key),
+        }
     }
 
     /// The budgeted metrics this document fails, in budget order.
@@ -348,7 +368,7 @@ impl Metrics {
         budget
             .limits
             .iter()
-            .filter(|(key, bound)| self.get(key).is_some_and(|v| !bound.ok(v)))
+            .filter(|(key, bound)| self.judged(key).is_some_and(|v| !bound.ok(v)))
             .map(|(key, _)| *key)
             .collect()
     }
@@ -447,11 +467,38 @@ pub fn measure(text: &str) -> Metrics {
         .collect();
     long_sentences.sort_by_key(|&(n, _)| std::cmp::Reverse(n));
 
+    // Long sentences that join clauses inside an explanation are excused from
+    // the budget, and listed apart, so the report can say which and why.
+    let mut joined_sentences = Vec::new();
+    let mut judged = None;
+    if !long_sentences.is_empty() {
+        let joined = explain::joined_sentences(text);
+        if !joined.is_empty() {
+            let (excused, kept): (Vec<_>, Vec<_>) = long_sentences
+                .into_iter()
+                .partition(|(_, s)| joined.contains(&explain::sentence_key(s)));
+            long_sentences = kept;
+            joined_sentences = excused;
+            if !joined_sentences.is_empty() {
+                let max = lengths
+                    .iter()
+                    .zip(&sentences)
+                    .filter(|(_, s)| !joined.contains(&explain::sentence_key(s)))
+                    .map(|(&n, _)| n)
+                    .max()
+                    .unwrap_or(0);
+                judged = Some((max as f64, pct(long_sentences.len(), n_sents)));
+            }
+        }
+    }
+
     Metrics {
         values,
         scored: true,
         long_sentences,
         passive_sentences,
+        joined_sentences,
+        judged,
     }
 }
 

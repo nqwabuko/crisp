@@ -211,7 +211,11 @@ longer. The gate knows this: it scores each source paragraph, asks 40% only of
 the ones that are not explaining, and fails the run if a joint went missing from
 a sentence that survived (`JOINTS [LOST]`) or an unpacked list lost a part
 (`LISTS [LOST]`). Restoring an explanation that was cut too far (2-6x growth) is
-writing, not editing: run that rewrite without `--baseline`.
+writing, not editing: run that rewrite without `--baseline`. A long sentence in
+an explanation that joins short clauses ("..., so ...", "..., which means
+...") is excused from the sentence budget and listed under `JOINED
+SENTENCES`; don't split it just to get under 30 words if the joint is what
+makes it clear.
 `references/simplify.md` Part E has the why and the sources.
 4. **Words.** Only now. Every filler the `padding` flag lists, every intensifier,
    every "in fact", every stacked adjective.

@@ -338,6 +338,9 @@ pub struct Paragraph {
     /// fill, which a joint inside them does not redeem.
     pub padding: usize,
     pub explanatory: bool,
+    /// The paragraph, code masked, for callers that need its sentences.
+    #[serde(skip)]
+    pub text: String,
 }
 
 /// Joints, definitions, unpacked lists and anticipations, less padding, per
@@ -377,6 +380,7 @@ pub fn paragraphs(text: &str) -> Vec<Paragraph> {
                 anticipations,
                 padding,
                 explanatory: words >= 12 && signal / sentences as f64 >= EXPLANATORY_DENSITY,
+                text: p.clone(),
             }
         })
         .collect()
@@ -395,6 +399,59 @@ pub fn explanatory_share(text: &str) -> f64 {
         .map(|p| p.words)
         .sum();
     explaining as f64 / total as f64
+}
+
+// ── joined sentences ─────────────────────────────────────────────────────────
+
+/// The hard ceiling on a joined sentence: past this, even well-joined clauses
+/// are too much to hold at once.
+pub const JOINED_MAX_WORDS: usize = 45;
+
+/// A long sentence that is long because it joins clauses, not because it stacks
+/// them: it has at least one joint, every clause between its joints (and any
+/// `;` or `:`) is within `LONG_SENTENCE` words, and the whole is within
+/// `JOINED_MAX_WORDS`. "The boiler heats the water, so the sensor learns late"
+/// gives the reader somewhere to rest at the "so"; the same words strung with
+/// "which" and "in terms of" do not. A "because" clause tends to help recall
+/// rather than hurt it (Pearson 1974-75), which a word count cannot see.
+pub fn joined(sentence: &str) -> bool {
+    let words = text::count_words(sentence);
+    if words <= super::LONG_SENTENCE || words > JOINED_MAX_WORDS {
+        return false;
+    }
+    let mut cuts: Vec<usize> = joints(sentence).into_iter().map(|(_, at)| at).collect();
+    if cuts.is_empty() {
+        return false;
+    }
+    cuts.extend(sentence.match_indices([';', ':']).map(|(at, _)| at));
+    cuts.push(0);
+    cuts.push(sentence.len());
+    cuts.sort_unstable();
+    cuts.dedup();
+    cuts.windows(2)
+        .all(|w| text::count_words(&sentence[w[0]..w[1]]) <= super::LONG_SENTENCE)
+}
+
+/// A sentence as a comparable key: its words, single-spaced. The same sentence
+/// segmented from masked or from stripped text gives the same key.
+pub fn sentence_key(sentence: &str) -> String {
+    text::WORD
+        .find_iter(sentence)
+        .map(|m| m.as_str())
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
+/// The keys of the long sentences in explanatory paragraphs that are joined
+/// rather than stacked, so the sentence budget can excuse them.
+pub fn joined_sentences(text: &str) -> std::collections::HashSet<String> {
+    paragraphs(text)
+        .into_iter()
+        .filter(|p| p.explanatory)
+        .flat_map(|p| text::split_sentences(&p.text))
+        .filter(|s| joined(s))
+        .map(|s| sentence_key(&s))
+        .collect()
 }
 
 // ── what a rewrite kept ──────────────────────────────────────────────────────
@@ -624,6 +681,46 @@ mod tests {
         let p = promises("The gate has three parts:\na key, a lock and a hinge. It works.");
         assert!(p[0].unpacked);
         assert_eq!(p[0].items, ["key", "lock", "hinge"]);
+    }
+
+    #[test]
+    fn a_long_sentence_is_joined_only_when_every_clause_is_short() {
+        // 33 words, one "so", clauses of 20 and 13.
+        let joined_ok = "The boiler heats the water, the water heats the radiator, and only \
+                         then does the radiator heat the air, so the sensor learns about each \
+                         burst of heat late.";
+        assert!(joined(joined_ok));
+        // 33 words with no joint at all: stacked, not joined.
+        let stacked = "The boiler heats the water and the water heats the radiator and the \
+                       radiator heats the air and the air reaches the sensor in the hallway \
+                       near the door eventually.";
+        assert!(!joined(stacked));
+        // A joint, but one clause is still over 25 words.
+        let lopsided = "The boiler heats the water and the water heats the radiator and the \
+                        radiator heats the air and the air reaches the sensor in the hallway \
+                        near the door, so it lags.";
+        assert!(!joined(lopsided));
+        // Joined throughout, but past the 45-word ceiling.
+        let too_long = format!(
+            "{joined_ok} {}",
+            "and so the reading lags because the pipe is long, ".repeat(2)
+        );
+        assert!(!joined(&too_long));
+    }
+
+    #[test]
+    fn only_explanatory_paragraphs_excuse_a_joined_sentence() {
+        let joined_ok = "The boiler heats the water, the water heats the radiator, and only \
+                         then does the radiator heat the air, so the sensor learns about each \
+                         burst of heat late.";
+        let explaining = format!(
+            "{joined_ok} If the room is cold, the boiler fires. It stops when the sensor says warm."
+        );
+        let padding = format!(
+            "It should be noted that we are very excited. {joined_ok} We really look forward to it."
+        );
+        assert_eq!(joined_sentences(&explaining).len(), 1);
+        assert!(joined_sentences(&padding).is_empty());
     }
 
     #[test]

@@ -471,6 +471,7 @@ fn record_config() -> Value {
             "density": crisp::explain::EXPLANATORY_DENSITY,
             "survives": crisp::explain::SURVIVES,
             "min_joints": crisp::report::MIN_JOINTS_TO_GATE,
+            "joined_max_words": crisp::explain::JOINED_MAX_WORDS,
         },
         "insight": {
             "sections": crisp::insight::SECTIONS,
