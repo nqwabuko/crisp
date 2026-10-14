@@ -382,6 +382,12 @@ pub(crate) fn round1(x: f64) -> f64 {
 }
 
 pub fn measure(text: &str) -> Metrics {
+    measure_against(text, None)
+}
+
+/// `measure`, judging a rewrite of `source`: a long sentence is excused from
+/// the sentence budget only if it also came from the source's explanation.
+pub fn measure_against(text: &str, source: Option<&str>) -> Metrics {
     let prose = text::strip_code(text);
     let sentences = text::split_sentences(&prose);
     let paragraphs = text::split_paragraphs(&prose);
@@ -472,22 +478,47 @@ pub fn measure(text: &str) -> Metrics {
     let mut joined_sentences = Vec::new();
     let mut judged = None;
     if !long_sentences.is_empty() {
-        let joined = explain::joined_sentences(text);
+        let mut joined = explain::joined_sentences(text, source);
         if !joined.is_empty() {
-            let (excused, kept): (Vec<_>, Vec<_>) = long_sentences
-                .into_iter()
-                .partition(|(_, s)| joined.contains(&explain::sentence_key(s)));
-            long_sentences = kept;
-            joined_sentences = excused;
-            if !joined_sentences.is_empty() {
-                let max = lengths
+            // Each occurrence is excused once: a twin elsewhere is not.
+            let mut take = |s: &str| match joined.get_mut(&explain::sentence_key(s)) {
+                Some(n) if *n > 0 => {
+                    *n -= 1;
+                    true
+                }
+                _ => false,
+            };
+            let excused_at: Vec<bool> = lengths
+                .iter()
+                .zip(&sentences)
+                .map(|(&n, s)| n > LONG_SENTENCE && take(s))
+                .collect();
+            let max = lengths
+                .iter()
+                .zip(&excused_at)
+                .filter(|(_, excused)| !**excused)
+                .map(|(&n, _)| n)
+                .max()
+                .unwrap_or(0);
+            let mut excused: Vec<(usize, String)> = lengths
+                .iter()
+                .zip(&sentences)
+                .zip(&excused_at)
+                .filter(|(_, excused)| **excused)
+                .map(|((&n, s), _)| (n, s.clone()))
+                .collect();
+            excused.sort_by_key(|&(n, _)| std::cmp::Reverse(n));
+            if !excused.is_empty() {
+                long_sentences = lengths
                     .iter()
                     .zip(&sentences)
-                    .filter(|(_, s)| !joined.contains(&explain::sentence_key(s)))
-                    .map(|(&n, _)| n)
-                    .max()
-                    .unwrap_or(0);
+                    .zip(&excused_at)
+                    .filter(|((n, _), excused)| **n > LONG_SENTENCE && !**excused)
+                    .map(|((&n, s), _)| (n, s.clone()))
+                    .collect();
+                long_sentences.sort_by_key(|&(n, _)| std::cmp::Reverse(n));
                 judged = Some((max as f64, pct(long_sentences.len(), n_sents)));
+                joined_sentences = excused;
             }
         }
     }

@@ -121,3 +121,57 @@ fn a_faithful_explanation_passes_the_sentence_budget_on_joined_sentences() {
     );
     assert_eq!(code, 0, "{r}");
 }
+
+/// One document on its own, no baseline: the sentence budget's verdict.
+fn judge(file: &str, baseline: Option<&str>) -> (String, i32) {
+    let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures/cases/joined");
+    let mut cmd = Command::new(env!("CARGO_BIN_EXE_crisp"));
+    cmd.args(["simplify", "--report", "--check"]);
+    if let Some(src) = baseline {
+        cmd.arg("--baseline").arg(dir.join(src));
+    }
+    let out = cmd.arg(dir.join(file)).output().expect("crisp runs");
+    (
+        String::from_utf8(out.stderr).expect("utf-8 report"),
+        out.status.code().expect("an exit code"),
+    )
+}
+
+#[test]
+fn a_business_note_does_not_excuse_its_own_long_sentences() {
+    // Each long sentence sits alone in its paragraph with one "so" or
+    // "because": one sentence is not an explanation.
+    let (r, code) = judge("status.md", None);
+    assert!(r.contains("OVER BUDGET on max_sentence_words"), "{r}");
+    assert_eq!(code, 1);
+    // Rewritten from a source with no explanation, nothing is excused either.
+    let (r, code) = judge("status.md", Some("src.md"));
+    assert!(!r.contains("JOINED SENTENCES"), "{r}");
+    assert_eq!(code, 1);
+}
+
+#[test]
+fn a_joint_in_a_quoted_title_and_a_stack_of_ifs_are_not_joined() {
+    for file in ["title.md", "ifchain.md"] {
+        let (r, code) = judge(file, None);
+        assert!(!r.contains("JOINED SENTENCES"), "{file}:\n{r}");
+        assert_eq!(code, 1, "{file}");
+    }
+}
+
+#[test]
+fn a_twin_in_a_padding_paragraph_is_not_excused_with_its_original() {
+    let (r, _) = judge("dup.md", None);
+    assert!(
+        line(&r, "  [PASS]  pct_long_sentences").contains("(12.5 without"),
+        "one of the two copies is still counted:\n{r}"
+    );
+    assert!(r.contains("LONGEST SENTENCES"), "{r}");
+}
+
+#[test]
+fn markdown_stripped_once_still_matches_the_excused_sentence() {
+    let (r, code) = judge("nomatch.md", None);
+    assert!(r.contains("JOINED SENTENCES"), "{r}");
+    assert_eq!(code, 0, "{r}");
+}

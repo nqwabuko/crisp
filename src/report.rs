@@ -347,7 +347,7 @@ pub struct Simplified {
 impl Simplified {
     pub fn new(text: &str, baseline: Option<&str>) -> Self {
         let rewrite = rewrite::simplify(text);
-        let metrics = super::measure(&rewrite.text);
+        let metrics = super::measure_against(&rewrite.text, baseline);
         let compression = baseline.map(|source| Compression::between(source, &rewrite.text));
         let explanation = baseline.map(|source| Explanation::between(source, &rewrite.text));
         let source_lists = baseline.map_or(0, |source| {

@@ -1,0 +1,1 @@
+The boiler heats the water, the water heats the radiator, and only then does the radiator heat the air [see]*(guide)*, so the sensor learns about each burst of heat late. If the room is cold, the boiler fires. It stops when the sensor says warm.

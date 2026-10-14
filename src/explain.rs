@@ -354,13 +354,20 @@ pub const EXPLANATORY_DENSITY: f64 = 0.4;
 /// The paragraphs of `text`, scored. Headings, fences and lists count as part of
 /// the paragraph they sit in, as the metrics count them.
 pub fn paragraphs(text: &str) -> Vec<Paragraph> {
-    // Code is masked first: paragraph splitting drops fence lines, after which
-    // a fenced `if`/`while` would read as prose joints.
-    text::split_paragraphs(&mask_code(text))
-        .iter()
-        .map(|p| {
+    // Code is masked first, so a fenced `if`/`while` never reads as a prose
+    // joint, and each paragraph is the raw slice of the masked text: its
+    // sentences are then split (and its markdown stripped) once, exactly as
+    // `measure` does, so a sentence found here is the sentence measured there.
+    let masked = mask_code(text);
+    text::block_units(&masked)
+        .into_iter()
+        .map(|(start, end, _)| masked[start..end].to_string())
+        .filter(|p| text::WORD.is_match(p))
+        .map(|raw| {
+            let p = &text::plain(&raw);
             let words = text::count_words(p);
-            let sentences = text::split_sentences(p).len().max(1);
+            let n_sentences = text::split_sentences(&raw).len();
+            let sentences = n_sentences.max(1);
             let joints = joints(p).len();
             let definitions = DEFINITION.find_iter(p).count();
             let promises = promises(p).iter().filter(|x| x.unpacked).count();
@@ -370,7 +377,11 @@ pub fn paragraphs(text: &str) -> Vec<Paragraph> {
                 .chain(super::detell_locate(p).iter())
                 .filter(|h| h.kind != super::Kind::Complexity || h.rule.starts_with("hedge"))
                 .count();
-            let signal = (joints + definitions + promises + anticipations) as f64 - padding as f64;
+            // An unpacked list counts twice: it names the parts and orders
+            // them, which is the pre-training move (Mayer), the best supported
+            // of all.
+            let signal =
+                (joints + definitions + 2 * promises + anticipations) as f64 - padding as f64;
             Paragraph {
                 words,
                 sentences,
@@ -379,8 +390,13 @@ pub fn paragraphs(text: &str) -> Vec<Paragraph> {
                 promises,
                 anticipations,
                 padding,
-                explanatory: words >= 12 && signal / sentences as f64 >= EXPLANATORY_DENSITY,
-                text: p.clone(),
+                // An explanation links claims, so it takes two sentences and
+                // two signals: a lone sentence with one "so" is not one.
+                explanatory: words >= 12
+                    && n_sentences >= 2
+                    && signal >= 2.0
+                    && signal / sentences as f64 >= EXPLANATORY_DENSITY,
+                text: raw,
             }
         })
         .collect()
@@ -407,6 +423,15 @@ pub fn explanatory_share(text: &str) -> f64 {
 /// are too much to hold at once.
 pub const JOINED_MAX_WORDS: usize = 45;
 
+/// At most this many clauses: one or two joints is a sentence with somewhere to
+/// rest; seven short "if"s in a row is a stack, however short each one is.
+pub const JOINED_MAX_CLAUSES: usize = 3;
+
+/// Quoted text, which is someone's words or a title ("Because Internet"), not a
+/// joint between the sentence's own clauses.
+static QUOTED: LazyLock<Regex> =
+    LazyLock::new(|| re("\"[^\"\n]*\"|\u{201c}[^\u{201d}\n]*\u{201d}"));
+
 /// A long sentence that is long because it joins clauses, not because it stacks
 /// them: it has at least one joint, every clause between its joints (and any
 /// `;` or `:`) is within `LONG_SENTENCE` words, and the whole is within
@@ -419,17 +444,35 @@ pub fn joined(sentence: &str) -> bool {
     if words <= super::LONG_SENTENCE || words > JOINED_MAX_WORDS {
         return false;
     }
-    let mut cuts: Vec<usize> = joints(sentence).into_iter().map(|(_, at)| at).collect();
+    let quoted: Vec<(usize, usize)> = QUOTED
+        .find_iter(sentence)
+        .map(|m| (m.start(), m.end()))
+        .collect();
+    let outside = |at: &usize| !quoted.iter().any(|&(s, e)| s <= *at && *at < e);
+    let mut cuts: Vec<usize> = joints(sentence)
+        .into_iter()
+        .map(|(_, at)| at)
+        .filter(outside)
+        .collect();
     if cuts.is_empty() {
         return false;
     }
-    cuts.extend(sentence.match_indices([';', ':']).map(|(at, _)| at));
+    cuts.extend(
+        sentence
+            .match_indices([';', ':'])
+            .map(|(at, _)| at)
+            .filter(outside),
+    );
     cuts.push(0);
     cuts.push(sentence.len());
     cuts.sort_unstable();
     cuts.dedup();
-    cuts.windows(2)
-        .all(|w| text::count_words(&sentence[w[0]..w[1]]) <= super::LONG_SENTENCE)
+    let clauses: Vec<usize> = cuts
+        .windows(2)
+        .map(|w| text::count_words(&sentence[w[0]..w[1]]))
+        .filter(|&n| n > 0)
+        .collect();
+    clauses.len() <= JOINED_MAX_CLAUSES && clauses.iter().all(|&n| n <= super::LONG_SENTENCE)
 }
 
 /// A sentence as a comparable key: its words, single-spaced. The same sentence
@@ -442,16 +485,43 @@ pub fn sentence_key(sentence: &str) -> String {
         .join(" ")
 }
 
-/// The keys of the long sentences in explanatory paragraphs that are joined
-/// rather than stacked, so the sentence budget can excuse them.
-pub fn joined_sentences(text: &str) -> std::collections::HashSet<String> {
-    paragraphs(text)
-        .into_iter()
-        .filter(|p| p.explanatory)
-        .flat_map(|p| text::split_sentences(&p.text))
-        .filter(|s| joined(s))
-        .map(|s| sentence_key(&s))
-        .collect()
+/// The long sentences in explanatory paragraphs that are joined rather than
+/// stacked, so the sentence budget can excuse them: each key with how many
+/// times it occurs there, so a twin of an excused sentence in a padding
+/// paragraph is not excused with it.
+///
+/// With a `source` (a `--baseline`), a sentence also has to have come from an
+/// explanatory paragraph of the source: half its content words there. Without
+/// that, a rewrite of a business note could turn "and" into "so" and earn the
+/// excuse.
+pub fn joined_sentences(
+    text: &str,
+    source: Option<&str>,
+) -> std::collections::HashMap<String, usize> {
+    let explained: Option<std::collections::HashSet<String>> = source.map(|src| {
+        paragraphs(src)
+            .into_iter()
+            .filter(|p| p.explanatory)
+            .flat_map(|p| content(&text::plain(&p.text)))
+            .collect()
+    });
+    let from_explanation = |s: &str| {
+        explained.as_ref().is_none_or(|set| {
+            let words = content(s);
+            !words.is_empty()
+                && words.iter().filter(|w| set.contains(*w)).count() as f64
+                    >= SURVIVES * words.len() as f64
+        })
+    };
+    let mut out = std::collections::HashMap::new();
+    for p in paragraphs(text).into_iter().filter(|p| p.explanatory) {
+        for s in text::split_sentences(&p.text) {
+            if joined(&s) && from_explanation(&s) {
+                *out.entry(sentence_key(&s)).or_insert(0) += 1;
+            }
+        }
+    }
+    out
 }
 
 // ── what a rewrite kept ──────────────────────────────────────────────────────
@@ -719,8 +789,8 @@ mod tests {
         let padding = format!(
             "It should be noted that we are very excited. {joined_ok} We really look forward to it."
         );
-        assert_eq!(joined_sentences(&explaining).len(), 1);
-        assert!(joined_sentences(&padding).is_empty());
+        assert_eq!(joined_sentences(&explaining, None).len(), 1);
+        assert!(joined_sentences(&padding, None).is_empty());
     }
 
     #[test]

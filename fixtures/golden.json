@@ -2174,6 +2174,7 @@
     "explanation": {
       "density": 0.4,
       "growth": 1.5,
+      "joined_max_clauses": 3,
       "joined_max_words": 45,
       "min_joints": 3,
       "survives": 0.5
@@ -5135,14 +5136,14 @@
           "after": 305,
           "before": 305,
           "cut_pct": 0.0,
-          "explaining": 0.22,
-          "explaining_words": 67,
+          "explaining": 0.105,
+          "explaining_words": 32,
           "growth": 1.5,
-          "limit": 243,
+          "limit": 211,
           "ok": false,
-          "rest_words": 238,
+          "rest_words": 273,
           "scored": true,
-          "target": 31.2
+          "target": 35.8
         },
         "explanation": {
           "joints": {
@@ -5200,7 +5201,7 @@
       },
       "simplify --check --baseline --insight --report": {
         "exit": 1,
-        "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD  (305 words, 27 sentences, 14 paragraphs):\n  [PASS]  mean_sentence_words       11.3   budget <= 18.0\n  [PASS]  max_sentence_words          26   budget <= 30\n  [PASS]  pct_long_sentences         3.7   budget <= 15.0\n  [PASS]  flesch_reading_ease       63.9   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       7.2   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words            12.1   budget <= 20.0\n  [PASS]  max_paragraph_words         56   budget <= 90\n  [PASS]  pct_ly_adverbs             0.0   budget <= 4.0\nLENGTH  [SHORT]  305 -> 305 words, at most 243\n        22.0% of the source explains (67 words, may grow 1.5x); the rest (238 words) owes a 40.0% cut\nJOINTS  [PASS]  4 in the sentences that survived, 4 in the rewrite (because/so/but/if...)\nLONGEST SENTENCES (over 25 words, cut or split):\n   26w  Dana Whitfield (Product Manager, Halcyon Energy) asked on 2026-09-09...\nINSIGHT STRUCTURE  [FAIL] (2):\n  [FAIL]  no_customer_metrics customer estate size: \"18,000 units\" — describe it qualitatively instead (\"a large estate\"); the number is the customer's to disclose\n  [FAIL]  no_customer_metrics customer estate size: \"18,000 chargers\" — describe it qualitatively instead (\"a large estate\"); the number is the customer's to disclose\nVERDICT: OVER BUDGET on length, insight structure\n=============================================\n",
+        "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD  (305 words, 27 sentences, 14 paragraphs):\n  [PASS]  mean_sentence_words       11.3   budget <= 18.0\n  [PASS]  max_sentence_words          26   budget <= 30\n  [PASS]  pct_long_sentences         3.7   budget <= 15.0\n  [PASS]  flesch_reading_ease       63.9   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       7.2   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words            12.1   budget <= 20.0\n  [PASS]  max_paragraph_words         56   budget <= 90\n  [PASS]  pct_ly_adverbs             0.0   budget <= 4.0\nLENGTH  [SHORT]  305 -> 305 words, at most 211\n        10.5% of the source explains (32 words, may grow 1.5x); the rest (273 words) owes a 40.0% cut\nJOINTS  [PASS]  4 in the sentences that survived, 4 in the rewrite (because/so/but/if...)\nLONGEST SENTENCES (over 25 words, cut or split):\n   26w  Dana Whitfield (Product Manager, Halcyon Energy) asked on 2026-09-09...\nINSIGHT STRUCTURE  [FAIL] (2):\n  [FAIL]  no_customer_metrics customer estate size: \"18,000 units\" — describe it qualitatively instead (\"a large estate\"); the number is the customer's to disclose\n  [FAIL]  no_customer_metrics customer estate size: \"18,000 chargers\" — describe it qualitatively instead (\"a large estate\"); the number is the customer's to disclose\nVERDICT: OVER BUDGET on length, insight structure\n=============================================\n",
         "stdout": "**The ask**\n\nA general workflow builder for the marketplace, like IFTTT: watch for a trigger, then do something. Halcyon is the first example. When a charger boots, send a DataTransfer, then use the response to update the charger and EVSE records.\n\n# INSIGHT\n\n**Context**\n\nDana Whitfield (Product Manager, Halcyon Energy) asked on 2026-09-09 that the platform read a charger's real configuration each time it boots, and keep our record in step. Halcyon's residential migration is around 18,000 units, and the drivers moving across want Dynamic Load Management and Power Sharing.\n\nThe charger, not the platform, is the source of truth. A driver can change the maximum current with a physical switch on the unit. When our record drifts, load management runs on the wrong numbers and breaks the one feature they migrated for.\n\n**Insight Description**\n\nThe platform can tell a customer that something happened on a charger, but cannot act on it. We already ask the charger for its configuration after boot, then send the result out as a webhook. Customers can write values back through the API, and we already run their code as marketplace apps. Nothing joins them up.\n\nSo Halcyon's only route is to keep a service running around the clock, catching that webhook and calling us back to write the result. That is the middleware they are paying us to take over.\n\nThis request keeps coming back. Brightline Fleet asked in 2025, and Cavendish Motors asked for event-driven throttling. Halcyon named two more of their own uses on the call: credit card handling, and Halcyon Ultra sending user details.\n\n**Significance**\n\nHigh\n\nHalcyon's residential migration is around 18,000 chargers and gates the second contract. Not Critical, because Halcyon can host the middleware themselves. But that asks them to keep running the system they are replacing.\n\n**Customer Details**\nCustomer Name(s): Halcyon Energy, Canada\nURL (tenant environment): https://halcyon.tenant.example.com/\n"
       },
       "simplify --check --baseline --json": {
@@ -5208,14 +5209,14 @@
           "after": 305,
           "before": 305,
           "cut_pct": 0.0,
-          "explaining": 0.22,
-          "explaining_words": 67,
+          "explaining": 0.105,
+          "explaining_words": 32,
           "growth": 1.5,
-          "limit": 243,
+          "limit": 211,
           "ok": false,
-          "rest_words": 238,
+          "rest_words": 273,
           "scored": true,
-          "target": 31.2
+          "target": 35.8
         },
         "explanation": {
           "joints": {
@@ -5264,7 +5265,7 @@
       },
       "simplify --check --baseline --report": {
         "exit": 1,
-        "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD  (305 words, 27 sentences, 14 paragraphs):\n  [PASS]  mean_sentence_words       11.3   budget <= 18.0\n  [PASS]  max_sentence_words          26   budget <= 30\n  [PASS]  pct_long_sentences         3.7   budget <= 15.0\n  [PASS]  flesch_reading_ease       63.9   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       7.2   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words            12.1   budget <= 20.0\n  [PASS]  max_paragraph_words         56   budget <= 90\n  [PASS]  pct_ly_adverbs             0.0   budget <= 4.0\nLENGTH  [SHORT]  305 -> 305 words, at most 243\n        22.0% of the source explains (67 words, may grow 1.5x); the rest (238 words) owes a 40.0% cut\nJOINTS  [PASS]  4 in the sentences that survived, 4 in the rewrite (because/so/but/if...)\nLONGEST SENTENCES (over 25 words, cut or split):\n   26w  Dana Whitfield (Product Manager, Halcyon Energy) asked on 2026-09-09...\nVERDICT: OVER BUDGET on length\n=============================================\n",
+        "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD  (305 words, 27 sentences, 14 paragraphs):\n  [PASS]  mean_sentence_words       11.3   budget <= 18.0\n  [PASS]  max_sentence_words          26   budget <= 30\n  [PASS]  pct_long_sentences         3.7   budget <= 15.0\n  [PASS]  flesch_reading_ease       63.9   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       7.2   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words            12.1   budget <= 20.0\n  [PASS]  max_paragraph_words         56   budget <= 90\n  [PASS]  pct_ly_adverbs             0.0   budget <= 4.0\nLENGTH  [SHORT]  305 -> 305 words, at most 211\n        10.5% of the source explains (32 words, may grow 1.5x); the rest (273 words) owes a 40.0% cut\nJOINTS  [PASS]  4 in the sentences that survived, 4 in the rewrite (because/so/but/if...)\nLONGEST SENTENCES (over 25 words, cut or split):\n   26w  Dana Whitfield (Product Manager, Halcyon Energy) asked on 2026-09-09...\nVERDICT: OVER BUDGET on length\n=============================================\n",
         "stdout": "**The ask**\n\nA general workflow builder for the marketplace, like IFTTT: watch for a trigger, then do something. Halcyon is the first example. When a charger boots, send a DataTransfer, then use the response to update the charger and EVSE records.\n\n# INSIGHT\n\n**Context**\n\nDana Whitfield (Product Manager, Halcyon Energy) asked on 2026-09-09 that the platform read a charger's real configuration each time it boots, and keep our record in step. Halcyon's residential migration is around 18,000 units, and the drivers moving across want Dynamic Load Management and Power Sharing.\n\nThe charger, not the platform, is the source of truth. A driver can change the maximum current with a physical switch on the unit. When our record drifts, load management runs on the wrong numbers and breaks the one feature they migrated for.\n\n**Insight Description**\n\nThe platform can tell a customer that something happened on a charger, but cannot act on it. We already ask the charger for its configuration after boot, then send the result out as a webhook. Customers can write values back through the API, and we already run their code as marketplace apps. Nothing joins them up.\n\nSo Halcyon's only route is to keep a service running around the clock, catching that webhook and calling us back to write the result. That is the middleware they are paying us to take over.\n\nThis request keeps coming back. Brightline Fleet asked in 2025, and Cavendish Motors asked for event-driven throttling. Halcyon named two more of their own uses on the call: credit card handling, and Halcyon Ultra sending user details.\n\n**Significance**\n\nHigh\n\nHalcyon's residential migration is around 18,000 chargers and gates the second contract. Not Critical, because Halcyon can host the middleware themselves. But that asks them to keep running the system they are replacing.\n\n**Customer Details**\nCustomer Name(s): Halcyon Energy, Canada\nURL (tenant environment): https://halcyon.tenant.example.com/\n"
       }
     },
