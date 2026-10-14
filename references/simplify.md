@@ -37,8 +37,8 @@ its adjectives.
 |---|---|
 | A section | Background the reader already has. "How we got here." |
 | A paragraph | The one restating the paragraph above in other words. |
-| A sentence | The setup for the next sentence. The summary of the last one. The unasked-for caveat. The apology. |
-| A clause | "which means that", "in order to", "so that we can", the trailing repeat of the point. |
+| A sentence | The throat-clearing that announces the next sentence. The summary of the last one. The unasked-for caveat. The apology. |
+| A clause | "in order to" (to "to"), "so that we can", the trailing repeat of the point. Never a joint between two kept claims (Part E). |
 | A word | Filler, intensifiers, stacked adjectives, the second half of a doublet. |
 
 **The usual suspects, all deletable on sight.**
@@ -52,8 +52,10 @@ its adjectives.
   advance planning, absolutely essential, collaborated together, added bonus.
 - The meta sentence: "This document sets out...", "In this section we will...",
   "Hopefully that makes sense". Say the thing; don't announce it.
-- Your own reasoning. The reader wants the conclusion. Show the working only
-  where they have to check it.
+- Your own reasoning about how you got here. The reader wants the conclusion.
+  Show the working only where they have to check it. This is not the reasoning
+  *in* an explanation, the "because" that makes the conclusion follow: that is
+  the content (Part E).
 
 **Two tests for anything that survives.** Does this sentence do work no other
 sentence is doing? Would the reader act differently without it? Two nos means
@@ -155,6 +157,8 @@ back:
 - **Quotes and names.** Never smooth someone's actual words.
 - **The load-bearing long word.** Sometimes the precise word is four syllables.
   Keep it and spend the simplicity elsewhere in the sentence.
+- **The joints of an explanation.** Causal links, definitions, mechanism steps,
+  and the sentence that answers the reader's next question. Part E.
 
 The budget (`Budget::default` in `src/rules.rs`) is a servant, not a master. If a metric is over
 because the text genuinely needs a technical term or a 28-word sentence, say so
@@ -164,3 +168,67 @@ The same goes for the length gate, in both directions. A draft that will not
 reach a 40% cut without losing a number or a caveat has genuinely arrived short:
 say so and ship it. But "I couldn't find 40%" almost always means you were
 shaving words when there was a paragraph to delete.
+
+## Part E: explanation is not padding
+
+crisp was built on business writing, where most words are padding and a 40% cut
+is easy. On a book chapter it cut the explanation instead, and readers got lost:
+the "because" and "so" between two claims were gone, "it has five parts" arrived
+with no parts, and mechanisms were folded into one-word labels. What is known
+about explaining says why that hurts, and what to keep.
+
+**1. Keep the joints.** Readers infer far less than writers think. Pinker calls
+this the curse of knowledge, and his advice on connectives is blunt: prose is in
+"greater danger of being confusing because it has too few connectives than
+pedantic because it has too many. When in doubt, connect" (*The Sense of Style*,
+2014, ch. 5). The studies agree. Adding the missing links between ideas improved
+recall, most for readers short on background (Britton & Gülgöz 1991, *J. Educ.
+Psych.* 83). Leaving causal connectives implicit lowered comprehension (Degand &
+Sanders 2002, *Reading and Writing* 15). Zinsser names the failure: "the writer,
+in whose head the connection is clear, hasn't bothered to provide the missing
+link" (*On Writing Well*, ch. 2). So a "because", "so", "which means", "but" or
+"if" between two claims you keep is never clutter.
+
+**2. Name it, then use it.** Teaching the names and parts before the mechanism
+is one of the best-supported results in learning research (Mayer's pre-training
+principle; Mayer, Mathias & Wetzell 2002, *JEP: Applied* 8). Fleisch builds his
+*Student's Guides* on it: each chapter opens with an "expanded view" of the
+equation "in which the meaning of each term is clearly called out" before any
+of it is used. Feynman's version: knowing the name of something is not knowing
+something. So "it has five parts" is followed by the five, and a label gets its
+plain unpacking where it first appears.
+
+**3. One step, one sentence.** A mechanism is a sequence. Zinsser on explaining
+science: "take the reader through the same sequence of ideas and deductions that
+made the process clear to you." Folding three steps into a clause with
+semicolons is the cut that loses them. A good step reads: what triggers it,
+what happens, why, what results.
+
+**4. The anticipating sentence is load-bearing.** "You might wonder why...",
+"It's tempting to...", "The catch is..." each answer the question the reader is
+about to ask. They are the opposite of throat-clearing, which announces the
+writer's next move rather than the reader's next doubt. Keep one if the next
+sentence answers it.
+
+**5. Old before new.** Each sentence starts from something the reader already
+has and ends on what is new (Williams, *Style: Lessons in Clarity and Grace*;
+Gopen & Swan, "The Science of Scientific Writing", *American Scientist* 78,
+1990). Cutting the first half of a sentence often cuts the link back.
+
+**Calibrate to the reader.** Expert readers learn more from slightly less
+cohesive text (McNamara, Kintsch, Songer & Kintsch 1996, *Cognition and
+Instruction* 14), and too many connectives read as condescending (Pinker again).
+Explain for the reader who is new to the idea, and cut harder for the one who
+built it: the audience cut in SKILL.md (step 0) still comes first.
+
+**What the gate measures.** `crisp simplify --baseline` scores each source
+paragraph on joints, definitions, unpacked lists and anticipations per sentence,
+less its padding. A paragraph at 0.4 or more is explanation and owes no cut; 40%
+applies to the rest, and a source that is all explanation may grow. Two checks
+then fail the run however short it is: joints per sentence fell (`JOINTS
+[LOST]`), or a list the source unpacked is no longer unpacked (`LISTS
+[LOST]`). Outside a baseline, `PROMISED, NOT UNPACKED` lists every "has N parts"
+with no parts after it. The checks are blunt by design: a list shown in a
+figure, or one deliberately deferred to a later chapter, reads as unpacked to a
+person and not to the gate, so treat that as a prompt to look, not a verdict.
+

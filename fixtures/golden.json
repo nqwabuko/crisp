@@ -300,6 +300,7 @@
       "exit": 1,
       "stderr": {
         "compression": null,
+        "explanation": null,
         "fixes": {},
         "flags": [],
         "insight": [
@@ -328,6 +329,7 @@
           "words": 96
         },
         "over_budget": [],
+        "promised_not_unpacked": [],
         "scored": true,
         "total_fixes": 0,
         "total_flags": 0
@@ -338,6 +340,7 @@
       "exit": 1,
       "stderr": {
         "compression": null,
+        "explanation": null,
         "fixes": {},
         "flags": [],
         "insight": [
@@ -362,6 +365,7 @@
           "words": 83
         },
         "over_budget": [],
+        "promised_not_unpacked": [],
         "scored": true,
         "total_fixes": 0,
         "total_flags": 0
@@ -372,6 +376,7 @@
       "exit": 0,
       "stderr": {
         "compression": null,
+        "explanation": null,
         "fixes": {},
         "flags": [],
         "insight": [],
@@ -391,6 +396,7 @@
           "words": 85
         },
         "over_budget": [],
+        "promised_not_unpacked": [],
         "scored": true,
         "total_fixes": 0,
         "total_flags": 0
@@ -401,6 +407,7 @@
       "exit": 1,
       "stderr": {
         "compression": null,
+        "explanation": null,
         "fixes": {},
         "flags": [],
         "insight": [
@@ -425,6 +432,7 @@
           "words": 85
         },
         "over_budget": [],
+        "promised_not_unpacked": [],
         "scored": true,
         "total_fixes": 0,
         "total_flags": 0
@@ -435,6 +443,7 @@
       "exit": 0,
       "stderr": {
         "compression": null,
+        "explanation": null,
         "fixes": {},
         "flags": [],
         "insight": [],
@@ -444,6 +453,7 @@
           "words": 10
         },
         "over_budget": [],
+        "promised_not_unpacked": [],
         "scored": false,
         "total_fixes": 0,
         "total_flags": 0
@@ -1439,46 +1449,209 @@
       "stderr": "",
       "stdout": "**Context** x. **Insight Description** y.\n\nLow\n\n**Significance**, **Customer Details**: z.\n"
     },
-    "simplify --json --check --baseline fixtures/insight-ask-first.md fixtures/plain-rewrite.md": {
-      "exit": 0,
+    "simplify --json --check --baseline fixtures/explanatory.md fixtures/cases/explanatory-kept.md": {
+      "exit": 1,
       "stderr": {
         "compression": {
-          "after": 114,
-          "before": 305,
-          "cut_pct": 62.6,
+          "after": 156,
+          "before": 169,
+          "cut_pct": 7.7,
+          "explaining": 0.775,
           "ok": true,
+          "rest_after": 4,
+          "rest_before": 38,
+          "rest_cut_pct": 89.5,
           "scored": true,
-          "target": 40.0
+          "target": 9.0
+        },
+        "explanation": {
+          "joints": {
+            "after": 4,
+            "after_per_sentence": 0.4,
+            "before": 3,
+            "before_per_sentence": 0.3,
+            "gated": true,
+            "ok": true
+          },
+          "lists": {
+            "ok": true,
+            "unkept_after": 0,
+            "unkept_before": 0,
+            "unpacked_after": 2,
+            "unpacked_before": 2
+          }
+        },
+        "fixes": {},
+        "flags": [
+          {
+            "count": 1,
+            "hint": "passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")",
+            "rule": "passive",
+            "samples": [
+              "...st of heat minutes after it was paid for.  It works in two steps..."
+            ]
+          }
+        ],
+        "insight": null,
+        "long_sentences": [
+          {
+            "text": "The boiler heats water, the water heats the radiator, and only then does the radiator heat the air, so the sensor learns about each burst of heat minutes after it was paid for.",
+            "words": 33
+          },
+          {
+            "text": "Second, the heat already stored in the water and the radiator keeps arriving after the boiler stops, which means the room carries on warming past the setting.",
+            "words": 27
+          }
+        ],
+        "metrics": {
+          "flesch_kincaid_grade": 6.6,
+          "flesch_reading_ease": 75.5,
+          "max_paragraph_words": 68,
+          "max_sentence_words": 33,
+          "mean_sentence_words": 15.6,
+          "paragraphs": 4,
+          "pct_long_sentences": 20.0,
+          "pct_long_words": 7.7,
+          "pct_ly_adverbs": 0.0,
+          "pct_passive_sentences": 10.0,
+          "sentences": 10,
+          "words": 156
+        },
+        "over_budget": [
+          "max_sentence_words",
+          "pct_long_sentences"
+        ],
+        "promised_not_unpacked": [],
+        "scored": true,
+        "total_fixes": 0,
+        "total_flags": 1
+      },
+      "stdout": "# Why the radiator overshoots\n\nA thermostat loop has three parts: a sensor, a controller and a boiler. The\nsensor reads the room, the controller compares it with the setting, and the\nboiler adds heat when the room is cold.\n\nYou might wonder why the room ends up warmer than the setting. The answer is\ndelay. The boiler heats water, the water heats the radiator, and only then does\nthe radiator heat the air, so the sensor learns about each burst of heat\nminutes after it was paid for.\n\nIt works in two steps. First, the controller keeps the boiler on until the\nsensor says the room is warm enough. Second, the heat already stored in the\nwater and the radiator keeps arriving after the boiler stops, which means the\nroom carries on warming past the setting. That stored heat is the overshoot:\nthe loop acted on old news, because news of the room always arrives late.\n"
+    },
+    "simplify --json --check --baseline fixtures/explanatory.md fixtures/cases/explanatory-overcut.md": {
+      "exit": 1,
+      "stderr": {
+        "compression": {
+          "after": 58,
+          "before": 169,
+          "cut_pct": 65.7,
+          "explaining": 0.775,
+          "ok": true,
+          "rest_after": 58,
+          "rest_before": 38,
+          "rest_cut_pct": -52.6,
+          "scored": true,
+          "target": 9.0
+        },
+        "explanation": {
+          "joints": {
+            "after": 1,
+            "after_per_sentence": 0.08,
+            "before": 3,
+            "before_per_sentence": 0.3,
+            "gated": true,
+            "ok": false
+          },
+          "lists": {
+            "ok": false,
+            "unkept_after": 2,
+            "unkept_before": 0,
+            "unpacked_after": 0,
+            "unpacked_before": 2
+          }
         },
         "fixes": {},
         "flags": [],
         "insight": null,
         "long_sentences": [],
         "metrics": {
-          "flesch_kincaid_grade": 5.9,
-          "flesch_reading_ease": 72.8,
-          "max_paragraph_words": 44,
-          "max_sentence_words": 20,
-          "mean_sentence_words": 11.4,
+          "flesch_kincaid_grade": 2.8,
+          "flesch_reading_ease": 83.8,
+          "max_paragraph_words": 27,
+          "max_sentence_words": 9,
+          "mean_sentence_words": 4.8,
           "paragraphs": 4,
           "pct_long_sentences": 0.0,
-          "pct_long_words": 7.0,
+          "pct_long_words": 12.1,
           "pct_ly_adverbs": 0.0,
           "pct_passive_sentences": 0.0,
-          "sentences": 10,
-          "words": 114
+          "sentences": 12,
+          "words": 58
         },
         "over_budget": [],
+        "promised_not_unpacked": [
+          "has three parts",
+          "in two steps"
+        ],
         "scored": true,
         "total_fixes": 0,
         "total_flags": 0
       },
-      "stdout": "# Insight: operators can't see why DLM throttled a charger\n\nLegacy capacity groups map to circuits in our model. When a charger stops\nsending meter values, the platform falls back to a safe current limit to\nprotect the site. That's the right call. The problem is we never tell the\noperator we did it.\n\nSo the charger throttles, the driver complains, and the operator has no way to\nsee the cause. They end up reading comm logs to work out which capacity group\nwent into fallback. Four customers raised this last quarter.\n\nWe should surface fallback state on the capacity group itself. I'd sequence it\nwith the smart charging work rather than as a one-off.\n"
+      "stdout": "# Why the radiator overshoots\n\nA thermostat loop has three parts.\n\nThe room ends up warmer than the setting. Delay. The boiler heats water. The\nwater heats the radiator. The radiator heats the air. The sensor learns late.\n\nIt works in two steps. The boiler stays on until the room is warm. Stored heat\nkeeps arriving. The room overshoots.\n"
+    },
+    "simplify --json --check --baseline fixtures/explanatory.md fixtures/cases/explanatory-tight.md": {
+      "exit": 0,
+      "stderr": {
+        "compression": {
+          "after": 103,
+          "before": 169,
+          "cut_pct": 39.1,
+          "explaining": 0.775,
+          "ok": true,
+          "rest_after": 39,
+          "rest_before": 38,
+          "rest_cut_pct": -2.6,
+          "scored": true,
+          "target": 9.0
+        },
+        "explanation": {
+          "joints": {
+            "after": 3,
+            "after_per_sentence": 0.3,
+            "before": 3,
+            "before_per_sentence": 0.3,
+            "gated": true,
+            "ok": true
+          },
+          "lists": {
+            "ok": true,
+            "unkept_after": 0,
+            "unkept_before": 0,
+            "unpacked_after": 2,
+            "unpacked_before": 2
+          }
+        },
+        "fixes": {},
+        "flags": [],
+        "insight": null,
+        "long_sentences": [],
+        "metrics": {
+          "flesch_kincaid_grade": 4.4,
+          "flesch_reading_ease": 82.2,
+          "max_paragraph_words": 35,
+          "max_sentence_words": 17,
+          "mean_sentence_words": 10.3,
+          "paragraphs": 4,
+          "pct_long_sentences": 0.0,
+          "pct_long_words": 7.8,
+          "pct_ly_adverbs": 0.0,
+          "pct_passive_sentences": 0.0,
+          "sentences": 10,
+          "words": 103
+        },
+        "over_budget": [],
+        "promised_not_unpacked": [],
+        "scored": true,
+        "total_fixes": 0,
+        "total_flags": 0
+      },
+      "stdout": "# Why the radiator overshoots\n\nA thermostat loop has three parts: a sensor, a controller and a boiler. The\nsensor reads the room. The controller compares it with the setting, and the\nboiler adds heat when the room is cold.\n\nYou might wonder why the room ends up warmer than the setting. The answer is\ndelay. Heat travels from boiler to water to radiator to air, so the sensor\nhears about it late.\n\nIt works in two steps. First, the boiler stays on until the room reads warm.\nSecond, heat already in the pipes keeps arriving, which means the room warms\npast the setting.\n"
     },
     "simplify --json < fixtures/cases/carriage-returns.md": {
       "exit": 0,
       "stderr": {
         "compression": null,
+        "explanation": null,
         "fixes": {
           "clutter:during": 1,
           "clutter:regularly": 1
@@ -1529,6 +1702,7 @@
           "pct_passive_sentences",
           "pct_ly_adverbs"
         ],
+        "promised_not_unpacked": [],
         "scored": true,
         "total_fixes": 2,
         "total_flags": 3
@@ -1539,6 +1713,7 @@
       "exit": 0,
       "stderr": {
         "compression": null,
+        "explanation": null,
         "fixes": {
           "clutter:basis": 1,
           "clutter:before": 1,
@@ -1579,6 +1754,7 @@
           "words": 33
         },
         "over_budget": [],
+        "promised_not_unpacked": [],
         "scored": true,
         "total_fixes": 14,
         "total_flags": 1
@@ -1906,10 +2082,20 @@
         }
       }
     },
-    "simplify --report --check --baseline fixtures/insight-ask-first.md fixtures/plain-rewrite.md": {
+    "simplify --report --check --baseline fixtures/explanatory.md fixtures/cases/explanatory-kept.md": {
+      "exit": 1,
+      "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED (needs the rewrite pass, 1):\n    1  passive  -> passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")\n         . ...st of heat minutes after it was paid for.  It works in two steps...\nSCORECARD  (156 words, 10 sentences, 4 paragraphs):\n  [PASS]  mean_sentence_words       15.6   budget <= 18.0\n  [OVER]  max_sentence_words          33   budget <= 30\n  [OVER]  pct_long_sentences        20.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       75.5   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       6.6   budget <= 12.0\n  [PASS]  pct_passive_sentences     10.0   budget <= 10.0\n  [PASS]  pct_long_words             7.7   budget <= 20.0\n  [PASS]  max_paragraph_words         68   budget <= 90\n  [PASS]  pct_ly_adverbs             0.0   budget <= 4.0\nLENGTH  [PASS]  169 -> 156 words, cut 7.7%   target >= 9.0%\n        77.5% of the source explains: no cut owed there, 40.0% on the rest\n        the rest: 38 -> 4 words, cut 89.5% (passes at 40.0% whatever the explanation did)\nJOINTS  [PASS]  3 -> 4 (because/so/but/if...), 0.3 -> 0.4 per sentence\nLISTS   [PASS]  promised lists unpacked 2 -> 2, left unpacked 0 -> 0\nLONGEST SENTENCES (over 25 words, cut or split):\n   33w  The boiler heats water, the water heats the radiator, and only then d...\n   27w  Second, the heat already stored in the water and the radiator keeps a...\nPASSIVE SENTENCES (name the actor):\n       The boiler heats water, the water heats the radiator, and only then d...\nVERDICT: OVER BUDGET on max_sentence_words, pct_long_sentences\n=============================================\n",
+      "stdout": "# Why the radiator overshoots\n\nA thermostat loop has three parts: a sensor, a controller and a boiler. The\nsensor reads the room, the controller compares it with the setting, and the\nboiler adds heat when the room is cold.\n\nYou might wonder why the room ends up warmer than the setting. The answer is\ndelay. The boiler heats water, the water heats the radiator, and only then does\nthe radiator heat the air, so the sensor learns about each burst of heat\nminutes after it was paid for.\n\nIt works in two steps. First, the controller keeps the boiler on until the\nsensor says the room is warm enough. Second, the heat already stored in the\nwater and the radiator keeps arriving after the boiler stops, which means the\nroom carries on warming past the setting. That stored heat is the overshoot:\nthe loop acted on old news, because news of the room always arrives late.\n"
+    },
+    "simplify --report --check --baseline fixtures/explanatory.md fixtures/cases/explanatory-overcut.md": {
+      "exit": 1,
+      "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD  (58 words, 12 sentences, 4 paragraphs):\n  [PASS]  mean_sentence_words        4.8   budget <= 18.0\n  [PASS]  max_sentence_words           9   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       83.8   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       2.8   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words            12.1   budget <= 20.0\n  [PASS]  max_paragraph_words         27   budget <= 90\n  [PASS]  pct_ly_adverbs             0.0   budget <= 4.0\nLENGTH  [PASS]  169 -> 58 words, cut 65.7%   target >= 9.0%\n        77.5% of the source explains: no cut owed there, 40.0% on the rest\nJOINTS  [LOST]  3 -> 1 (because/so/but/if...), 0.3 -> 0.08 per sentence\nLISTS   [LOST]  promised lists unpacked 2 -> 0, left unpacked 0 -> 2\nPROMISED, NOT UNPACKED (name the parts where you promise them):\n       \"has three parts\"\n       \"in two steps\"\nVERDICT: OVER BUDGET on joints, lists\n=============================================\n",
+      "stdout": "# Why the radiator overshoots\n\nA thermostat loop has three parts.\n\nThe room ends up warmer than the setting. Delay. The boiler heats water. The\nwater heats the radiator. The radiator heats the air. The sensor learns late.\n\nIt works in two steps. The boiler stays on until the room is warm. Stored heat\nkeeps arriving. The room overshoots.\n"
+    },
+    "simplify --report --check --baseline fixtures/explanatory.md fixtures/cases/explanatory-tight.md": {
       "exit": 0,
-      "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD  (114 words, 10 sentences, 4 paragraphs):\n  [PASS]  mean_sentence_words       11.4   budget <= 18.0\n  [PASS]  max_sentence_words          20   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       72.8   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       5.9   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words             7.0   budget <= 20.0\n  [PASS]  max_paragraph_words         44   budget <= 90\n  [PASS]  pct_ly_adverbs             0.0   budget <= 4.0\nLENGTH  [PASS]  305 -> 114 words, cut 62.6%   target >= 40.0%\nVERDICT: within budget\n=============================================\n",
-      "stdout": "# Insight: operators can't see why DLM throttled a charger\n\nLegacy capacity groups map to circuits in our model. When a charger stops\nsending meter values, the platform falls back to a safe current limit to\nprotect the site. That's the right call. The problem is we never tell the\noperator we did it.\n\nSo the charger throttles, the driver complains, and the operator has no way to\nsee the cause. They end up reading comm logs to work out which capacity group\nwent into fallback. Four customers raised this last quarter.\n\nWe should surface fallback state on the capacity group itself. I'd sequence it\nwith the smart charging work rather than as a one-off.\n"
+      "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD  (103 words, 10 sentences, 4 paragraphs):\n  [PASS]  mean_sentence_words       10.3   budget <= 18.0\n  [PASS]  max_sentence_words          17   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       82.2   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       4.4   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words             7.8   budget <= 20.0\n  [PASS]  max_paragraph_words         35   budget <= 90\n  [PASS]  pct_ly_adverbs             0.0   budget <= 4.0\nLENGTH  [PASS]  169 -> 103 words, cut 39.1%   target >= 9.0%\n        77.5% of the source explains: no cut owed there, 40.0% on the rest\nJOINTS  [PASS]  3 -> 3 (because/so/but/if...), 0.3 -> 0.3 per sentence\nLISTS   [PASS]  promised lists unpacked 2 -> 2, left unpacked 0 -> 0\nVERDICT: within budget\n=============================================\n",
+      "stdout": "# Why the radiator overshoots\n\nA thermostat loop has three parts: a sensor, a controller and a boiler. The\nsensor reads the room. The controller compares it with the setting, and the\nboiler adds heat when the room is cold.\n\nYou might wonder why the room ends up warmer than the setting. The answer is\ndelay. Heat travels from boiler to water to radiator to air, so the sensor\nhears about it late.\n\nIt works in two steps. First, the boiler stays on until the room reads warm.\nSecond, heat already in the pipes keeps arriving, which means the room warms\npast the setting.\n"
     },
     "simplify --report --check < fixtures/cases/carriage-returns.md": {
       "exit": 1,
@@ -2202,9 +2388,30 @@
           "after": 43,
           "before": 47,
           "cut_pct": 8.5,
+          "explaining": 0.0,
           "ok": false,
+          "rest_after": 43,
+          "rest_before": 47,
+          "rest_cut_pct": 8.5,
           "scored": true,
           "target": 40.0
+        },
+        "explanation": {
+          "joints": {
+            "after": 0,
+            "after_per_sentence": 0.0,
+            "before": 0,
+            "before_per_sentence": 0.0,
+            "gated": false,
+            "ok": true
+          },
+          "lists": {
+            "ok": true,
+            "unkept_after": 0,
+            "unkept_before": 0,
+            "unpacked_after": 0,
+            "unpacked_before": 0
+          }
         },
         "fixes": {
           "padding:note": 1
@@ -2245,6 +2452,7 @@
           "words": 43
         },
         "over_budget": [],
+        "promised_not_unpacked": [],
         "scored": true,
         "total_fixes": 1,
         "total_flags": 1
@@ -2259,9 +2467,30 @@
           "after": 43,
           "before": 47,
           "cut_pct": 8.5,
+          "explaining": 0.0,
           "ok": false,
+          "rest_after": 43,
+          "rest_before": 47,
+          "rest_cut_pct": 8.5,
           "scored": true,
           "target": 40.0
+        },
+        "explanation": {
+          "joints": {
+            "after": 0,
+            "after_per_sentence": 0.0,
+            "before": 0,
+            "before_per_sentence": 0.0,
+            "gated": false,
+            "ok": true
+          },
+          "lists": {
+            "ok": true,
+            "unkept_after": 0,
+            "unkept_before": 0,
+            "unpacked_after": 0,
+            "unpacked_before": 0
+          }
         },
         "fixes": {
           "padding:note": 1
@@ -2293,6 +2522,7 @@
           "words": 43
         },
         "over_budget": [],
+        "promised_not_unpacked": [],
         "scored": true,
         "total_fixes": 1,
         "total_flags": 1
@@ -2621,9 +2851,30 @@
           "after": 143,
           "before": 159,
           "cut_pct": 10.1,
+          "explaining": 0.0,
           "ok": false,
+          "rest_after": 94,
+          "rest_before": 159,
+          "rest_cut_pct": 40.9,
           "scored": true,
           "target": 40.0
+        },
+        "explanation": {
+          "joints": {
+            "after": 2,
+            "after_per_sentence": 0.4,
+            "before": 1,
+            "before_per_sentence": 0.2,
+            "gated": false,
+            "ok": true
+          },
+          "lists": {
+            "ok": true,
+            "unkept_after": 0,
+            "unkept_before": 0,
+            "unpacked_after": 0,
+            "unpacked_before": 0
+          }
         },
         "fixes": {
           "clutter:because": 1,
@@ -2768,6 +3019,7 @@
           "pct_passive_sentences",
           "pct_long_words"
         ],
+        "promised_not_unpacked": [],
         "scored": true,
         "total_fixes": 5,
         "total_flags": 27
@@ -2782,9 +3034,30 @@
           "after": 143,
           "before": 159,
           "cut_pct": 10.1,
+          "explaining": 0.0,
           "ok": false,
+          "rest_after": 94,
+          "rest_before": 159,
+          "rest_cut_pct": 40.9,
           "scored": true,
           "target": 40.0
+        },
+        "explanation": {
+          "joints": {
+            "after": 2,
+            "after_per_sentence": 0.4,
+            "before": 1,
+            "before_per_sentence": 0.2,
+            "gated": false,
+            "ok": true
+          },
+          "lists": {
+            "ok": true,
+            "unkept_after": 0,
+            "unkept_before": 0,
+            "unpacked_after": 0,
+            "unpacked_before": 0
+          }
         },
         "fixes": {
           "clutter:because": 1,
@@ -2920,6 +3193,7 @@
           "pct_passive_sentences",
           "pct_long_words"
         ],
+        "promised_not_unpacked": [],
         "scored": true,
         "total_fixes": 5,
         "total_flags": 27
@@ -3428,9 +3702,30 @@
           "after": 19,
           "before": 20,
           "cut_pct": 5.0,
+          "explaining": 0.0,
           "ok": true,
+          "rest_after": 36,
+          "rest_before": 37,
+          "rest_cut_pct": 2.7,
           "scored": false,
           "target": 40.0
+        },
+        "explanation": {
+          "joints": {
+            "after": 0,
+            "after_per_sentence": 0.0,
+            "before": 0,
+            "before_per_sentence": 0.0,
+            "gated": false,
+            "ok": true
+          },
+          "lists": {
+            "ok": true,
+            "unkept_after": 0,
+            "unkept_before": 0,
+            "unpacked_after": 0,
+            "unpacked_before": 0
+          }
         },
         "fixes": {
           "clutter:before": 1
@@ -3461,6 +3756,7 @@
           "words": 19
         },
         "over_budget": [],
+        "promised_not_unpacked": [],
         "scored": false,
         "total_fixes": 1,
         "total_flags": 1
@@ -3475,9 +3771,30 @@
           "after": 19,
           "before": 20,
           "cut_pct": 5.0,
+          "explaining": 0.0,
           "ok": true,
+          "rest_after": 36,
+          "rest_before": 37,
+          "rest_cut_pct": 2.7,
           "scored": false,
           "target": 40.0
+        },
+        "explanation": {
+          "joints": {
+            "after": 0,
+            "after_per_sentence": 0.0,
+            "before": 0,
+            "before_per_sentence": 0.0,
+            "gated": false,
+            "ok": true
+          },
+          "lists": {
+            "ok": true,
+            "unkept_after": 0,
+            "unkept_before": 0,
+            "unpacked_after": 0,
+            "unpacked_before": 0
+          }
         },
         "fixes": {
           "clutter:before": 1
@@ -3499,6 +3816,7 @@
           "words": 19
         },
         "over_budget": [],
+        "promised_not_unpacked": [],
         "scored": false,
         "total_fixes": 1,
         "total_flags": 1
@@ -3616,6 +3934,509 @@
     },
     "spans_consistent": true
   },
+  "explanatory.md": {
+    "cli": {
+      "detell --json": {
+        "fixes": {},
+        "flags": [
+          {
+            "count": 2,
+            "rule": "hedge:filler",
+            "samples": [
+              "…h noting that this is a really very common issue that…",
+              "…g that this is a really very common issue that a lot…"
+            ]
+          },
+          {
+            "count": 1,
+            "rule": "phrase:worth-noting",
+            "samples": [
+              "…At the end of the day, it's worth noting that this is a really very c…"
+            ]
+          },
+          {
+            "count": 1,
+            "rule": "phrase:end-of-day",
+            "samples": [
+              "…rming past the setting. At the end of the day, it's worth noting that…"
+            ]
+          }
+        ],
+        "total_fixes": 0,
+        "total_flags": 4
+      },
+      "detell --report": {
+        "exit": 0,
+        "stderr": "── detell report ─────────────────────────────\nFIXED: nothing (already clean typography)\nFLAGGED (needs a human/voice pass, 4):\n    2  hedge:filler\n         · …h noting that this is a really very common issue that…\n         · …g that this is a really very common issue that a lot…\n    1  phrase:worth-noting\n         · …At the end of the day, it's worth noting that this is a really very c…\n    1  phrase:end-of-day\n         · …rming past the setting. At the end of the day, it's worth noting that…\n──────────────────────────────────────────────\n"
+      },
+      "simplify --check --baseline --insight --json": {
+        "compression": {
+          "after": 159,
+          "before": 169,
+          "cut_pct": 5.9,
+          "explaining": 0.775,
+          "ok": false,
+          "rest_after": 28,
+          "rest_before": 38,
+          "rest_cut_pct": 26.3,
+          "scored": true,
+          "target": 9.0
+        },
+        "explanation": {
+          "joints": {
+            "after": 3,
+            "after_per_sentence": 0.3,
+            "before": 3,
+            "before_per_sentence": 0.3,
+            "gated": true,
+            "ok": true
+          },
+          "lists": {
+            "ok": true,
+            "unkept_after": 0,
+            "unkept_before": 0,
+            "unpacked_after": 2,
+            "unpacked_before": 2
+          }
+        },
+        "fixes": {
+          "padding:note": 1,
+          "padding:ultimately": 1
+        },
+        "flags": [
+          {
+            "count": 2,
+            "hint": "filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")",
+            "rule": "padding",
+            "samples": [
+              "...ast the setting.  This is a really very common issue that a lo...",
+              "...setting.  This is a really very common issue that a lot of..."
+            ]
+          },
+          {
+            "count": 1,
+            "hint": "passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")",
+            "rule": "passive",
+            "samples": [
+              "...st of heat minutes after it was paid for.  It works in two steps..."
+            ]
+          },
+          {
+            "count": 1,
+            "hint": "delayed subject: say who does what",
+            "rule": "it-is-that",
+            "samples": [
+              "...ave with their heating, and it is something that we all experience."
+            ]
+          }
+        ],
+        "insight": [
+          {
+            "check": "sections",
+            "detail": "missing template section(s): Context, Insight Description, Significance, Customer Details"
+          },
+          {
+            "check": "significance",
+            "detail": "found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line"
+          }
+        ],
+        "long_sentences": [
+          {
+            "text": "The boiler heats water, the water heats the radiator, and only then does the radiator heat the air, so the sensor learns about each burst of heat minutes after it was paid for.",
+            "words": 33
+          },
+          {
+            "text": "Second, the heat already in the water and the radiator keeps arriving after the boiler stops, which means the room carries on warming past the setting.",
+            "words": 26
+          }
+        ],
+        "metrics": {
+          "flesch_kincaid_grade": 7.0,
+          "flesch_reading_ease": 73.1,
+          "max_paragraph_words": 49,
+          "max_sentence_words": 33,
+          "mean_sentence_words": 15.9,
+          "paragraphs": 5,
+          "pct_long_sentences": 20.0,
+          "pct_long_words": 8.2,
+          "pct_ly_adverbs": 0.6,
+          "pct_passive_sentences": 10.0,
+          "sentences": 10,
+          "words": 159
+        },
+        "over_budget": [
+          "max_sentence_words",
+          "pct_long_sentences"
+        ],
+        "promised_not_unpacked": [],
+        "scored": true,
+        "total_fixes": 2,
+        "total_flags": 4
+      },
+      "simplify --check --baseline --insight --report": {
+        "exit": 1,
+        "stderr": "== simplify report ==========================\nCLUTTER CUT (auto, 2):\n    1  padding:note\n    1  padding:ultimately\nFLAGGED (needs the rewrite pass, 4):\n    2  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . ...ast the setting.  This is a really very common issue that a lo...\n         . ...setting.  This is a really very common issue that a lot of...\n    1  passive  -> passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")\n         . ...st of heat minutes after it was paid for.  It works in two steps...\n    1  it-is-that  -> delayed subject: say who does what\n         . ...ave with their heating, and it is something that we all experience.\nSCORECARD  (159 words, 10 sentences, 5 paragraphs):\n  [PASS]  mean_sentence_words       15.9   budget <= 18.0\n  [OVER]  max_sentence_words          33   budget <= 30\n  [OVER]  pct_long_sentences        20.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       73.1   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       7.0   budget <= 12.0\n  [PASS]  pct_passive_sentences     10.0   budget <= 10.0\n  [PASS]  pct_long_words             8.2   budget <= 20.0\n  [PASS]  max_paragraph_words         49   budget <= 90\n  [PASS]  pct_ly_adverbs             0.6   budget <= 4.0\nLENGTH  [SHORT]  169 -> 159 words, cut 5.9%   target >= 9.0%\n        77.5% of the source explains: no cut owed there, 40.0% on the rest\n        the rest: 38 -> 28 words, cut 26.3% (passes at 40.0% whatever the explanation did)\nJOINTS  [PASS]  3 -> 3 (because/so/but/if...), 0.3 -> 0.3 per sentence\nLISTS   [PASS]  promised lists unpacked 2 -> 2, left unpacked 0 -> 0\nLONGEST SENTENCES (over 25 words, cut or split):\n   33w  The boiler heats water, the water heats the radiator, and only then d...\n   26w  Second, the heat already in the water and the radiator keeps arriving...\nPASSIVE SENTENCES (name the actor):\n       The boiler heats water, the water heats the radiator, and only then d...\nINSIGHT STRUCTURE  [FAIL] (2):\n  [FAIL]  sections           missing template section(s): Context, Insight Description, Significance, Customer Details\n  [FAIL]  significance       found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line\nVERDICT: OVER BUDGET on max_sentence_words, pct_long_sentences, length, insight structure\n=============================================\n",
+        "stdout": "# Why the radiator overshoots\n\nA thermostat loop has three parts: a sensor, a controller and a boiler. The\nsensor reads the room, the controller compares it with the setting, and the\nboiler adds heat when the room is cold.\n\nYou might wonder why the room ends up warmer than the setting. The answer is\ndelay. The boiler heats water, the water heats the radiator, and only then does\nthe radiator heat the air, so the sensor learns about each burst of heat\nminutes after it was paid for.\n\nIt works in two steps. First, the controller keeps the boiler on until the\nsensor says the room is warm enough. Second, the heat already in the water and\nthe radiator keeps arriving after the boiler stops, which means the room\ncarries on warming past the setting.\n\nThis is a really very common\nissue that a lot of people have with their heating, and it is something that we\nall experience.\n"
+      },
+      "simplify --check --baseline --json": {
+        "compression": {
+          "after": 159,
+          "before": 169,
+          "cut_pct": 5.9,
+          "explaining": 0.775,
+          "ok": false,
+          "rest_after": 28,
+          "rest_before": 38,
+          "rest_cut_pct": 26.3,
+          "scored": true,
+          "target": 9.0
+        },
+        "explanation": {
+          "joints": {
+            "after": 3,
+            "after_per_sentence": 0.3,
+            "before": 3,
+            "before_per_sentence": 0.3,
+            "gated": true,
+            "ok": true
+          },
+          "lists": {
+            "ok": true,
+            "unkept_after": 0,
+            "unkept_before": 0,
+            "unpacked_after": 2,
+            "unpacked_before": 2
+          }
+        },
+        "fixes": {
+          "padding:note": 1,
+          "padding:ultimately": 1
+        },
+        "flags": [
+          {
+            "count": 2,
+            "hint": "filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")",
+            "rule": "padding",
+            "samples": [
+              "...ast the setting.  This is a really very common issue that a lo...",
+              "...setting.  This is a really very common issue that a lot of..."
+            ]
+          },
+          {
+            "count": 1,
+            "hint": "passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")",
+            "rule": "passive",
+            "samples": [
+              "...st of heat minutes after it was paid for.  It works in two steps..."
+            ]
+          },
+          {
+            "count": 1,
+            "hint": "delayed subject: say who does what",
+            "rule": "it-is-that",
+            "samples": [
+              "...ave with their heating, and it is something that we all experience."
+            ]
+          }
+        ],
+        "insight": null,
+        "long_sentences": [
+          {
+            "text": "The boiler heats water, the water heats the radiator, and only then does the radiator heat the air, so the sensor learns about each burst of heat minutes after it was paid for.",
+            "words": 33
+          },
+          {
+            "text": "Second, the heat already in the water and the radiator keeps arriving after the boiler stops, which means the room carries on warming past the setting.",
+            "words": 26
+          }
+        ],
+        "metrics": {
+          "flesch_kincaid_grade": 7.0,
+          "flesch_reading_ease": 73.1,
+          "max_paragraph_words": 49,
+          "max_sentence_words": 33,
+          "mean_sentence_words": 15.9,
+          "paragraphs": 5,
+          "pct_long_sentences": 20.0,
+          "pct_long_words": 8.2,
+          "pct_ly_adverbs": 0.6,
+          "pct_passive_sentences": 10.0,
+          "sentences": 10,
+          "words": 159
+        },
+        "over_budget": [
+          "max_sentence_words",
+          "pct_long_sentences"
+        ],
+        "promised_not_unpacked": [],
+        "scored": true,
+        "total_fixes": 2,
+        "total_flags": 4
+      },
+      "simplify --check --baseline --report": {
+        "exit": 1,
+        "stderr": "== simplify report ==========================\nCLUTTER CUT (auto, 2):\n    1  padding:note\n    1  padding:ultimately\nFLAGGED (needs the rewrite pass, 4):\n    2  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . ...ast the setting.  This is a really very common issue that a lo...\n         . ...setting.  This is a really very common issue that a lot of...\n    1  passive  -> passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")\n         . ...st of heat minutes after it was paid for.  It works in two steps...\n    1  it-is-that  -> delayed subject: say who does what\n         . ...ave with their heating, and it is something that we all experience.\nSCORECARD  (159 words, 10 sentences, 5 paragraphs):\n  [PASS]  mean_sentence_words       15.9   budget <= 18.0\n  [OVER]  max_sentence_words          33   budget <= 30\n  [OVER]  pct_long_sentences        20.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       73.1   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       7.0   budget <= 12.0\n  [PASS]  pct_passive_sentences     10.0   budget <= 10.0\n  [PASS]  pct_long_words             8.2   budget <= 20.0\n  [PASS]  max_paragraph_words         49   budget <= 90\n  [PASS]  pct_ly_adverbs             0.6   budget <= 4.0\nLENGTH  [SHORT]  169 -> 159 words, cut 5.9%   target >= 9.0%\n        77.5% of the source explains: no cut owed there, 40.0% on the rest\n        the rest: 38 -> 28 words, cut 26.3% (passes at 40.0% whatever the explanation did)\nJOINTS  [PASS]  3 -> 3 (because/so/but/if...), 0.3 -> 0.3 per sentence\nLISTS   [PASS]  promised lists unpacked 2 -> 2, left unpacked 0 -> 0\nLONGEST SENTENCES (over 25 words, cut or split):\n   33w  The boiler heats water, the water heats the radiator, and only then d...\n   26w  Second, the heat already in the water and the radiator keeps arriving...\nPASSIVE SENTENCES (name the actor):\n       The boiler heats water, the water heats the radiator, and only then d...\nVERDICT: OVER BUDGET on max_sentence_words, pct_long_sentences, length\n=============================================\n",
+        "stdout": "# Why the radiator overshoots\n\nA thermostat loop has three parts: a sensor, a controller and a boiler. The\nsensor reads the room, the controller compares it with the setting, and the\nboiler adds heat when the room is cold.\n\nYou might wonder why the room ends up warmer than the setting. The answer is\ndelay. The boiler heats water, the water heats the radiator, and only then does\nthe radiator heat the air, so the sensor learns about each burst of heat\nminutes after it was paid for.\n\nIt works in two steps. First, the controller keeps the boiler on until the\nsensor says the room is warm enough. Second, the heat already in the water and\nthe radiator keeps arriving after the boiler stops, which means the room\ncarries on warming past the setting.\n\nThis is a really very common\nissue that a lot of people have with their heating, and it is something that we\nall experience.\n"
+      }
+    },
+    "detell": {
+      "cleaned": "# Why the radiator overshoots\n\nA thermostat loop has three parts: a sensor, a controller and a boiler. The\nsensor reads the room, the controller compares it with the setting, and the\nboiler adds heat when the room is cold.\n\nYou might wonder why the room ends up warmer than the setting. The answer is\ndelay. The boiler heats water, the water heats the radiator, and only then does\nthe radiator heat the air, so the sensor learns about each burst of heat\nminutes after it was paid for.\n\nIt works in two steps. First, the controller keeps the boiler on until the\nsensor says the room is warm enough. Second, the heat already in the water and\nthe radiator keeps arriving after the boiler stops, which means the room\ncarries on warming past the setting.\n\nAt the end of the day, it's worth noting that this is a really very common\nissue that a lot of people have with their heating, and it is something that we\nall experience.\n",
+      "fixes": {},
+      "flags": {
+        "hedge:filler": 2,
+        "phrase:end-of-day": 1,
+        "phrase:worth-noting": 1
+      }
+    },
+    "insight": [
+      {
+        "check": "sections",
+        "detail": "missing template section(s): Context, Insight Description, Significance, Customer Details"
+      },
+      {
+        "check": "significance",
+        "detail": "found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line"
+      }
+    ],
+    "locate": {
+      "detell": [
+        [
+          "phrase:end-of-day",
+          "tell",
+          17,
+          1,
+          17,
+          22,
+          "At the end of the day"
+        ],
+        [
+          "phrase:worth-noting",
+          "tell",
+          17,
+          24,
+          17,
+          46,
+          "it's worth noting that"
+        ],
+        [
+          "hedge:filler",
+          "tell",
+          17,
+          57,
+          17,
+          63,
+          "really"
+        ],
+        [
+          "hedge:filler",
+          "tell",
+          17,
+          64,
+          17,
+          68,
+          "very"
+        ]
+      ],
+      "simplify": [
+        [
+          "passive",
+          "complexity",
+          10,
+          18,
+          10,
+          26,
+          "was paid"
+        ],
+        [
+          "padding:ultimately",
+          "clutter",
+          17,
+          1,
+          17,
+          25,
+          "At the end of the day, i"
+        ],
+        [
+          "padding:note",
+          "clutter",
+          17,
+          24,
+          17,
+          48,
+          "it's worth noting that t"
+        ],
+        [
+          "padding",
+          "complexity",
+          17,
+          57,
+          17,
+          63,
+          "really"
+        ],
+        [
+          "padding",
+          "complexity",
+          17,
+          64,
+          17,
+          68,
+          "very"
+        ],
+        [
+          "it-is-that",
+          "complexity",
+          18,
+          57,
+          18,
+          77,
+          "it is something that"
+        ]
+      ]
+    },
+    "simplify": {
+      "fixes": {
+        "padding:note": 1,
+        "padding:ultimately": 1
+      },
+      "flags": {
+        "it-is-that": 1,
+        "padding": 2,
+        "passive": 1
+      },
+      "metrics": {
+        "flesch_kincaid_grade": 7.0,
+        "flesch_reading_ease": 73.1,
+        "max_paragraph_words": 49,
+        "max_sentence_words": 33,
+        "mean_sentence_words": 15.9,
+        "paragraphs": 5,
+        "pct_long_sentences": 20.0,
+        "pct_long_words": 8.2,
+        "pct_ly_adverbs": 0.6,
+        "pct_passive_sentences": 10.0,
+        "sentences": 10,
+        "words": 159
+      },
+      "over_budget": [
+        "max_sentence_words",
+        "pct_long_sentences"
+      ],
+      "scored": true
+    },
+    "spans": {
+      "paragraphs": [
+        {
+          "col": 1,
+          "end_col": 30,
+          "end_line": 1,
+          "line": 1,
+          "words": 4
+        },
+        {
+          "col": 1,
+          "end_col": 40,
+          "end_line": 5,
+          "line": 3,
+          "words": 35
+        },
+        {
+          "col": 1,
+          "end_col": 31,
+          "end_line": 10,
+          "line": 7,
+          "words": 49
+        },
+        {
+          "col": 1,
+          "end_col": 37,
+          "end_line": 15,
+          "line": 12,
+          "words": 47
+        },
+        {
+          "col": 1,
+          "end_col": 16,
+          "end_line": 19,
+          "line": 17,
+          "words": 34
+        }
+      ],
+      "sentences": [
+        {
+          "col": 1,
+          "end_col": 30,
+          "end_line": 1,
+          "line": 1,
+          "words": 4
+        },
+        {
+          "col": 1,
+          "end_col": 72,
+          "end_line": 3,
+          "line": 3,
+          "words": 13
+        },
+        {
+          "col": 73,
+          "end_col": 40,
+          "end_line": 5,
+          "line": 3,
+          "words": 22
+        },
+        {
+          "col": 1,
+          "end_col": 63,
+          "end_line": 7,
+          "line": 7,
+          "words": 12
+        },
+        {
+          "col": 64,
+          "end_col": 7,
+          "end_line": 8,
+          "line": 7,
+          "words": 4
+        },
+        {
+          "col": 8,
+          "end_col": 31,
+          "end_line": 10,
+          "line": 8,
+          "words": 33
+        },
+        {
+          "col": 1,
+          "end_col": 23,
+          "end_line": 12,
+          "line": 12,
+          "words": 5
+        },
+        {
+          "col": 24,
+          "end_col": 37,
+          "end_line": 13,
+          "line": 12,
+          "words": 16
+        },
+        {
+          "col": 38,
+          "end_col": 37,
+          "end_line": 15,
+          "line": 13,
+          "words": 26
+        },
+        {
+          "col": 1,
+          "end_col": 16,
+          "end_line": 19,
+          "line": 17,
+          "words": 34
+        }
+      ]
+    },
+    "spans_consistent": true
+  },
   "hard-wrapped.md": {
     "cli": {
       "detell --json": {
@@ -3648,9 +4469,30 @@
           "after": 35,
           "before": 41,
           "cut_pct": 14.6,
+          "explaining": 0.0,
           "ok": false,
+          "rest_after": 35,
+          "rest_before": 41,
+          "rest_cut_pct": 14.6,
           "scored": true,
           "target": 40.0
+        },
+        "explanation": {
+          "joints": {
+            "after": 1,
+            "after_per_sentence": 0.5,
+            "before": 1,
+            "before_per_sentence": 0.5,
+            "gated": false,
+            "ok": true
+          },
+          "lists": {
+            "ok": true,
+            "unkept_after": 0,
+            "unkept_before": 0,
+            "unpacked_after": 0,
+            "unpacked_before": 0
+          }
         },
         "fixes": {
           "clutter:during": 1,
@@ -3711,6 +4553,7 @@
           "pct_passive_sentences",
           "pct_ly_adverbs"
         ],
+        "promised_not_unpacked": [],
         "scored": true,
         "total_fixes": 2,
         "total_flags": 3
@@ -3725,9 +4568,30 @@
           "after": 35,
           "before": 41,
           "cut_pct": 14.6,
+          "explaining": 0.0,
           "ok": false,
+          "rest_after": 35,
+          "rest_before": 41,
+          "rest_cut_pct": 14.6,
           "scored": true,
           "target": 40.0
+        },
+        "explanation": {
+          "joints": {
+            "after": 1,
+            "after_per_sentence": 0.5,
+            "before": 1,
+            "before_per_sentence": 0.5,
+            "gated": false,
+            "ok": true
+          },
+          "lists": {
+            "ok": true,
+            "unkept_after": 0,
+            "unkept_before": 0,
+            "unpacked_after": 0,
+            "unpacked_before": 0
+          }
         },
         "fixes": {
           "clutter:during": 1,
@@ -3779,6 +4643,7 @@
           "pct_passive_sentences",
           "pct_ly_adverbs"
         ],
+        "promised_not_unpacked": [],
         "scored": true,
         "total_fixes": 2,
         "total_flags": 3
@@ -3959,9 +4824,30 @@
           "after": 60,
           "before": 60,
           "cut_pct": 0.0,
+          "explaining": 0.0,
           "ok": false,
+          "rest_after": 60,
+          "rest_before": 60,
+          "rest_cut_pct": 0.0,
           "scored": true,
           "target": 40.0
+        },
+        "explanation": {
+          "joints": {
+            "after": 0,
+            "after_per_sentence": 0.0,
+            "before": 0,
+            "before_per_sentence": 0.0,
+            "gated": false,
+            "ok": true
+          },
+          "lists": {
+            "ok": true,
+            "unkept_after": 0,
+            "unkept_before": 0,
+            "unpacked_after": 0,
+            "unpacked_before": 0
+          }
         },
         "fixes": {},
         "flags": [],
@@ -4001,6 +4887,7 @@
         "over_budget": [
           "flesch_reading_ease"
         ],
+        "promised_not_unpacked": [],
         "scored": true,
         "total_fixes": 0,
         "total_flags": 0
@@ -4015,9 +4902,30 @@
           "after": 60,
           "before": 60,
           "cut_pct": 0.0,
+          "explaining": 0.0,
           "ok": false,
+          "rest_after": 60,
+          "rest_before": 60,
+          "rest_cut_pct": 0.0,
           "scored": true,
           "target": 40.0
+        },
+        "explanation": {
+          "joints": {
+            "after": 0,
+            "after_per_sentence": 0.0,
+            "before": 0,
+            "before_per_sentence": 0.0,
+            "gated": false,
+            "ok": true
+          },
+          "lists": {
+            "ok": true,
+            "unkept_after": 0,
+            "unkept_before": 0,
+            "unpacked_after": 0,
+            "unpacked_before": 0
+          }
         },
         "fixes": {},
         "flags": [],
@@ -4040,6 +4948,7 @@
         "over_budget": [
           "flesch_reading_ease"
         ],
+        "promised_not_unpacked": [],
         "scored": true,
         "total_fixes": 0,
         "total_flags": 0
@@ -4215,9 +5124,30 @@
           "after": 305,
           "before": 305,
           "cut_pct": 0.0,
+          "explaining": 0.22,
           "ok": false,
+          "rest_after": 238,
+          "rest_before": 238,
+          "rest_cut_pct": 0.0,
           "scored": true,
-          "target": 40.0
+          "target": 31.2
+        },
+        "explanation": {
+          "joints": {
+            "after": 4,
+            "after_per_sentence": 0.15,
+            "before": 4,
+            "before_per_sentence": 0.15,
+            "gated": true,
+            "ok": true
+          },
+          "lists": {
+            "ok": true,
+            "unkept_after": 0,
+            "unkept_before": 0,
+            "unpacked_after": 0,
+            "unpacked_before": 0
+          }
         },
         "fixes": {},
         "flags": [],
@@ -4252,13 +5182,14 @@
           "words": 305
         },
         "over_budget": [],
+        "promised_not_unpacked": [],
         "scored": true,
         "total_fixes": 0,
         "total_flags": 0
       },
       "simplify --check --baseline --insight --report": {
         "exit": 1,
-        "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD  (305 words, 27 sentences, 14 paragraphs):\n  [PASS]  mean_sentence_words       11.3   budget <= 18.0\n  [PASS]  max_sentence_words          26   budget <= 30\n  [PASS]  pct_long_sentences         3.7   budget <= 15.0\n  [PASS]  flesch_reading_ease       63.9   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       7.2   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words            12.1   budget <= 20.0\n  [PASS]  max_paragraph_words         56   budget <= 90\n  [PASS]  pct_ly_adverbs             0.0   budget <= 4.0\nLENGTH  [SHORT]  305 -> 305 words, cut 0.0%   target >= 40.0%\nLONGEST SENTENCES (over 25 words, cut or split):\n   26w  Dana Whitfield (Product Manager, Halcyon Energy) asked on 2026-09-09...\nINSIGHT STRUCTURE  [FAIL] (2):\n  [FAIL]  no_customer_metrics customer estate size: \"18,000 units\" — describe it qualitatively instead (\"a large estate\"); the number is the customer's to disclose\n  [FAIL]  no_customer_metrics customer estate size: \"18,000 chargers\" — describe it qualitatively instead (\"a large estate\"); the number is the customer's to disclose\nVERDICT: OVER BUDGET on length, insight structure\n=============================================\n",
+        "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD  (305 words, 27 sentences, 14 paragraphs):\n  [PASS]  mean_sentence_words       11.3   budget <= 18.0\n  [PASS]  max_sentence_words          26   budget <= 30\n  [PASS]  pct_long_sentences         3.7   budget <= 15.0\n  [PASS]  flesch_reading_ease       63.9   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       7.2   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words            12.1   budget <= 20.0\n  [PASS]  max_paragraph_words         56   budget <= 90\n  [PASS]  pct_ly_adverbs             0.0   budget <= 4.0\nLENGTH  [SHORT]  305 -> 305 words, cut 0.0%   target >= 31.2%\n        22.0% of the source explains: no cut owed there, 40.0% on the rest\n        the rest: 238 -> 238 words, cut 0.0% (passes at 40.0% whatever the explanation did)\nJOINTS  [PASS]  4 -> 4 (because/so/but/if...), 0.15 -> 0.15 per sentence\nLONGEST SENTENCES (over 25 words, cut or split):\n   26w  Dana Whitfield (Product Manager, Halcyon Energy) asked on 2026-09-09...\nINSIGHT STRUCTURE  [FAIL] (2):\n  [FAIL]  no_customer_metrics customer estate size: \"18,000 units\" — describe it qualitatively instead (\"a large estate\"); the number is the customer's to disclose\n  [FAIL]  no_customer_metrics customer estate size: \"18,000 chargers\" — describe it qualitatively instead (\"a large estate\"); the number is the customer's to disclose\nVERDICT: OVER BUDGET on length, insight structure\n=============================================\n",
         "stdout": "**The ask**\n\nA general workflow builder for the marketplace, like IFTTT: watch for a trigger, then do something. Halcyon is the first example. When a charger boots, send a DataTransfer, then use the response to update the charger and EVSE records.\n\n# INSIGHT\n\n**Context**\n\nDana Whitfield (Product Manager, Halcyon Energy) asked on 2026-09-09 that the platform read a charger's real configuration each time it boots, and keep our record in step. Halcyon's residential migration is around 18,000 units, and the drivers moving across want Dynamic Load Management and Power Sharing.\n\nThe charger, not the platform, is the source of truth. A driver can change the maximum current with a physical switch on the unit. When our record drifts, load management runs on the wrong numbers and breaks the one feature they migrated for.\n\n**Insight Description**\n\nThe platform can tell a customer that something happened on a charger, but cannot act on it. We already ask the charger for its configuration after boot, then send the result out as a webhook. Customers can write values back through the API, and we already run their code as marketplace apps. Nothing joins them up.\n\nSo Halcyon's only route is to keep a service running around the clock, catching that webhook and calling us back to write the result. That is the middleware they are paying us to take over.\n\nThis request keeps coming back. Brightline Fleet asked in 2025, and Cavendish Motors asked for event-driven throttling. Halcyon named two more of their own uses on the call: credit card handling, and Halcyon Ultra sending user details.\n\n**Significance**\n\nHigh\n\nHalcyon's residential migration is around 18,000 chargers and gates the second contract. Not Critical, because Halcyon can host the middleware themselves. But that asks them to keep running the system they are replacing.\n\n**Customer Details**\nCustomer Name(s): Halcyon Energy, Canada\nURL (tenant environment): https://halcyon.tenant.example.com/\n"
       },
       "simplify --check --baseline --json": {
@@ -4266,9 +5197,30 @@
           "after": 305,
           "before": 305,
           "cut_pct": 0.0,
+          "explaining": 0.22,
           "ok": false,
+          "rest_after": 238,
+          "rest_before": 238,
+          "rest_cut_pct": 0.0,
           "scored": true,
-          "target": 40.0
+          "target": 31.2
+        },
+        "explanation": {
+          "joints": {
+            "after": 4,
+            "after_per_sentence": 0.15,
+            "before": 4,
+            "before_per_sentence": 0.15,
+            "gated": true,
+            "ok": true
+          },
+          "lists": {
+            "ok": true,
+            "unkept_after": 0,
+            "unkept_before": 0,
+            "unpacked_after": 0,
+            "unpacked_before": 0
+          }
         },
         "fixes": {},
         "flags": [],
@@ -4294,13 +5246,14 @@
           "words": 305
         },
         "over_budget": [],
+        "promised_not_unpacked": [],
         "scored": true,
         "total_fixes": 0,
         "total_flags": 0
       },
       "simplify --check --baseline --report": {
         "exit": 1,
-        "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD  (305 words, 27 sentences, 14 paragraphs):\n  [PASS]  mean_sentence_words       11.3   budget <= 18.0\n  [PASS]  max_sentence_words          26   budget <= 30\n  [PASS]  pct_long_sentences         3.7   budget <= 15.0\n  [PASS]  flesch_reading_ease       63.9   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       7.2   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words            12.1   budget <= 20.0\n  [PASS]  max_paragraph_words         56   budget <= 90\n  [PASS]  pct_ly_adverbs             0.0   budget <= 4.0\nLENGTH  [SHORT]  305 -> 305 words, cut 0.0%   target >= 40.0%\nLONGEST SENTENCES (over 25 words, cut or split):\n   26w  Dana Whitfield (Product Manager, Halcyon Energy) asked on 2026-09-09...\nVERDICT: OVER BUDGET on length\n=============================================\n",
+        "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD  (305 words, 27 sentences, 14 paragraphs):\n  [PASS]  mean_sentence_words       11.3   budget <= 18.0\n  [PASS]  max_sentence_words          26   budget <= 30\n  [PASS]  pct_long_sentences         3.7   budget <= 15.0\n  [PASS]  flesch_reading_ease       63.9   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       7.2   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words            12.1   budget <= 20.0\n  [PASS]  max_paragraph_words         56   budget <= 90\n  [PASS]  pct_ly_adverbs             0.0   budget <= 4.0\nLENGTH  [SHORT]  305 -> 305 words, cut 0.0%   target >= 31.2%\n        22.0% of the source explains: no cut owed there, 40.0% on the rest\n        the rest: 238 -> 238 words, cut 0.0% (passes at 40.0% whatever the explanation did)\nJOINTS  [PASS]  4 -> 4 (because/so/but/if...), 0.15 -> 0.15 per sentence\nLONGEST SENTENCES (over 25 words, cut or split):\n   26w  Dana Whitfield (Product Manager, Halcyon Energy) asked on 2026-09-09...\nVERDICT: OVER BUDGET on length\n=============================================\n",
         "stdout": "**The ask**\n\nA general workflow builder for the marketplace, like IFTTT: watch for a trigger, then do something. Halcyon is the first example. When a charger boots, send a DataTransfer, then use the response to update the charger and EVSE records.\n\n# INSIGHT\n\n**Context**\n\nDana Whitfield (Product Manager, Halcyon Energy) asked on 2026-09-09 that the platform read a charger's real configuration each time it boots, and keep our record in step. Halcyon's residential migration is around 18,000 units, and the drivers moving across want Dynamic Load Management and Power Sharing.\n\nThe charger, not the platform, is the source of truth. A driver can change the maximum current with a physical switch on the unit. When our record drifts, load management runs on the wrong numbers and breaks the one feature they migrated for.\n\n**Insight Description**\n\nThe platform can tell a customer that something happened on a charger, but cannot act on it. We already ask the charger for its configuration after boot, then send the result out as a webhook. Customers can write values back through the API, and we already run their code as marketplace apps. Nothing joins them up.\n\nSo Halcyon's only route is to keep a service running around the clock, catching that webhook and calling us back to write the result. That is the middleware they are paying us to take over.\n\nThis request keeps coming back. Brightline Fleet asked in 2025, and Cavendish Motors asked for event-driven throttling. Halcyon named two more of their own uses on the call: credit card handling, and Halcyon Ultra sending user details.\n\n**Significance**\n\nHigh\n\nHalcyon's residential migration is around 18,000 chargers and gates the second contract. Not Critical, because Halcyon can host the middleware themselves. But that asks them to keep running the system they are replacing.\n\n**Customer Details**\nCustomer Name(s): Halcyon Energy, Canada\nURL (tenant environment): https://halcyon.tenant.example.com/\n"
       }
     },
@@ -4765,9 +5718,30 @@
           "after": 137,
           "before": 137,
           "cut_pct": 0.0,
+          "explaining": 0.0,
           "ok": false,
+          "rest_after": 137,
+          "rest_before": 137,
+          "rest_cut_pct": 0.0,
           "scored": true,
           "target": 40.0
+        },
+        "explanation": {
+          "joints": {
+            "after": 0,
+            "after_per_sentence": 0.0,
+            "before": 0,
+            "before_per_sentence": 0.0,
+            "gated": false,
+            "ok": true
+          },
+          "lists": {
+            "ok": true,
+            "unkept_after": 0,
+            "unkept_before": 0,
+            "unpacked_after": 0,
+            "unpacked_before": 0
+          }
         },
         "fixes": {},
         "flags": [
@@ -4821,6 +5795,7 @@
           "words": 137
         },
         "over_budget": [],
+        "promised_not_unpacked": [],
         "scored": true,
         "total_fixes": 0,
         "total_flags": 6
@@ -4835,9 +5810,30 @@
           "after": 137,
           "before": 137,
           "cut_pct": 0.0,
+          "explaining": 0.0,
           "ok": false,
+          "rest_after": 137,
+          "rest_before": 137,
+          "rest_cut_pct": 0.0,
           "scored": true,
           "target": 40.0
+        },
+        "explanation": {
+          "joints": {
+            "after": 0,
+            "after_per_sentence": 0.0,
+            "before": 0,
+            "before_per_sentence": 0.0,
+            "gated": false,
+            "ok": true
+          },
+          "lists": {
+            "ok": true,
+            "unkept_after": 0,
+            "unkept_before": 0,
+            "unpacked_after": 0,
+            "unpacked_before": 0
+          }
         },
         "fixes": {},
         "flags": [
@@ -4882,6 +5878,7 @@
           "words": 137
         },
         "over_budget": [],
+        "promised_not_unpacked": [],
         "scored": true,
         "total_fixes": 0,
         "total_flags": 6
@@ -5485,9 +6482,30 @@
           "after": 87,
           "before": 122,
           "cut_pct": 28.7,
+          "explaining": 0.0,
           "ok": false,
+          "rest_after": 104,
+          "rest_before": 139,
+          "rest_cut_pct": 25.2,
           "scored": true,
           "target": 40.0
+        },
+        "explanation": {
+          "joints": {
+            "after": 1,
+            "after_per_sentence": 0.11,
+            "before": 1,
+            "before_per_sentence": 0.11,
+            "gated": false,
+            "ok": true
+          },
+          "lists": {
+            "ok": true,
+            "unkept_after": 0,
+            "unkept_before": 0,
+            "unpacked_after": 0,
+            "unpacked_before": 0
+          }
         },
         "fixes": {
           "clutter:before": 1,
@@ -5554,6 +6572,7 @@
           "pct_passive_sentences",
           "pct_ly_adverbs"
         ],
+        "promised_not_unpacked": [],
         "scored": true,
         "total_fixes": 16,
         "total_flags": 10
@@ -5568,9 +6587,30 @@
           "after": 87,
           "before": 122,
           "cut_pct": 28.7,
+          "explaining": 0.0,
           "ok": false,
+          "rest_after": 104,
+          "rest_before": 139,
+          "rest_cut_pct": 25.2,
           "scored": true,
           "target": 40.0
+        },
+        "explanation": {
+          "joints": {
+            "after": 1,
+            "after_per_sentence": 0.11,
+            "before": 1,
+            "before_per_sentence": 0.11,
+            "gated": false,
+            "ok": true
+          },
+          "lists": {
+            "ok": true,
+            "unkept_after": 0,
+            "unkept_before": 0,
+            "unpacked_after": 0,
+            "unpacked_before": 0
+          }
         },
         "fixes": {
           "clutter:before": 1,
@@ -5628,6 +6668,7 @@
           "pct_passive_sentences",
           "pct_ly_adverbs"
         ],
+        "promised_not_unpacked": [],
         "scored": true,
         "total_fixes": 16,
         "total_flags": 10
@@ -6192,9 +7233,30 @@
           "after": 114,
           "before": 114,
           "cut_pct": 0.0,
+          "explaining": 0.0,
           "ok": false,
+          "rest_after": 114,
+          "rest_before": 114,
+          "rest_cut_pct": 0.0,
           "scored": true,
           "target": 40.0
+        },
+        "explanation": {
+          "joints": {
+            "after": 1,
+            "after_per_sentence": 0.1,
+            "before": 1,
+            "before_per_sentence": 0.1,
+            "gated": false,
+            "ok": true
+          },
+          "lists": {
+            "ok": true,
+            "unkept_after": 0,
+            "unkept_before": 0,
+            "unpacked_after": 0,
+            "unpacked_before": 0
+          }
         },
         "fixes": {},
         "flags": [],
@@ -6224,6 +7286,7 @@
           "words": 114
         },
         "over_budget": [],
+        "promised_not_unpacked": [],
         "scored": true,
         "total_fixes": 0,
         "total_flags": 0
@@ -6238,9 +7301,30 @@
           "after": 114,
           "before": 114,
           "cut_pct": 0.0,
+          "explaining": 0.0,
           "ok": false,
+          "rest_after": 114,
+          "rest_before": 114,
+          "rest_cut_pct": 0.0,
           "scored": true,
           "target": 40.0
+        },
+        "explanation": {
+          "joints": {
+            "after": 1,
+            "after_per_sentence": 0.1,
+            "before": 1,
+            "before_per_sentence": 0.1,
+            "gated": false,
+            "ok": true
+          },
+          "lists": {
+            "ok": true,
+            "unkept_after": 0,
+            "unkept_before": 0,
+            "unpacked_after": 0,
+            "unpacked_before": 0
+          }
         },
         "fixes": {},
         "flags": [],
@@ -6261,6 +7345,7 @@
           "words": 114
         },
         "over_budget": [],
+        "promised_not_unpacked": [],
         "scored": true,
         "total_fixes": 0,
         "total_flags": 0
@@ -6433,9 +7518,30 @@
           "after": 44,
           "before": 44,
           "cut_pct": 0.0,
+          "explaining": 0.0,
           "ok": false,
+          "rest_after": 44,
+          "rest_before": 44,
+          "rest_cut_pct": 0.0,
           "scored": true,
           "target": 40.0
+        },
+        "explanation": {
+          "joints": {
+            "after": 0,
+            "after_per_sentence": 0.0,
+            "before": 0,
+            "before_per_sentence": 0.0,
+            "gated": false,
+            "ok": true
+          },
+          "lists": {
+            "ok": true,
+            "unkept_after": 0,
+            "unkept_before": 0,
+            "unpacked_after": 0,
+            "unpacked_before": 0
+          }
         },
         "fixes": {},
         "flags": [],
@@ -6465,6 +7571,7 @@
           "words": 44
         },
         "over_budget": [],
+        "promised_not_unpacked": [],
         "scored": true,
         "total_fixes": 0,
         "total_flags": 0
@@ -6479,9 +7586,30 @@
           "after": 44,
           "before": 44,
           "cut_pct": 0.0,
+          "explaining": 0.0,
           "ok": false,
+          "rest_after": 44,
+          "rest_before": 44,
+          "rest_cut_pct": 0.0,
           "scored": true,
           "target": 40.0
+        },
+        "explanation": {
+          "joints": {
+            "after": 0,
+            "after_per_sentence": 0.0,
+            "before": 0,
+            "before_per_sentence": 0.0,
+            "gated": false,
+            "ok": true
+          },
+          "lists": {
+            "ok": true,
+            "unkept_after": 0,
+            "unkept_before": 0,
+            "unpacked_after": 0,
+            "unpacked_before": 0
+          }
         },
         "fixes": {},
         "flags": [],
@@ -6502,6 +7630,7 @@
           "words": 44
         },
         "over_budget": [],
+        "promised_not_unpacked": [],
         "scored": true,
         "total_fixes": 0,
         "total_flags": 0
@@ -6660,9 +7789,30 @@
           "after": 6,
           "before": 7,
           "cut_pct": 14.3,
+          "explaining": 0.0,
           "ok": true,
+          "rest_after": 6,
+          "rest_before": 7,
+          "rest_cut_pct": 14.3,
           "scored": false,
           "target": 40.0
+        },
+        "explanation": {
+          "joints": {
+            "after": 0,
+            "after_per_sentence": 0.0,
+            "before": 0,
+            "before_per_sentence": 0.0,
+            "gated": false,
+            "ok": true
+          },
+          "lists": {
+            "ok": true,
+            "unkept_after": 0,
+            "unkept_before": 0,
+            "unpacked_after": 0,
+            "unpacked_before": 0
+          }
         },
         "fixes": {
           "clutter:before": 1
@@ -6684,6 +7834,7 @@
           "words": 6
         },
         "over_budget": [],
+        "promised_not_unpacked": [],
         "scored": false,
         "total_fixes": 1,
         "total_flags": 0
@@ -6698,9 +7849,30 @@
           "after": 6,
           "before": 7,
           "cut_pct": 14.3,
+          "explaining": 0.0,
           "ok": true,
+          "rest_after": 6,
+          "rest_before": 7,
+          "rest_cut_pct": 14.3,
           "scored": false,
           "target": 40.0
+        },
+        "explanation": {
+          "joints": {
+            "after": 0,
+            "after_per_sentence": 0.0,
+            "before": 0,
+            "before_per_sentence": 0.0,
+            "gated": false,
+            "ok": true
+          },
+          "lists": {
+            "ok": true,
+            "unkept_after": 0,
+            "unkept_before": 0,
+            "unpacked_after": 0,
+            "unpacked_before": 0
+          }
         },
         "fixes": {
           "clutter:before": 1
@@ -6713,6 +7885,7 @@
           "words": 6
         },
         "over_budget": [],
+        "promised_not_unpacked": [],
         "scored": false,
         "total_fixes": 1,
         "total_flags": 0

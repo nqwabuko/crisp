@@ -626,27 +626,74 @@ const CASES: &[(&str, bool, &[&str])] = &[
         true,
         &["simplify", "--json"],
     ),
-    // A rewrite that clears the length gate, so the passing verdict is pinned.
+    // Explanation is not padding: a rewrite that cut the joints and the lists
+    // fails on them; one that kept them and let the explanation grow passes.
     (
-        "fixtures/plain-rewrite.md",
+        "fixtures/cases/explanatory-overcut.md",
         false,
         &[
             "simplify",
             "--report",
             "--check",
             "--baseline",
-            "fixtures/insight-ask-first.md",
+            "fixtures/explanatory.md",
         ],
     ),
     (
-        "fixtures/plain-rewrite.md",
+        "fixtures/cases/explanatory-overcut.md",
         false,
         &[
             "simplify",
             "--json",
             "--check",
             "--baseline",
-            "fixtures/insight-ask-first.md",
+            "fixtures/explanatory.md",
+        ],
+    ),
+    (
+        "fixtures/cases/explanatory-kept.md",
+        false,
+        &[
+            "simplify",
+            "--report",
+            "--check",
+            "--baseline",
+            "fixtures/explanatory.md",
+        ],
+    ),
+    (
+        "fixtures/cases/explanatory-kept.md",
+        false,
+        &[
+            "simplify",
+            "--json",
+            "--check",
+            "--baseline",
+            "fixtures/explanatory.md",
+        ],
+    ),
+    // A rewrite that clears every gate, so the passing verdict is pinned: the
+    // padding cut, the joints and the lists kept, the sentences inside budget.
+    (
+        "fixtures/cases/explanatory-tight.md",
+        false,
+        &[
+            "simplify",
+            "--report",
+            "--check",
+            "--baseline",
+            "fixtures/explanatory.md",
+        ],
+    ),
+    (
+        "fixtures/cases/explanatory-tight.md",
+        false,
+        &[
+            "simplify",
+            "--json",
+            "--check",
+            "--baseline",
+            "fixtures/explanatory.md",
         ],
     ),
 ];

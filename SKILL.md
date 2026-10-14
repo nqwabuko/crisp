@@ -4,9 +4,11 @@ description: >-
   Turn any draft into clean, AI-tell-free, plain prose in a good-PM voice: strip
   em dashes and machine fingerprints, cut Zinsser/Strunk-and-White clutter, then
   tighten to the point (Ben Horowitz "good product manager" cadence, lead with
-  the point, cut fluff). Always makes the text SHORTER: a measured length gate
-  requires the rewrite to cut at least 40% of the words, and that is the floor,
-  not the target. Three deterministic passes do the mechanical work every run,
+  the point, cut fluff). Makes padding SHORTER and keeps explanation whole: a
+  measured length gate requires the rewrite to cut at least 40% of the words that
+  are not explaining (that is the floor, not the target), while explanatory
+  passages keep their because/so joints, named parts and steps, owe no cut and
+  may grow. Three deterministic passes do the mechanical work every run,
   including a complexity budget (sentence length, Flesch, passive voice) and the
   length gate that the text must pass; the voice, cutting and simplification
   rewrite then runs twice, each time in a fresh subagent. Use when the user wants text de-slopped, de-AI'd, "made
@@ -52,6 +54,12 @@ all of them and still be twice as long as it needs to be. `--baseline` measures
 the rewrite against the source it came from and fails it if fewer than 40% of the
 words are gone. Treat 40% as the floor, not the target. The way to find it is
 deleting whole sentences, not shaving words.
+
+**But explanation is not padding.** The 40% is owed by padding and repetition.
+A paragraph that explains (joints like because and so, named parts, steps, the
+reader's next question answered) owes nothing and may grow, and the gate fails a
+rewrite that cut its joints or emptied a list it promised. See "Explanation is
+not padding" under Pass step A.
 
 **Two rewrites, two fresh agents.** The judgement pass runs twice, each time in a
 separate subagent that has never seen the draft before. The second one gets only
@@ -181,19 +189,37 @@ Work in this order, biggest unit first:
    before-and-after.
 1. **Whole sections and paragraphs.** What is the one point? Anything that does
    not serve it goes, however well written it is.
-2. **Whole sentences.** Restatements, the sentence that sets up the next
-   sentence, the summary of what you just said, the caveat nobody asked for, the
-   history of how you found out. Cut the sentence, not its adjectives.
-3. **Clauses.** "which means that ...", "in order to ...", the trailing "so that
-   we can ..." that repeats the point.
+2. **Whole sentences.** Restatements, the throat-clearing setup that announces
+   the next sentence, the summary of what you just said, the caveat nobody asked
+   for, the history of how you found out. Cut the sentence, not its adjectives.
+   Not a sentence that answers the reader's next question ("you might wonder
+   why..."): that one is load-bearing.
+3. **Clauses.** "in order to ..." (to "to"), the trailing "so that we can ..."
+   that repeats the point. Never the "because", "so", "which means" or "but"
+   that joins two claims you are keeping: that is the explanation, not padding.
+
+**Explanation is not padding.** Cut padding and repetition, never the joints. On
+a passage that explains (a mechanism, a cause, a term the reader has not met):
+- keep every connective that links two surviving claims (because, so, which
+  means, but, if, until);
+- a term or a count is named and unpacked where it is first used ("it has three
+  parts: a, b and c"), so never cut the unpacking;
+- a step-by-step mechanism keeps one sentence per step, in order;
+- a sentence that anticipates the reader's confusion stays.
+An explanatory passage owes the length gate nothing, and may come out longer. The
+gate knows this: it scores each source paragraph, asks 40% only of the ones that
+are not explaining, and fails the run if joints per sentence fell (`JOINTS
+[LOST]`) or an unpacked list lost its parts (`LISTS [LOST]`).
+`references/simplify.md` Part E has the why and the sources.
 4. **Words.** Only now. Every filler the `padding` flag lists, every intensifier,
    every "in fact", every stacked adjective.
 
 Then read it back and ask Zinsser's question of each remaining sentence: *is this
 doing work no other sentence is doing?* If not, it goes.
 
-The gate is 40%. Do not stop there if more is available: keep cutting until
-taking out one more word would lose a fact, a number, a name or a real caveat.
+The gate is 40% of whatever is not explaining. Do not stop there if more is
+available: keep cutting until taking out one more word would lose a fact, a
+number, a name, a real caveat or a joint.
 Never buy the number by cutting one of those (`references/simplify.md` Part D is
 the do-not-cut list).
 

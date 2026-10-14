@@ -16,6 +16,7 @@
 //! This crate does not decide the budget for every caller: `Budget::default()`
 //! is crisp's tuning, and every function that judges takes a `&Budget`.
 
+pub mod explain;
 #[cfg(feature = "grammar")]
 pub mod grammar;
 pub mod insight;

@@ -61,6 +61,14 @@ is a ratio, so a document can sit inside all of them and still be twice as long
 as it needs to be. Length is the one thing a per-sentence measure cannot see, and
 it is usually the biggest win available.
 
+The 40% is owed by padding, not by explanation. With `--baseline`, each source
+paragraph is scored on its joints (because, so, but, if...), definitions,
+unpacked lists and anticipations per sentence, less its padding; explanatory
+paragraphs owe no cut and may grow. Two more lines then gate the rewrite:
+`JOINTS` fails if joints per sentence fell, and `LISTS` fails if "it has three
+parts" lost its parts. The research behind this is in
+`references/simplify.md` Part E.
+
 `--insight` adds a structure gate for a document being filed to the product
 backlog: the four template sections must be present, significance must be exactly
 one value, and no internal code references or customer commercial numbers may
