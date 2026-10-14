@@ -136,10 +136,16 @@ pub fn map_prose(text: &str, f: impl Fn(&str) -> String) -> String {
     out
 }
 
-/// Code removed and the rest concatenated. Right for counting, wrong for
-/// anything positional.
+/// Code removed, the rest joined by single spaces. Right for counting, wrong
+/// for anything positional. The space is what keeps removed code a word
+/// boundary, as masked code is: joined directly, `` a`x`b `` would count as one
+/// word in the metrics and two in the spans.
 pub fn strip_code(text: &str) -> String {
-    prose_spans(text).into_iter().map(|(_, s)| s).collect()
+    prose_spans(text)
+        .into_iter()
+        .map(|(_, s)| s)
+        .collect::<Vec<_>>()
+        .join(" ")
 }
 
 /// Code blanked out, preserving byte length and line structure.
@@ -426,6 +432,23 @@ pub fn line_col(text: &str, starts: &[usize], off: usize, unit: Unit) -> (usize,
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// Removed code is a word boundary, as masked code is: otherwise the words
+    /// either side fuse, and the metrics count one word where the spans count two.
+    #[test]
+    fn stripping_code_never_joins_the_words_around_it() {
+        for text in [
+            "a`x`b",
+            "golden` and let the `golden.json",
+            "one `two` three",
+        ] {
+            assert_eq!(
+                count_words(&strip_code(text)),
+                count_words(&mask_code(text)),
+                "{text:?}"
+            );
+        }
+    }
 
     #[test]
     fn masking_preserves_byte_offsets() {
