@@ -77,8 +77,7 @@ is missing (a fresh clone, another machine), build it once:
 ```
 
 `crisp detell` and `crisp simplify` take the same flags the old Python scripts
-did. The scripts still exist, but only as the test oracle (see "Measure-only
-mode").
+did.
 
 ### 1. Get the text
 Whatever the user wants cleaned. If they didn't paste it inline, it's usually:
@@ -411,33 +410,33 @@ Whenever you touch the rule tables, the budget, or the locating arithmetic, run
 the checks from the repo root. They cover different failure modes:
 
 ```bash
-~/.cargo/bin/cargo test                                # Rust == Python oracle, every mode, every fixture
-python3 scripts/verify-locate.py fixtures/*.md         # ranges are honest
-python3 scripts/golden.py                              # behaviour hasn't drifted
+~/.cargo/bin/cargo fmt --check && ~/.cargo/bin/cargo clippy --all-targets -- -D warnings
+~/.cargo/bin/cargo test                    # the contract, the invariants, the CLI, grammar
 ```
 
-The Python scripts are the **oracle**. `tests/conformance.rs` and
-`tests/insight.rs` run them beside the binary and require identical output, so
-a rule added to one engine and not the other fails the build. They retire once
-the binary has held parity for a release; `docs/rust.md` has the plan.
-
-`verify-locate.py` slices the buffer at every reported range and requires the
-slice to equal the reported text, then checks that nothing inside code was
-reported and that findings come back sorted. Silent off-by-one drift is what it
-catches.
-
-`golden.py` pins behaviour against `fixtures/`: the rewritten text, every
-per-rule count, the metrics, the verdict, every located range, **and the tunables
-themselves** (`BUDGET`, the thresholds, the rule-name lists). The config is
-pinned directly because output alone misses a threshold moving when no fixture
-happens to straddle it. On a diff, decide: intended means re-record with
-`--update` and let the `golden.json` diff be the review; unintended means you
-just changed something a consumer depends on. `--update` is a decision, not a
+`tests/golden.rs` holds the engine to `fixtures/golden.json`: the rewritten text,
+every per-rule count, the metrics, the verdict, every located range and span,
+the binary's report and JSON output byte for byte, a set of edge cases under
+`fixtures/cases/` (carriage returns, stdin, rewrite corner cases, unusual
+characters), **and the tunables themselves** (the budget, the thresholds, the
+rule-name lists). The config is pinned directly because output alone misses a
+threshold moving when no fixture happens to straddle it. On a diff, decide:
+intended means re-record with `CRISP_UPDATE_GOLDEN=1 ~/.cargo/bin/cargo test
+--test golden` and let the `golden.json` diff be the review; unintended means you
+just changed something a consumer depends on. Re-recording is a decision, not a
 build step.
 
-This matters more than it used to. `--locate` is a runtime contract now, not just
-a report: ink shells out to it and renders what it returns, so a careless rule
-edit changes another program's output.
+`tests/invariants.rs` slices the buffer at every reported range and requires the
+slice to equal the reported text, checks that nothing inside code was reported
+and that findings come back sorted, and that the positioned spans and the
+metrics describe the same document. Silent off-by-one drift is what it catches.
+
+crisp was first written in Python, and the Rust was held byte-identical to it
+until the Python retired on 13 Oct 2026. `golden.json` is the only contract now.
+
+This matters more than it used to. ink carries this engine as a synced copy and
+renders what it finds, so a careless rule edit changes another program's output
+the next time ink syncs.
 
 ## Notes
 - Fenced code blocks and inline `code` pass through both scripts untouched, and
@@ -453,13 +452,10 @@ edit changes another program's output.
 - The padding cuts do not know about quotation marks. If the draft quotes
   someone, check their words survived intact and put back anything the script
   trimmed inside the quotes.
-- To extend the tell list, add the line to `src/rules.rs` **and** to `FIX_RULES`
-  or `FLAG_RULES` in `scripts/detell.py` (clutter and complexity: `src/rules.rs`
-  and `scripts/simplify.py`), then rebuild. The conformance test fails if the
-  two disagree. Add both spellings, British and American. The rule tables are
-  the program.
-- The length target lives in `COMPRESSION_TARGET` (in `src/lib.rs` and
-  `scripts/simplify.py`), one number, next to the budget.
-- The complexity budget lives in `Budget::default` in `src/rules.rs`, mirrored by
-  the `BUDGET` dict in `scripts/simplify.py`. It's tuned for short business writing (filed insights,
+- To extend the tell list, add one line to `src/rules.rs`, rebuild, and
+  re-record the contract (the `golden.json` diff is the review). Add both
+  spellings, British and American. The rule tables are the program.
+- The length target lives in `COMPRESSION_TARGET` in `src/lib.rs`, one number,
+  next to the budget.
+- The complexity budget lives in `Budget::default` in `src/rules.rs`. It's tuned for short business writing (filed insights,
   Slack, email, story descriptions). Tune it there, not per run.

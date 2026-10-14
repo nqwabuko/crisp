@@ -4,7 +4,7 @@ A deterministic prose-quality engine: strip the machine fingerprints, cut the
 clutter, and measure whether a document is harder to read than it needs to be.
 
 It exists because "this is too complex" was an opinion you could argue with.
-`simplify.py --check` turns it into a test that exits 1. `--baseline` does the
+`crisp simplify --check` turns it into a test that exits 1. `--baseline` does the
 same for "this is too long": measure the rewrite against the source it came from
 and fail it if fewer than a quarter of the words are gone.
 
@@ -24,8 +24,8 @@ equivalent, so a script applies it. A FLAG changes meaning, so the script only
 locates it and says why; a human or an agent decides. The scripts never quietly
 reweight what you said.
 
-`scripts/detell.py` and `scripts/simplify.py` are the original Python. They are
-now the test oracle: the Rust must match them byte for byte. See `docs/rust.md`.
+crisp began as two Python scripts. The Rust was held byte-identical to them
+until they retired on 13 Oct 2026; `docs/rust.md` has the story.
 
 ## Use
 
@@ -84,24 +84,18 @@ ln -s "$PWD" ~/.claude/skills/crisp
 
 ## Tests
 
-Three checks, covering different failure modes. Run all three after touching a
-rule table, the budget, or the locating arithmetic.
+`cargo test` after touching a rule table, the budget, or the locating arithmetic.
 
-```bash
-cargo test                                         # Rust == Python, every mode, every fixture
-python3 scripts/golden.py                          # behaviour hasn't drifted
-python3 scripts/verify-locate.py fixtures/*.md     # ranges are honest
-```
-
-`golden.py` pins `fixtures/` output *and the tunables themselves*. Pinning output
-alone leaves a hole: a threshold can move with no fixture straddling it, which is
-how a budget change once landed silently. On a diff, decide. Intended means
-re-record with `--update` and let the `golden.json` diff be the review.
-Unintended means you just changed something a consumer depends on.
-
-`verify-locate.py` slices the buffer at every reported range and requires the
-slice to equal the reported text, then checks nothing inside code was reported
-and that findings come back sorted. Silent off-by-one drift is what it catches.
+- `tests/golden.rs` pins `fixtures/` output, the binary's reports byte for byte,
+  the edge cases in `fixtures/cases/`, *and the tunables themselves*. Pinning
+  output alone leaves a hole: a threshold can move with no fixture straddling
+  it, which is how a budget change once landed silently. On a diff, decide.
+  Intended means re-record with `CRISP_UPDATE_GOLDEN=1 cargo test --test golden`
+  and let the `golden.json` diff be the review. Unintended means you just
+  changed something a consumer depends on.
+- `tests/invariants.rs` slices the buffer at every reported range and requires
+  the slice to equal the reported text, checks nothing inside code was reported
+  and that findings come back sorted. Silent off-by-one drift is what it catches.
 
 ## Notes for anyone porting the rules
 

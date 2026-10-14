@@ -42,24 +42,39 @@ the binary what the skill calls.
 
 ## Oracle and contract
 
-The Python scripts stay, demoted to test-only oracle, until the Rust binary has
-passed parity on every fixture for one full release. Then they go, and
-`fixtures/golden.json` is the only contract. The lens in `src/insight.rs` that
-copies Python's `\w` and `\s` goes with them: from then on Rust's own Unicode
-classes are the contract, and `golden.json` is re-recorded once. Until then:
+**The Python retired on 13 Oct 2026**, once ink was following upstream.
+`fixtures/golden.json` is the only contract now. Before the scripts went:
 
-- `tests/conformance.rs` runs the binary and the Python script on every
-  fixture and every mode, and requires identical stdout, identical parsed
-  JSON, and identical exit codes. It fails (does not skip) when Python is
-  missing: the oracle is in this repo.
-- `tests/golden.rs` checks the engine against `fixtures/golden.json` directly,
-  no vendored copy.
-- `tests/invariants.rs` is verify-locate and check_spans in Rust.
+1. `tests/golden.rs` became the recorder `scripts/golden.py` was. Its first
+   re-record matched the Python's file leaf for leaf (values and int/float
+   types); only the key order changed, to sorted.
+2. The binary's report text and JSON, per fixture, were added to the contract
+   (`cli`), plus 50 edge-case runs from `fixtures/cases/` (`__cases__`): carriage
+   returns from a file and on stdin, the rewrite corner cases, a cut over the
+   target, and the insight documents with unusual characters. All 66 + 50 were
+   checked against the Python before it was deleted; 115 matched, and the one
+   that didn't was the known `\x1c`-`\x1f` span difference below.
+3. Then the scripts, `tests/conformance.rs`, `tests/insight.rs` and the lens in
+   `src/insight.rs` that copied Python's `\w` and `\s` went, and Rust's own
+   Unicode classes became the contract. The one re-record that followed changed
+   only the two unusual-character cases: a decomposed accent now stays inside
+   its word (`config/réseau.yaml` is reported whole, `café::run` is caught),
+   `x²::y` and a figure joined to its noun by `\x1c` are no longer caught, and
+   a significance line ending in `\x1f` no longer counts.
+
+What holds the engine now:
+
+- `tests/golden.rs`: everything in `golden.json`, recorded by the engine.
+  `CRISP_UPDATE_GOLDEN=1` re-records it.
+- `tests/invariants.rs`: verify-locate and check_spans, the checks that need no
+  contract at all.
+- `tests/cli.rs`: what the binary refuses, and order at a tie.
+- `tests/grammar.rs`, `tests/vendorable.rs`.
 
 ## Check
 
 ```
-~/.cargo/bin/cargo fmt --check && ~/.cargo/bin/cargo clippy --all-targets -- -D warnings && ~/.cargo/bin/cargo test && python3 scripts/golden.py
+~/.cargo/bin/cargo fmt --check && ~/.cargo/bin/cargo clippy --all-targets -- -D warnings && ~/.cargo/bin/cargo test
 ```
 
 ## Grammar (Harper, UK English)
@@ -129,6 +144,7 @@ crisp checks style. It has never checked grammar or spelling. `harper-core`
    Grammar (Harper, British) lands in the same round, behind its own subcommand.
 3. SKILL.md and README call the binary, grammar joins the deterministic pass,
    and `references/voice.md` says UK English. Python documented as the oracle.
+   (Retired 13 Oct 2026, after step 4.)
 4. ink follows upstream (13 Oct 2026). See below.
 
 ## ink follows upstream

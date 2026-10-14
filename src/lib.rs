@@ -9,10 +9,9 @@
 //! each other with `super::`, never `crate::`, because inside ink the crate root
 //! is ink; `tests/vendorable.rs` holds that.
 //!
-//! **The Python scripts stay the oracle** until the binary has held parity for a
-//! full release (see `docs/rust.md`). `tests/golden.rs` holds the engine against
-//! `fixtures/golden.json`, and `tests/invariants.rs` holds it to the checks that
-//! need no oracle at all.
+//! The Python retired on 13 Oct 2026 (see `docs/rust.md`). `tests/golden.rs`
+//! holds the engine against `fixtures/golden.json`, which it also records, and
+//! `tests/invariants.rs` holds it to the checks that need no contract at all.
 //!
 //! This crate does not decide the budget for every caller: `Budget::default()`
 //! is crisp's tuning, and every function that judges takes a `&Budget`.

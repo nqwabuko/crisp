@@ -20,7 +20,8 @@ fn library_files_never_name_the_crate_root() {
         }
         checked += 1;
         for (i, line) in fs::read_to_string(&path).unwrap().lines().enumerate() {
-            if line.contains("crate::") {
+            // Comments may name it; only code resolves it.
+            if line.contains("crate::") && !line.trim_start().starts_with("//") {
                 offenders.push(format!("src/{name}:{}: {}", i + 1, line.trim()));
             }
         }

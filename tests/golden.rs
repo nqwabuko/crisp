@@ -29,7 +29,7 @@ fn fixtures(contract: &Value) -> Vec<(String, String)> {
         .as_object()
         .expect("an object")
         .keys()
-        .filter(|k| *k != "__config__")
+        .filter(|k| !k.starts_with("__"))
         .map(|name| {
             let text = common::read(&common::fixtures_dir().join(name));
             (name.clone(), text)
@@ -369,7 +369,7 @@ fn the_typography_rewrite_matches_the_recorded_contract() {
 
 /// Everything a consumer can observe, for one fixture, in the contract's shape.
 ///
-/// The Rust side of what `scripts/golden.py` records. The rewrites run as a
+/// What `scripts/golden.py` used to record, before the Python retired. The rewrites run as a
 /// pipeline (typography, then clutter, then measure), so the tallies and metrics
 /// describe the end of it; the ranges and spans describe the raw text.
 fn record(text: &str) -> Value {
@@ -479,12 +479,278 @@ fn record_config() -> Value {
     })
 }
 
+/// What the `crisp` binary prints for one fixture, run the way the skill runs
+/// it: `detell` on the file, then `simplify --check --baseline FILE` on
+/// detell's output, plain and with `--insight`. This pins the report text and
+/// the JSON shape byte for byte, which the per-field records above cannot see.
+fn record_cli(path: &std::path::Path) -> Value {
+    use serde_json::json;
+    use std::io::Write;
+    use std::process::{Command, Stdio};
+
+    let run = |args: &[&str], stdin: Option<&[u8]>| -> std::process::Output {
+        let mut cmd = Command::new(env!("CARGO_BIN_EXE_crisp"));
+        cmd.args(args)
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped());
+        let mut child = cmd.spawn().expect("crisp runs");
+        let input = stdin.unwrap_or_default().to_vec();
+        let mut pipe = child.stdin.take().expect("stdin");
+        let feed = std::thread::spawn(move || pipe.write_all(&input));
+        let out = child.wait_with_output().expect("crisp finishes");
+        feed.join().expect("feeder").expect("stdin written");
+        out
+    };
+    let text = |b: &[u8]| String::from_utf8(b.to_vec()).expect("utf-8 output");
+    let parsed = |b: &[u8]| -> Value { serde_json::from_slice(b).expect("JSON on stderr") };
+    let file = path.to_str().expect("a utf-8 path");
+
+    let detell = run(&["detell", "--report", file], None);
+    let detell_json = run(&["detell", "--json", file], None);
+    let mut out = serde_json::Map::new();
+    out.insert(
+        "detell --report".into(),
+        json!({"stderr": text(&detell.stderr), "exit": detell.status.code()}),
+    );
+    out.insert("detell --json".into(), parsed(&detell_json.stderr));
+    for lens in [&[][..], &["--insight"][..]] {
+        let base: Vec<&str> = ["simplify", "--check", "--baseline", file]
+            .iter()
+            .copied()
+            .chain(lens.iter().copied())
+            .collect();
+        let label = base[..3].join(" ") + &lens.iter().map(|l| format!(" {l}")).collect::<String>();
+        let report = run(&[&base[..], &["--report"]].concat(), Some(&detell.stdout));
+        let as_json = run(&[&base[..], &["--json"]].concat(), Some(&detell.stdout));
+        out.insert(
+            format!("{label} --report"),
+            json!({
+                "stdout": text(&report.stdout),
+                "stderr": text(&report.stderr),
+                "exit": report.status.code(),
+            }),
+        );
+        out.insert(format!("{label} --json"), parsed(&as_json.stderr));
+    }
+    Value::Object(out)
+}
+
+/// Inputs `fixtures/*.md` never reaches, each run through the binary the way
+/// that case needs. Paths are relative to the repo root, where the binary runs,
+/// so a recorded report never carries a machine's home directory.
+///
+/// `stdin` matters on its own: a file is read in universal-newline mode and
+/// stdin is not, so `carriage-returns.md` is positioned one way from a file and
+/// keeps its `\r` for detell's `crlf` fix the other way.
+const CASES: &[(&str, bool, &[&str])] = &[
+    // (input, on stdin, args)
+    ("fixtures/ai-tells.md", true, &["detell", "--locate"]),
+    (
+        "fixtures/ai-tells.md",
+        true,
+        &["simplify", "--locate", "--spans"],
+    ),
+    (
+        "fixtures/cases/carriage-returns.md",
+        false,
+        &["detell", "--locate"],
+    ),
+    (
+        "fixtures/cases/carriage-returns.md",
+        false,
+        &["simplify", "--locate", "--spans"],
+    ),
+    (
+        "fixtures/cases/carriage-returns.md",
+        false,
+        &["detell", "--report"],
+    ),
+    (
+        "fixtures/cases/carriage-returns.md",
+        false,
+        &["simplify", "--report"],
+    ),
+    (
+        "fixtures/cases/carriage-returns.md",
+        true,
+        &["detell", "--locate"],
+    ),
+    (
+        "fixtures/cases/carriage-returns.md",
+        true,
+        &["simplify", "--locate", "--spans"],
+    ),
+    ("fixtures/cases/carriage-returns.md", true, &["detell"]),
+    (
+        "fixtures/cases/carriage-returns.md",
+        true,
+        &["detell", "--report"],
+    ),
+    (
+        "fixtures/cases/carriage-returns.md",
+        true,
+        &["detell", "--json"],
+    ),
+    ("fixtures/cases/carriage-returns.md", true, &["simplify"]),
+    (
+        "fixtures/cases/carriage-returns.md",
+        true,
+        &["simplify", "--report", "--check"],
+    ),
+    (
+        "fixtures/cases/carriage-returns.md",
+        true,
+        &["simplify", "--json"],
+    ),
+    // Chained en dash ranges, runs of spaces left by a deletion, padding before
+    // a quotation, redundancies keeping their inflection, the `purposes` guard,
+    // trailing whitespace at the very end, and a fix at the very start.
+    (
+        "fixtures/cases/rewrite-edges.txt",
+        true,
+        &["detell", "--report"],
+    ),
+    (
+        "fixtures/cases/rewrite-edges.txt",
+        true,
+        &["detell", "--json"],
+    ),
+    (
+        "fixtures/cases/rewrite-edges.txt",
+        true,
+        &["simplify", "--report"],
+    ),
+    (
+        "fixtures/cases/rewrite-edges.txt",
+        true,
+        &["simplify", "--json"],
+    ),
+    // A rewrite that clears the length gate, so the passing verdict is pinned.
+    (
+        "fixtures/plain-rewrite.md",
+        false,
+        &[
+            "simplify",
+            "--report",
+            "--check",
+            "--baseline",
+            "fixtures/insight-ask-first.md",
+        ],
+    ),
+    (
+        "fixtures/plain-rewrite.md",
+        false,
+        &[
+            "simplify",
+            "--json",
+            "--check",
+            "--baseline",
+            "fixtures/insight-ask-first.md",
+        ],
+    ),
+];
+
+/// Insight documents the fixtures lack: one that passes the lens and the
+/// budget, one too short to score, one that leaks a figure once, and two whose
+/// characters (a decomposed accent, a superscript digit, the \x1c-\x1f
+/// separators) sit where regex character classes disagree between engines.
+const INSIGHT_CASES: &[&str] = &[
+    "passing-insight.md",
+    "short-insight.md",
+    "leaky-insight.md",
+    "classes-insight.md",
+    "separator-insight.md",
+];
+const INSIGHT_ARGS: &[&[&str]] = &[
+    &["simplify", "--insight"],
+    &["simplify", "--insight", "--report", "--check"],
+    &["simplify", "--insight", "--json", "--check"],
+    &["simplify", "--insight", "--locate", "--check"],
+    &["simplify", "--insight", "--locate", "--spans"],
+    &[
+        "simplify",
+        "--insight",
+        "--report",
+        "--check",
+        "--baseline",
+        "fixtures/bloated-insight.md",
+    ],
+];
+
+/// One run of the binary from the repo root, as the contract records it: JSON
+/// parsed where the mode prints JSON, text otherwise, and the exit code.
+fn record_run(input: &str, stdin: bool, args: &[&str]) -> Value {
+    use serde_json::json;
+    use std::io::Write;
+    use std::process::{Command, Stdio};
+
+    let root = env!("CARGO_MANIFEST_DIR");
+    let mut argv: Vec<&str> = args.to_vec();
+    if !stdin {
+        argv.push(input);
+    }
+    let mut child = Command::new(env!("CARGO_BIN_EXE_crisp"))
+        .args(&argv)
+        .current_dir(root)
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .expect("crisp runs");
+    let bytes = if stdin {
+        std::fs::read(std::path::Path::new(root).join(input)).expect("the case input")
+    } else {
+        Vec::new()
+    };
+    let mut pipe = child.stdin.take().expect("stdin");
+    let feed = std::thread::spawn(move || pipe.write_all(&bytes));
+    let out = child.wait_with_output().expect("crisp finishes");
+    feed.join().expect("feeder").expect("stdin written");
+
+    let as_value = |b: &[u8], is_json: bool| -> Value {
+        if is_json {
+            serde_json::from_slice(b).expect("JSON output")
+        } else {
+            Value::String(String::from_utf8(b.to_vec()).expect("utf-8 output"))
+        }
+    };
+    json!({
+        "stdout": as_value(&out.stdout, args.contains(&"--locate")),
+        "stderr": as_value(&out.stderr, args.contains(&"--json")),
+        "exit": out.status.code(),
+    })
+}
+
+fn record_cases() -> Value {
+    let mut out = serde_json::Map::new();
+    let mut put = |input: &str, stdin: bool, args: &[&str]| {
+        let how = if stdin { "< " } else { "" };
+        out.insert(
+            format!("{} {how}{input}", args.join(" ")),
+            record_run(input, stdin, args),
+        );
+    };
+    for &(input, stdin, args) in CASES {
+        put(input, stdin, args);
+    }
+    for file in INSIGHT_CASES {
+        for args in INSIGHT_ARGS {
+            put(&format!("fixtures/cases/{file}"), false, args);
+        }
+    }
+    Value::Object(out)
+}
+
 fn record_all() -> Value {
     let mut out = serde_json::Map::new();
     out.insert("__config__".into(), record_config());
+    out.insert("__cases__".into(), record_cases());
     for path in common::fixture_paths() {
         let name = path.file_name().unwrap().to_string_lossy().into_owned();
-        out.insert(name, record(&common::read(&path)));
+        let mut rec = record(&common::read(&path));
+        rec["cli"] = record_cli(&path);
+        out.insert(name, rec);
     }
     Value::Object(out)
 }
@@ -529,11 +795,7 @@ fn the_engine_records_exactly_the_contract() {
         let path = common::fixtures_dir().join("golden.json");
         let body = serde_json::to_string_pretty(&now).expect("serialises") + "\n";
         std::fs::write(&path, body).expect("golden.json is writable");
-        eprintln!(
-            "recorded {} -> {}",
-            now.as_object().unwrap().len() - 1,
-            path.display()
-        );
+        eprintln!("recorded the contract -> {}", path.display());
         return;
     }
     let mut drift = Vec::new();

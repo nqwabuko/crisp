@@ -93,65 +93,6 @@ fn re(pattern: &str) -> Regex {
     Regex::new(pattern).expect("an insight pattern should compile")
 }
 
-/// Python's `\w`, `\b` and `\s` are not Rust's. Python's word characters are
-/// letters, numbers and the underscore; Rust's add every combining mark (so a
-/// decomposed `é` is one word to Rust and two to Python), connector punctuation
-/// and some symbols, and leave out numbers such as `²`. Python's whitespace adds
-/// the separators `\x1c`-`\x1f`. The patterns are written as crisp writes them
-/// and run over a copy of the text in which each character in dispute stands in
-/// for one Rust classifies as Python does, so `\w`, `\b` and `\s` all agree.
-static PY_ONLY_WORD: LazyLock<Regex> = LazyLock::new(|| re(r"^[[\p{L}\p{N}_]--\w]$"));
-static RUST_ONLY_WORD: LazyLock<Regex> = LazyLock::new(|| re(r"^[\w--[\p{L}\p{N}_]]$"));
-
-/// Python's `str.isspace`: Rust's whitespace and the four separators.
-fn py_space(c: char) -> bool {
-    c.is_whitespace() || ('\u{1c}'..='\u{1f}').contains(&c)
-}
-
-/// The text as Python's regex classes see it, one character for one, with the
-/// way back to the original's offsets.
-struct PyView<'a> {
-    original: &'a str,
-    text: String,
-    /// The original byte offset of each byte of `text`, and of its end.
-    at: Vec<usize>,
-}
-
-impl<'a> PyView<'a> {
-    fn new(original: &'a str) -> Self {
-        let (mut text, mut at) = (String::with_capacity(original.len()), Vec::new());
-        for (i, c) in original.char_indices() {
-            let stand_in = if c.is_ascii() {
-                c
-            } else {
-                let mut buf = [0; 4];
-                let one = &*c.encode_utf8(&mut buf);
-                if RUST_ONLY_WORD.is_match(one) {
-                    '#' // a non-word character no pattern names
-                } else if PY_ONLY_WORD.is_match(one) {
-                    '_' // a word character that is not a digit
-                } else {
-                    c
-                }
-            };
-            let stand_in = if ('\u{1c}'..='\u{1f}').contains(&stand_in) {
-                '\u{b}' // whitespace that no literal space matches
-            } else {
-                stand_in
-            };
-            text.push(stand_in);
-            at.resize(text.len(), i);
-        }
-        at.push(original.len());
-        PyView { original, text, at }
-    }
-
-    /// The original text under a match on the view.
-    fn original(&self, m: &regex::Match) -> &'a str {
-        &self.original[self.at[m.start()]..self.at[m.end()]]
-    }
-}
-
 static SIGNIFICANCE_RE: LazyLock<Regex> = LazyLock::new(|| re(SIGNIFICANCE));
 static CODE_REF_RES: LazyLock<Vec<(Regex, &str)>> =
     LazyLock::new(|| CODE_REFS.iter().map(|&(p, what)| (re(p), what)).collect());
@@ -182,8 +123,7 @@ pub fn check(text: &str) -> Vec<Failure> {
         });
     }
 
-    let view = PyView::new(text);
-    let hits = SIGNIFICANCE_RE.find_iter(&view.text).count();
+    let hits = SIGNIFICANCE_RE.find_iter(text).count();
     if hits != 1 {
         out.push(Failure {
             check: "significance",
@@ -197,10 +137,7 @@ pub fn check(text: &str) -> Vec<Failure> {
     // Deliberately over the raw text, code included: a backticked `Foo::bar`
     // is precisely the thing being looked for.
     for (pat, what) in CODE_REF_RES.iter() {
-        let mut found: Vec<&str> = pat
-            .find_iter(&view.text)
-            .map(|m| view.original(&m))
-            .collect();
+        let mut found: Vec<&str> = pat.find_iter(text).map(|m| m.as_str()).collect();
         found.sort_unstable();
         found.dedup();
         if found.is_empty() {
@@ -218,13 +155,8 @@ pub fn check(text: &str) -> Vec<Failure> {
 
     let mut seen: Vec<String> = Vec::new();
     for (pat, what) in CUSTOMER_METRIC_RES.iter() {
-        for m in pat.find_iter(&view.text) {
-            let figure = view
-                .original(&m)
-                .split(py_space)
-                .filter(|w| !w.is_empty())
-                .collect::<Vec<_>>()
-                .join(" ");
+        for m in pat.find_iter(text) {
+            let figure = m.as_str().split_whitespace().collect::<Vec<_>>().join(" ");
             let key = figure.to_lowercase();
             if seen.contains(&key) {
                 continue;
@@ -232,7 +164,7 @@ pub fn check(text: &str) -> Vec<Failure> {
             // "up to 1000 EVSEs per call" is documentation; "1000 EVSEs" on its
             // own is the customer's estate. Without this the gate fires on our
             // own API caps and gets switched off.
-            if LIMIT_RE.is_match(window(&view.text, m.start(), m.end())) {
+            if LIMIT_RE.is_match(window(text, m.start(), m.end())) {
                 continue;
             }
             seen.push(key);
@@ -347,35 +279,25 @@ mod tests {
         assert_eq!(check(&text).len(), 1);
     }
 
-    /// Each case is what `check_insight` in `simplify.py` returns for it.
+    /// Rust's own Unicode classes decide, since the Python oracle retired. A
+    /// decomposed accent (macOS writes é as e + U+0301) stays inside its word,
+    /// and the separators \x1c-\x1f are not whitespace.
     #[test]
-    fn words_and_spaces_are_classified_as_python_classifies_them() {
+    fn words_and_spaces_follow_unicode_as_rust_reads_it() {
         let details = |extra: &str| -> Vec<String> {
             check(&format!("{TEMPLATE}{extra}"))
                 .into_iter()
                 .map(|f| f.detail)
                 .collect()
         };
-        // A combining accent (macOS writes é as e + U+0301) ends a Python word.
         assert_eq!(
             details("The bug is in config/re\u{301}seau.yaml.\n"),
-            ["source file path: seau.yaml"]
+            ["source file path: config/re\u{301}seau.yaml"]
         );
         assert_eq!(
-            details("See cafe\u{301}::run and e\u{301}x.py today.\n"),
-            ["source file path: x.py"]
+            details("They run 18,000\u{1c}chargers.\n"),
+            Vec::<String>::new()
         );
-        // A superscript digit is part of a Python word.
-        assert_eq!(
-            details("See x\u{b2}::y.\n"),
-            ["class/static reference: x\u{b2}::y"]
-        );
-        // The separators \x1c-\x1f are Python whitespace, but not a literal space.
-        let estate = details("They run 18,000\u{1c}chargers.\n");
-        assert_eq!(estate.len(), 1);
-        assert!(estate[0].starts_with("customer estate size: \"18,000 chargers\""));
-        assert_eq!(details("up\u{1c}to 1000 EVSEs\n").len(), 1);
-        assert_eq!(check(&TEMPLATE.replace("High\n", "High\u{1f}\n")), []);
     }
 
     #[test]

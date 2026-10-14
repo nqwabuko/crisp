@@ -26,7 +26,7 @@ The instinct is to rewrite a bloated sentence into a smoother bloated sentence.
 Delete instead. Most drafts lose 30-50% of their words with no loss of meaning.
 If you can strike a word and the sentence still means what it meant, the word
 was clutter. This is the single highest-leverage move and the one that gets
-skipped, which is why `simplify.py --baseline` now measures it: under a 40% cut
+skipped, which is why `crisp simplify --baseline` now measures it: under a 40% cut
 the run fails.
 
 **Cut in descending order of size.** Deleting words is the last resort, not the
@@ -156,7 +156,7 @@ back:
 - **The load-bearing long word.** Sometimes the precise word is four syllables.
   Keep it and spend the simplicity elsewhere in the sentence.
 
-The budget in `simplify.py` is a servant, not a master. If a metric is over
+The budget (`Budget::default` in `src/rules.rs`) is a servant, not a master. If a metric is over
 because the text genuinely needs a technical term or a 28-word sentence, say so
 and move on. What you must not do is leave it over because you didn't try.
 
