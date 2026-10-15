@@ -197,6 +197,15 @@ pub fn simplify(text: &str) -> Rewrite {
             merge(&mut flags, name, Some(hint), span, &hits, 28, "...");
         }
     }
+    merge(
+        &mut flags,
+        super::SAME_OPENING,
+        Some(super::SAME_OPENING_HINT),
+        &cleaned,
+        &super::same_openings(&cleaned),
+        28,
+        "...",
+    );
     flags.sort_by_key(|f| std::cmp::Reverse(f.count));
 
     Rewrite {

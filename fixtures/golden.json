@@ -1570,7 +1570,16 @@
           }
         },
         "fixes": {},
-        "flags": [],
+        "flags": [
+          {
+            "count": 1,
+            "hint": "sentences in a row open with the same word: vary them, or merge them",
+            "rule": "complexity:same-opening",
+            "samples": [
+              "...er than the setting. Delay. The boiler heats water. The water heats the radiator. The radiator heats the air. The sensor learns late.  It works in two steps. The..."
+            ]
+          }
+        ],
         "insight": null,
         "joined_sentences": [],
         "long_sentences": [],
@@ -1595,7 +1604,7 @@
         ],
         "scored": true,
         "total_fixes": 0,
-        "total_flags": 0
+        "total_flags": 1
       },
       "stdout": "# Why the radiator overshoots\n\nA thermostat loop has three parts.\n\nThe room ends up warmer than the setting. Delay. The boiler heats water. The\nwater heats the radiator. The radiator heats the air. The sensor learns late.\n\nIt works in two steps. The boiler stays on until the room is warm. Stored heat\nkeeps arriving. The room overshoots.\n"
     },
@@ -2101,7 +2110,7 @@
     },
     "simplify --report --check --baseline fixtures/explanatory.md fixtures/cases/explanatory-overcut.md": {
       "exit": 1,
-      "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD  (58 words, 12 sentences, 4 paragraphs):\n  [PASS]  mean_sentence_words        4.8   budget <= 18.0\n  [PASS]  max_sentence_words           9   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       83.8   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       2.8   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words            12.1   budget <= 20.0\n  [PASS]  max_paragraph_words         27   budget <= 90\n  [PASS]  pct_ly_adverbs             0.0   budget <= 4.0\nLENGTH  [PASS]  169 -> 58 words, at most 219\n        77.5% of the source explains (131 words, may grow 1.5x); the rest (38 words) owes a 40.0% cut\nJOINTS  [LOST]  3 in the sentences that survived, 1 in the rewrite (because/so/but/if...)\nLISTS   [LOST]  \"has three parts\" lost: controller\nLISTS   [LOST]  promised, not unpacked: \"has three parts\"\nVERDICT: OVER BUDGET on joints, lists\n=============================================\n",
+      "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED (needs the rewrite pass, 1):\n    1  complexity:same-opening  -> sentences in a row open with the same word: vary them, or merge them\n         . ...er than the setting. Delay. The boiler heats water. The water heats the radiator. The radiator heats the air. The sensor learns late.  It works in two steps. The...\nSCORECARD  (58 words, 12 sentences, 4 paragraphs):\n  [PASS]  mean_sentence_words        4.8   budget <= 18.0\n  [PASS]  max_sentence_words           9   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       83.8   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       2.8   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words            12.1   budget <= 20.0\n  [PASS]  max_paragraph_words         27   budget <= 90\n  [PASS]  pct_ly_adverbs             0.0   budget <= 4.0\nLENGTH  [PASS]  169 -> 58 words, at most 219\n        77.5% of the source explains (131 words, may grow 1.5x); the rest (38 words) owes a 40.0% cut\nJOINTS  [LOST]  3 in the sentences that survived, 1 in the rewrite (because/so/but/if...)\nLISTS   [LOST]  \"has three parts\" lost: controller\nLISTS   [LOST]  promised, not unpacked: \"has three parts\"\nVERDICT: OVER BUDGET on joints, lists\n=============================================\n",
       "stdout": "# Why the radiator overshoots\n\nA thermostat loop has three parts.\n\nThe room ends up warmer than the setting. Delay. The boiler heats water. The\nwater heats the radiator. The radiator heats the air. The sensor learns late.\n\nIt works in two steps. The boiler stays on until the room is warm. Stored heat\nkeeps arriving. The room overshoots.\n"
     },
     "simplify --report --check --baseline fixtures/explanatory.md fixtures/cases/explanatory-tight.md": {
@@ -2326,7 +2335,8 @@
         "padding",
         "hedge-stack"
       ]
-    }
+    },
+    "same_opening_run": 3
   },
   "ai-tells.md": {
     "cli": {

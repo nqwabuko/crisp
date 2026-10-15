@@ -88,6 +88,9 @@ one only if it changes the meaning.
 **Structural tells:**
 - The bold-header-then-explanatory-sentence listicle. Vary it. Use a list only
   when the items are genuinely parallel; otherwise write sentences.
+- `complexity:same-opening`: three or more sentences in a row opening with the
+  same word ("We built... We shipped... We tested..."). Merge two of them, or
+  start one with what matters most. Lists of steps are exempt.
 - Every paragraph the same length. Mechanical parallelism ("Firstly... Secondly...
   Finally...") reads generated.
 - Symmetrical "on one hand / on the other". Pick a side.
