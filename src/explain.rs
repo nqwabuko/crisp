@@ -321,7 +321,7 @@ static DEFINITION: LazyLock<Regex> = LazyLock::new(|| {
 });
 static ANTICIPATION: LazyLock<Regex> = LazyLock::new(|| {
     re(
-        r"(?i)\b(?:you (?:might|may|could) (?:wonder|ask|think|expect|have noticed|object)|it'?s tempting to|it is tempting to|at first (?:sight|glance)|the catch is|here'?s (?:the problem|why|the catch)|you don'?t need .{0,40} yet|which raises the question)|(?:^|[.!?]\s+)(?:so|but) why\b",
+        r"(?i)\b(?:you (?:might|may|could) (?:wonder|ask|think|expect|have noticed|object)|it'?s tempting to|it is tempting to|at first (?:sight|glance)|the catch is|here'?s (?:the problem|the catch)|you don'?t need .{0,40} yet|which raises the question)|(?:^|[.!?]\s+)(?:so|but) why\b",
     )
 });
 

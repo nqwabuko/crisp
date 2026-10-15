@@ -16,7 +16,10 @@ rest, because removing them changes meaning. Your job is to act on the flags.
 - Em dashes become commas. Sometimes a period or colon reads better, upgrade
   where the clause is really two sentences or a setup+payoff. Never reintroduce
   the em dash. (House rule: commas, colons, parentheses, or two sentences.)
-- En dashes: kept as hyphens inside number ranges (3-5), commas elsewhere.
+- En dashes: kept inside ranges ("3–5", "Mon–Fri"), where they are correct
+  typography. A spaced en dash (" – ") is the em dash in British dress, so it
+  becomes a comma, as does a typed " -- ". Hyphens in compounds
+  ("well-known", "day-ahead") are never touched.
 - Straight quotes and `...` only.
 
 **Vocabulary to kill (research-backed AI fingerprints).** Replace with the plain
@@ -30,7 +33,39 @@ cultivate, endeavour/endeavor, paramount.
 **Sentence scaffolds to rewrite:**
 - "It's not just X, it's Y" / "It's not about X, it's about Y", the single most
   recognisable tell. Rewrite to a direct claim: say what it *is*.
+- `phrase:not-x-its-y`: "This isn't X. It's Y.", "It isn't X, it's Y",
+  "less about X, more about Y". The tell is a contrast staged with a full stop
+  or a comma and no connective. First ask whether anyone actually believes X.
+  If nobody does, X is a strawman: drop it and state Y ("It's a decision
+  engine."). If the reader really holds X, the contrast is explanation: keep
+  it and give it its joint ("Most teams treat this as reporting, but it
+  decides what ships."). Never delete a `but` or `instead` that was already
+  there; the JOINTS gate counts it. A plain status ("It isn't live yet. It's
+  in review.") is not a reframe; leave it.
+- `phrase:no-x-no-y`: "No guesswork. No spreadsheets. Just answers." A slogan,
+  not a sentence. Say what the thing does, once.
 - "Not only X but also Y": join with "and" or split.
+- `phrase:run-up`: "Here's the thing", "Here's why", "Honestly?", "Look,",
+  "Let's be clear", "The reality is". Delete the run-up and start with the
+  point. For "Here's why", give the reason in the same sentence ("That matters
+  because..."). Anticipations that name what the reader is thinking ("You
+  might think the meter lies") are explanation and stay.
+- `phrase:serves-as`: "serves as", "stands as". Usually just "is".
+- `phrase:ing-tail`: ", ensuring...", ", highlighting...", ", marking...",
+  ", making it easier to...". The rider claims a consequence without saying who
+  does what. Make it its own sentence with a real subject and verb ("The
+  dashboard refreshes every 15 minutes, so operators see the latest state."),
+  or cut it if it adds nothing.
+- `phrase:closer-line`: "Let that sink in", "And that changes everything",
+  "That's the real win". The reader decides how to feel; cut the line and end
+  on the last concrete fact or the next step.
+- `phrase:borrowed-authority`: "Studies show", "Experts agree", "It's widely
+  recognised". Name the source or drop the claim to what you know.
+- `phrase:significance`: "marks a major milestone", "the future looks bright".
+  Say what changed and for whom.
+- `phrase:doc-narration`: "This guide will walk you through...". Start with
+  the first step.
+- `heading:title-case` / `heading:emoji`: headings in sentence case, no emoji.
 - "Let's dive in" / "dive deeper into": delete; just start.
 - "In today's fast-paced/digital world": delete the opener.
 - "It's worth noting that" / "It's important to note": delete; state the thing.
@@ -42,7 +77,8 @@ cultivate, endeavour/endeavor, paramount.
 
 **Chat residue (must never survive into prose):**
 "Certainly!", "Absolutely!", "Great question", "I hope this helps", "Feel free
-to", "Let me know if". Delete on sight.
+to", "Let me know if", "You're absolutely right", "Would you like me to", "As of
+my last update". Delete on sight.
 
 **Hedges / filler (default: delete, zero loss):**
 very, really, quite, just, actually, basically, essentially, simply, truly,
@@ -52,6 +88,9 @@ one only if it changes the meaning.
 **Structural tells:**
 - The bold-header-then-explanatory-sentence listicle. Vary it. Use a list only
   when the items are genuinely parallel; otherwise write sentences.
+- `complexity:same-opening`: three or more sentences in a row opening with the
+  same word ("We built... We shipped... We tested..."). Merge two of them, or
+  start one with what matters most. Lists of steps are exempt.
 - Every paragraph the same length. Mechanical parallelism ("Firstly... Secondly...
   Finally...") reads generated.
 - Symmetrical "on one hand / on the other". Pick a side.

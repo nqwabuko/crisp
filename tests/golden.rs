@@ -463,6 +463,7 @@ fn record_config() -> Value {
     json!({
         "budget": budget,
         "long_sentence": crisp::LONG_SENTENCE,
+        "same_opening_run": crisp::SAME_OPENING_RUN,
         "long_word_syllables": crisp::LONG_WORD_SYLLABLES,
         "min_words_to_score": crisp::MIN_WORDS_TO_SCORE,
         "compression_target": crisp::COMPRESSION_TARGET,

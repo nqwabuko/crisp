@@ -131,18 +131,17 @@ fn apply_fix(rule: &FixRule, s: &str) -> (String, usize) {
 /// How many replacements a `Fix::Scan` rule made.
 ///
 /// A scan returns only the rewritten text, so the count is read off the
-/// difference, which each rule's shape makes exact: every en dash range loses
-/// exactly one en dash, and every collapsed run of spaces stops being a run
+/// difference, which each rule's shape makes exact: every spaced en dash range
+/// loses its spaces and keeps its dash, and every collapsed run of spaces stops being a run
 /// (it becomes one space between two non-space characters, so it cannot join
 /// a neighbour). A scan rule with no entry here is a table change this file
 /// has not caught up with, and `every_scan_rule_is_counted` fails on it.
 fn scanned(rule: &str, before: &str, after: &str) -> usize {
     static RUN: LazyLock<Regex> =
         LazyLock::new(|| Regex::new(r"[ \t]{2,}").expect("a literal pattern"));
-    let dashes = |s: &str| s.matches('\u{2013}').count();
     let runs = |s: &str| RUN.find_iter(s).count();
     match rule {
-        "endash_range" => dashes(before) - dashes(after),
+        "endash_range" => rules::spaced_ranges(before) - rules::spaced_ranges(after),
         "run_spaces" => runs(before) - runs(after),
         other => panic!("no replacement count for the scan rule {other}"),
     }
@@ -198,6 +197,15 @@ pub fn simplify(text: &str) -> Rewrite {
             merge(&mut flags, name, Some(hint), span, &hits, 28, "...");
         }
     }
+    merge(
+        &mut flags,
+        super::SAME_OPENING,
+        Some(super::SAME_OPENING_HINT),
+        &cleaned,
+        &super::same_openings(&cleaned),
+        28,
+        "...",
+    );
     flags.sort_by_key(|f| std::cmp::Reverse(f.count));
 
     Rewrite {
@@ -317,9 +325,20 @@ mod tests {
 
     #[test]
     fn scan_rules_are_counted_per_replacement() {
-        let out = detell("3\u{2013}5\u{2013}7 and a  b  c\n");
-        assert_eq!(out.text, "3-5-7 and a b c\n");
+        let out = detell("3 \u{2013} 5 \u{2013} 7, 8\u{2013}9 and a  b  c\n");
+        assert_eq!(out.text, "3\u{2013}5\u{2013}7, 8\u{2013}9 and a b c\n");
         assert_eq!(out.fixes.0, [("endash_range", 2), ("run_spaces", 2)]);
+    }
+
+    #[test]
+    fn a_range_dash_stays_and_a_clause_dash_goes() {
+        let out = detell(
+            "Mon\u{2013}Fri, 9\u{2013}5. It works \u{2013} mostly. Ship it -- today. Run --json.\n",
+        );
+        assert_eq!(
+            out.text,
+            "Mon\u{2013}Fri, 9\u{2013}5. It works, mostly. Ship it, today. Run --json.\n"
+        );
     }
 
     #[test]

@@ -9,7 +9,7 @@
 //! each other with `super::`, never `crate::`, because inside ink the crate root
 //! is ink; `tests/vendorable.rs` holds that.
 //!
-//! The Python retired on 13 Oct 2026 (see `docs/rust.md`). `tests/golden.rs`
+//! The Python retired on 14 Oct 2026 (see `docs/rust.md`). `tests/golden.rs`
 //! holds the engine against `fixtures/golden.json`, which it also records, and
 //! `tests/invariants.rs` holds it to the checks that need no contract at all.
 //!
@@ -40,6 +40,9 @@ pub const LONG_SENTENCE: usize = 25;
 pub const LONG_WORD_SYLLABLES: usize = 3;
 /// Below this the percentages are noise.
 pub const MIN_WORDS_TO_SCORE: usize = 30;
+/// This many sentences in a row opening with the same word reads generated
+/// ("We... We... We..."). Two is ordinary English.
+pub const SAME_OPENING_RUN: usize = 3;
 /// How much shorter a rewrite has to come out than its `--baseline`, as a
 /// percentage of the source's words. crisp's floor, not a target: every budget
 /// metric is a ratio, so a draft can pass them all and still be twice as long as
@@ -303,8 +306,65 @@ pub fn simplify_locate(text: &str) -> Vec<Hit> {
         }
     }
 
+    for (start, end) in same_openings(text) {
+        found.push(Hit {
+            rule: SAME_OPENING,
+            kind: Kind::Complexity,
+            start,
+            end,
+            fix: None,
+            hint: Some(Cow::Borrowed(SAME_OPENING_HINT)),
+        });
+    }
+
     sort_by_position(&mut found);
     found
+}
+
+pub const SAME_OPENING: &str = "complexity:same-opening";
+pub const SAME_OPENING_HINT: &str =
+    "sentences in a row open with the same word: vary them, or merge them";
+
+/// Runs of `SAME_OPENING_RUN` or more sentences in one paragraph that open
+/// with the same word, as `(start, end)` from the first sentence to the last.
+///
+/// Prose paragraphs only: list items, headings, quotes and tables are block
+/// units, and a list of steps that all start "Run" is a list doing its job.
+/// The word is compared case-insensitively, and code never counts.
+pub fn same_openings(text: &str) -> Vec<(usize, usize)> {
+    let masked = text::mask_code(text);
+    let segmented = text::blank_emphasis(&masked);
+    let mut runs = Vec::new();
+    for (a, b, is_block) in text::block_units(&masked) {
+        if is_block {
+            continue;
+        }
+        let sentences: Vec<(usize, usize, Option<String>)> =
+            text::sentence_ranges(&segmented, a, b)
+                .into_iter()
+                .map(|(s, e)| {
+                    let first = WORD
+                        .find(&segmented[s..e])
+                        .map(|m| m.as_str().to_lowercase());
+                    (s, e, first)
+                })
+                .collect();
+        let mut i = 0;
+        while i < sentences.len() {
+            let mut j = i + 1;
+            while j < sentences.len()
+                && sentences[i].2.is_some()
+                && sentences[j].2 == sentences[i].2
+            {
+                j += 1;
+            }
+            if j - i >= SAME_OPENING_RUN {
+                runs.push((sentences[i].0, sentences[j - 1].1));
+            }
+            i = j;
+        }
+    }
+    runs
 }
 
 /// Document order, ties broken by table order.
@@ -812,7 +872,7 @@ mod tests {
     fn typography_keeps_numeric_ranges() {
         assert_eq!(
             typography("3\u{2013}5 items \u{2013} really"),
-            "3-5 items, really"
+            "3\u{2013}5 items, really"
         );
     }
 
@@ -910,6 +970,24 @@ The value was cached. Each and every parameter was validated in a timely manner.
                 other => panic!("unknown kind {other:?}"),
             }
         }
+    }
+
+    #[test]
+    fn three_sentences_opening_alike_are_one_finding() {
+        let text = "We built the meter. We shipped it. We tested it. Then it broke.\n\n\
+                    We ran it. We fixed it.\n\n\
+                    - Run the sync.\n- Run the tests.\n- Run the build.\n";
+        let runs = same_openings(text);
+        assert_eq!(runs.len(), 1, "two in a row and a list of steps are fine");
+        assert_eq!(
+            &text[runs[0].0..runs[0].1],
+            "We built the meter. We shipped it. We tested it."
+        );
+        let hit = simplify_locate(text)
+            .into_iter()
+            .find(|h| h.rule == SAME_OPENING)
+            .expect("located");
+        assert_eq!((hit.start, hit.end), runs[0]);
     }
 
     #[test]

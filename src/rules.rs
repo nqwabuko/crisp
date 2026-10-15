@@ -88,21 +88,45 @@ pub struct FixRule {
     pub fix: Fix,
 }
 
-/// `(?<=\d)\s*–\s*(?=\d)` -> `-`: an en dash inside a numeric range is a hyphen.
-///
-/// The trailing digit has to stay available as the next match's leading digit,
-/// or "3–5–7" would only lose its first dash. Capture groups rather than
+/// An en dash between two digits, whitespace allowed either side: a range.
+static RANGE: LazyLock<Regex> = LazyLock::new(|| re("(\\d)\\s*\u{2013}\\s*(\\d)"));
+
+/// Each range in `s` as (lead digit, trailing digit) bounds, chained: the
+/// trailing digit stays available as the next match's leading digit, or
+/// "3–5–7" would only see its first dash. Capture groups rather than
 /// arithmetic on the match bounds, because `\d` is Unicode and a digit is not
 /// always one byte.
+fn ranges(s: &str) -> Vec<(usize, usize)> {
+    let mut out = Vec::new();
+    let mut pos = 0;
+    while let Some(c) = RANGE.captures(&s[pos..]) {
+        let (lead, trail) = (c.get(1).unwrap(), c.get(2).unwrap());
+        out.push((pos + lead.end(), pos + trail.start()));
+        pos += trail.start();
+    }
+    out
+}
+
+/// How many ranges in `s` have whitespace around their en dash.
+pub fn spaced_ranges(s: &str) -> usize {
+    ranges(s)
+        .iter()
+        .filter(|&&(a, b)| b - a > '\u{2013}'.len_utf8())
+        .count()
+}
+
+/// `(?<=\d)\s*–\s*(?=\d)` -> `–`: an en dash inside a numeric range stays, and
+/// loses the spaces around it, so `endash_clause` never reads it as a break.
+///
+/// A range dash is correct typography, not a tell. Only the spaced en dash
+/// standing in for an em dash is one.
 fn endash_range(s: &str) -> String {
-    static P: LazyLock<Regex> = LazyLock::new(|| re("(\\d)\\s*\u{2013}\\s*(\\d)"));
     let mut out = String::new();
     let mut pos = 0;
-    while let Some(c) = P.captures(&s[pos..]) {
-        let (lead, trail) = (c.get(1).unwrap(), c.get(2).unwrap());
-        out.push_str(&s[pos..pos + lead.end()]);
-        out.push('-');
-        pos += trail.start();
+    for (dash_start, dash_end) in ranges(s) {
+        out.push_str(&s[pos..dash_start]);
+        out.push('\u{2013}');
+        pos = dash_end;
     }
     out.push_str(&s[pos..]);
     out
@@ -154,12 +178,21 @@ pub static DETELL_FIX: LazyLock<Vec<FixRule>> = LazyLock::new(|| {
         ),
         // Ellipsis glyph -> three dots.
         rule("ellipsis", Fix::Sub(re("\u{2026}"), "...")),
-        // En dash: a hyphen inside numeric ranges, otherwise a clause break.
+        // En dash: kept, unspaced, in a numeric range ("3–5"). A spaced en dash
+        // is the em dash in British dress, so it is a clause break. An
+        // unspaced one between words ("London–Paris", "Mon–Fri") is a range
+        // too, and stays.
         rule("endash_range", Fix::Scan(endash_range)),
-        rule("endash_clause", Fix::Sub(re("\\s*\u{2013}\\s*"), ", ")),
+        rule(
+            "endash_clause",
+            Fix::Sub(re("\\s+\u{2013}\\s*|\\s*\u{2013}\\s+"), ", "),
+        ),
         // Em dash, the headline tell. Any em dash becomes a comma break; the
         // voice pass upgrades some of these to a period or a colon.
         rule("em_dash", Fix::Sub(re("\\s*\u{2014}\\s*"), ", ")),
+        // A spaced double hyphen is a typed em dash. Spaced only, so a flag
+        // like `--json` in prose is never touched.
+        rule("double_hyphen", Fix::Sub(re(r"[ \t]+--[ \t]+"), ", ")),
         // "in order to" -> "to" (safe bloat trim, case-preserving).
         rule("in_order_to", Fix::Case(re(r"(?i)\bin order to\b"), "to")),
         // ── cleanup produced by the rules above ──
@@ -280,6 +313,22 @@ pub static DETELL_FLAG: LazyLock<Vec<FlagRule>> = LazyLock::new(|| {
                 "innovative",
                 "spearhead",
                 "boasts",
+                // humanizer's list, less the words work writing needs ("key",
+                // "highlight", and "enhance", which release notes use).
+                "additionally",
+                "garner",
+                "garners",
+                "garnered",
+                "interplay",
+                "bolster",
+                "bolsters",
+                "bolstered",
+                "enduring",
+                "nestled",
+                "renowned",
+                "stunning",
+                "breathtaking",
+                "groundbreaking",
             ]),
         ),
         // Sentence scaffolds ChatGPT reaches for.
@@ -351,6 +400,102 @@ pub static DETELL_FLAG: LazyLock<Vec<FlagRule>> = LazyLock::new(|| {
             "phrase:no-denying",
             re(r"(?i)\b(?:make no mistake|there'?s no denying|it goes without saying)\b"),
         ),
+        // The staged reframe with no connective: "This isn't X. It's Y.", "It
+        // isn't X, it's Y", "less about X, more about Y". Only the forms with
+        // no `but` or `instead` in them: a contrast that keeps its connective is
+        // ordinary English, and the JOINTS gate guards that word. The forms
+        // "it's not just/about" own are left to those rules ("it's not" is
+        // only matched here before an article), so nothing is flagged twice.
+        rule(
+            "phrase:not-x-its-y",
+            re(concat!(
+                r"(?i)\b(?:it|this|that|they|these|those)",
+                r"(?:'s not|'re not| is not| are not| was not| were not| isn'?t| aren'?t| wasn'?t| weren'?t)\b",
+                r"[^.!?\n]{1,80}[.!?]\s+(?:it|this|that|they|these|those)(?:'s|'re| is| are| was| were)\b",
+                r"|\b(?:it|this|that|they)(?: isn'?t| aren'?t| wasn'?t| is not| was not)\b",
+                r"[^.!?\n]{1,60},\s*(?:it|this|that|they)(?:'s|'re| is| are| was)\b",
+                r"|\bit'?s not (?:a|an|the)\b[^.!?\n]{1,60},\s*it'?s\b",
+                r"|\bless about\b[^.!?\n]{1,60}\bmore about\b",
+                r"|\b(?:does not|doesn'?t) mean\b[^.!?\n]{1,80}[.!?]\s+it means\b",
+            )),
+        ),
+        // "No guesswork. No spreadsheets. Just answers.": the slogan run.
+        // Capital "No" opens each sentence, so "no" mid-sentence never counts.
+        rule(
+            "phrase:no-x-no-y",
+            re(r"\bNo [^.!?\n]{1,30}[.!] No [^.!?\n]{1,30}[.!]"),
+        ),
+        // The staged run-up: a line that announces the point instead of
+        // making it. "Here's why" is here and not an anticipation in
+        // `explain`: it promises a reason without naming what the reader
+        // wondered, so it scores as padding. "Honestly?" and "Look," are
+        // case-sensitive, so only a sentence that opens with them counts.
+        rule(
+            "phrase:run-up",
+            re(concat!(
+                r"(?i)\bhere'?s (?:the thing|the deal|the kicker|the twist|the truth|the reality|why|what you need to know)\b",
+                r"|\blet'?s be (?:honest|clear|real)\b|\bthe (?:truth|reality) is\b",
+                r"|(?-i:\b(?:Honestly|Frankly|Seriously)\?|\bLook, )",
+            )),
+        ),
+        // The one-line closer that tells the reader how to feel. Only at a
+        // sentence end, so "that's the point of the gate" never counts.
+        rule(
+            "phrase:closer-line",
+            re(concat!(
+                r"(?i)\b(?:let that sink in|(?:and )?that changes everything",
+                r"|(?:and )?that'?s the (?:whole |real )?point|that'?s the real (?:win|story|lesson)",
+                r"|the rest is history)[.!]",
+            )),
+        ),
+        // Authority with no source: name the study or drop the claim.
+        rule(
+            "phrase:borrowed-authority",
+            re(concat!(
+                r"(?i)\b(?:experts (?:agree|say|suggest|believe)|studies (?:show|suggest|have shown)",
+                r"|research (?:shows|suggests|has shown)|(?:many|most) experts\b",
+                r"|it(?: is|'?s) widely (?:accepted|known|believed|recogni[sz]ed))\b",
+            )),
+        ),
+        // Inflated significance: the milestone that marks itself.
+        rule(
+            "phrase:significance",
+            re(concat!(
+                r"(?i)\bmarks? (?:a|an) (?:significant|major|pivotal|important|key|new|historic)",
+                r" (?:milestone|moment|shift|step|chapter|turning point)\b",
+                r"|\bthe future (?:looks|is) bright\b|\b(?:an|a) (?:enduring|lasting) legacy\b",
+            )),
+        ),
+        // A document announcing what it is about to do. "This document
+        // describes" is left alone: formal documents (a tender response) open
+        // that way on purpose. "In this post we'll cover" is `phrase:we-will`.
+        rule(
+            "phrase:doc-narration",
+            re(
+                r"(?i)\bthis (?:document|doc|post|article|guide) (?:aims to|will (?:explore|walk|take|cover|discuss|dive))\b",
+            ),
+        ),
+        // Avoiding "is": "serves as a reminder", "stands as a testament",
+        // "functions as a hub". Only the verb "functions", never the noun.
+        rule(
+            "phrase:serves-as",
+            re(
+                r"(?i)\b(?:serves?|served|serving|stands?|stood|functions|functioned) as (?:a|an|the)\b",
+            ),
+        ),
+        // The -ing rider tacked on after a comma to claim significance:
+        // ", highlighting the need", ", ensuring a smooth rollout". Both
+        // spellings, because the rider usually arrives in American English.
+        // "showcasing" and "fostering" are vocabulary already.
+        rule(
+            "phrase:ing-tail",
+            re(concat!(
+                r"(?i),\s+(?:highlighting|underscoring|reflecting|ensuring|emphasi[sz]ing|symboli[sz]ing",
+                r"|signall?ing|marking|demonstrating|illustrating|cementing|solidifying|reinforcing",
+                r"|contributing to|paving the way|setting the stage",
+                r"|making it (?:easier|harder|possible|ideal|clear))\b",
+            )),
+        ),
         // Assistant preamble / chat residue that should never survive into prose.
         anchored(
             "chat:preamble",
@@ -360,6 +505,19 @@ pub static DETELL_FLAG: LazyLock<Vec<FlagRule>> = LazyLock::new(|| {
         rule("chat:feel-free", re(r"(?i)\bfeel free to\b")),
         rule("chat:let-me-know", re(r"(?i)\blet me know if\b")),
         rule("chat:happy-to", re(r"(?i)\bi'?d be happy to\b")),
+        rule(
+            "chat:sycophancy",
+            re(r"(?i)\byou'?re (?:absolutely|completely|totally) right\b"),
+        ),
+        rule("chat:offer", re(r"(?i)\bwould you like me to\b")),
+        rule(
+            "chat:knowledge-limit",
+            re(concat!(
+                r"(?i)\bas of my (?:last|latest) (?:update|knowledge update|training)\b",
+                r"|\bmy (?:knowledge|training) (?:cutoff|cut-off)\b",
+                r"|\bi (?:don'?t|do not) have (?:access to )?real-time\b",
+            )),
+        ),
         // "as an AI, I..." only. The bare noun phrase is ordinary prose
         // ("reads as an AI tell"), so the comma or the qualifier is the tell.
         rule(
@@ -369,6 +527,21 @@ pub static DETELL_FLAG: LazyLock<Vec<FlagRule>> = LazyLock::new(|| {
         rule(
             "chat:heres-summary",
             re(r"(?i)\bhere'?s (?:a|the) (?:quick )?(?:breakdown|rundown|summary|overview)\b"),
+        ),
+        // Headings: crisp writes sentence case, the British convention, and a
+        // heading never needs an emoji. Title Case is three or more
+        // capitalised words, short joining words allowed between them.
+        anchored(
+            "heading:title-case",
+            re(concat!(
+                r"(?m)^#{1,6}[ \t]+[A-Z][\w'-]*",
+                r"(?:[ \t]+(?:(?:a|an|and|as|at|but|by|for|in|of|on|or|the|to|vs|with)[ \t]+)*[A-Z][\w'-]*){2,}",
+                r"[ \t]*$",
+            )),
+        ),
+        anchored(
+            "heading:emoji",
+            re(r"(?m)^#{1,6}[ \t]+[^\n]*[\x{1F300}-\x{1FAFF}\x{2600}-\x{27BF}]"),
         ),
         // Hedges / filler: usually deletable with zero loss.
         rule(
@@ -1116,8 +1289,9 @@ mod tests {
 
     #[test]
     fn endash_range_chains() {
-        assert_eq!(endash_range("3\u{2013}5\u{2013}7"), "3-5-7");
-        assert_eq!(endash_range("2020 \u{2013} 2021"), "2020-2021");
+        assert_eq!(endash_range("3\u{2013}5\u{2013}7"), "3\u{2013}5\u{2013}7");
+        assert_eq!(endash_range("2020 \u{2013} 2021"), "2020\u{2013}2021");
+        assert_eq!(spaced_ranges("3 \u{2013} 5\u{2013}7, 8\u{2013}9"), 1);
         // A clause dash is left for the next rule in the table.
         assert_eq!(endash_range("words \u{2013} more"), "words \u{2013} more");
     }
@@ -1150,6 +1324,153 @@ mod tests {
                 .captures(text)
                 .expect("the core pattern should match");
             assert_eq!(guard(text, &caps), want, "{text}");
+        }
+    }
+
+    /// The names of the FLAG rules that fire on `text`, filler words aside.
+    fn flagged(text: &str) -> Vec<&'static str> {
+        DETELL_FLAG
+            .iter()
+            .filter(|r| r.name != "hedge:filler" && r.pat.is_match(text))
+            .map(|r| r.name)
+            .collect()
+    }
+
+    #[test]
+    fn the_reframe_without_a_connective_is_flagged_once() {
+        for text in [
+            "This isn't a reporting tool. It's a decision engine.",
+            "It isn't about speed, it's trust.",
+            "It's not a bug, it's a feature.",
+            "They aren't customers. They're partners.",
+            "The work is less about code and more about judgement.",
+            "This doesn't mean a rewrite. It means a migration.",
+        ] {
+            assert_eq!(flagged(text), ["phrase:not-x-its-y"], "{text}");
+        }
+        // The older scaffolds keep their own rule; nothing fires twice.
+        assert_eq!(
+            flagged("It's not just a tool, it's a platform."),
+            ["phrase:not-just"]
+        );
+    }
+
+    #[test]
+    fn a_contrast_that_keeps_its_connective_is_not_a_tell() {
+        for text in [
+            "It isn't ready, but the fix is in review.",
+            "This is not the cause. Instead, look at the meter values.",
+            "It isn't live yet; the release is Friday.",
+            "The charger is not online.",
+        ] {
+            assert!(!flagged(text).contains(&"phrase:not-x-its-y"), "{text}");
+        }
+    }
+
+    #[test]
+    fn the_slogan_run_needs_two_sentences_opening_with_no() {
+        assert_eq!(
+            flagged("No guesswork. No spreadsheets. Just answers."),
+            ["phrase:no-x-no-y"]
+        );
+        assert!(flagged("There is no guesswork. No, really.").is_empty());
+    }
+
+    #[test]
+    fn run_ups_announce_and_anticipations_do_not() {
+        for text in [
+            "Here's the thing: the meter lies.",
+            "Here's why that matters.",
+            "Honestly? It works.",
+            "Look, the queue is full.",
+            "Let's be clear about scope.",
+            "The reality is that most sites have one charger.",
+        ] {
+            assert_eq!(flagged(text), ["phrase:run-up"], "{text}");
+        }
+        for text in [
+            "You might think the meter lies.",
+            "Here's the catch: it only works offline.",
+            "Have a look, then tell me.",
+            "Be honest with the customer.",
+        ] {
+            assert!(!flagged(text).contains(&"phrase:run-up"), "{text}");
+        }
+    }
+
+    #[test]
+    fn copula_avoidance_and_ing_riders() {
+        assert_eq!(
+            flagged("The pilot serves as a template for the rollout."),
+            ["phrase:serves-as"]
+        );
+        assert_eq!(
+            flagged("The site stands as the largest in the fleet."),
+            ["phrase:serves-as"]
+        );
+        assert_eq!(
+            flagged("The depot functions as a hub."),
+            ["phrase:serves-as"]
+        );
+        assert!(flagged("He stood as he spoke.").is_empty());
+        for text in [
+            "Revenue rose 4%, highlighting the need for capacity.",
+            "We deploy behind a flag, ensuring rollback is quick.",
+            "The release ships Friday, marking the end of the pilot.",
+            "It caches tokens, making it easier to scale.",
+            "Prices fell, emphasising the shift.",
+            "Prices fell, emphasizing the shift.",
+        ] {
+            assert_eq!(flagged(text), ["phrase:ing-tail"], "{text}");
+        }
+        assert!(flagged("Ensuring rollback is quick matters.").is_empty());
+    }
+
+    #[test]
+    fn the_cheap_batch_fires_on_its_tells_and_not_on_work_prose() {
+        for (text, want) in [
+            ("Let that sink in.", "phrase:closer-line"),
+            ("And that changes everything.", "phrase:closer-line"),
+            ("Studies show users prefer it.", "phrase:borrowed-authority"),
+            (
+                "It's widely recognised as best practice.",
+                "phrase:borrowed-authority",
+            ),
+            ("The launch marks a major milestone.", "phrase:significance"),
+            (
+                "This guide will walk you through setup.",
+                "phrase:doc-narration",
+            ),
+            (
+                "This article aims to explain pricing.",
+                "phrase:doc-narration",
+            ),
+            (
+                "You're absolutely right about the tariff.",
+                "chat:sycophancy",
+            ),
+            ("Would you like me to draft it?", "chat:offer"),
+            (
+                "As of my last update, it was in beta.",
+                "chat:knowledge-limit",
+            ),
+            ("# Plan For The Rollout", "heading:title-case"),
+            ("## Risks and Mitigations Overview", "heading:title-case"),
+            ("## Rollout plan \u{1F680}", "heading:emoji"),
+            ("Additionally, the meter resets.", "word:vocabulary"),
+        ] {
+            assert_eq!(flagged(text), [want], "{text}");
+        }
+        for text in [
+            "That's the point of the gate.",
+            "This document describes the interface.",
+            "The table below lists the sites.",
+            "Rotate the API key and enhance the logs.",
+            "# Plan for the rollout",
+            "## OCPP message flow",
+            "Want me to set up a call?",
+        ] {
+            assert!(flagged(text).is_empty(), "{text}: {:?}", flagged(text));
         }
     }
 }
