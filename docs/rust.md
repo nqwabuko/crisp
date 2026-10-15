@@ -42,7 +42,7 @@ the binary what the skill calls.
 
 ## Oracle and contract
 
-**The Python retired on 13 Oct 2026**, once ink was following upstream.
+**The Python retired on 14 Oct 2026**, once ink was following upstream.
 `fixtures/golden.json` is the only contract now. Before the scripts went:
 
 1. `tests/golden.rs` became the recorder `scripts/golden.py` was. Its first
@@ -144,7 +144,7 @@ crisp checks style. It has never checked grammar or spelling. `harper-core`
    Grammar (Harper, British) lands in the same round, behind its own subcommand.
 3. SKILL.md and README call the binary, grammar joins the deterministic pass,
    and `references/voice.md` says UK English. Python documented as the oracle.
-   (Retired 13 Oct 2026, after step 4.)
+   (Retired 14 Oct 2026, after step 4.)
 4. ink follows upstream (13 Oct 2026). See below.
 
 ## ink follows upstream

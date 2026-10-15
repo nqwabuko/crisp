@@ -31,7 +31,12 @@ agents. The second agent gets the first one's text, never its reasoning, and
 the gates measure the rewrite against the original draft.*
 
 crisp began as two Python scripts. The Rust was held byte-identical to them
-until they retired on 13 Oct 2026; `docs/rust.md` has the story.
+until they retired on 14 Oct 2026; `docs/rust.md` has the story.
+
+[`research/`](research/) keeps track of who did this before: the reading research
+behind the rules, the prior art for each of crisp's gates, a timeline of prose
+tools from Strunk to the AI-tell skills, and how regular expressions became
+grammars.
 
 ## Use
 

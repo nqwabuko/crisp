@@ -464,7 +464,7 @@ and that findings come back sorted, and that the positioned spans and the
 metrics describe the same document. Silent off-by-one drift is what it catches.
 
 crisp was first written in Python, and the Rust was held byte-identical to it
-until the Python retired on 13 Oct 2026. `golden.json` is the only contract now.
+until the Python retired on 14 Oct 2026. `golden.json` is the only contract now.
 
 This matters more than it used to. ink carries this engine as a synced copy and
 renders what it finds, so a careless rule edit changes another program's output
