@@ -2242,6 +2242,10 @@
         "phrase:not-x-its-y",
         "phrase:no-x-no-y",
         "phrase:run-up",
+        "phrase:closer-line",
+        "phrase:borrowed-authority",
+        "phrase:significance",
+        "phrase:doc-narration",
         "phrase:serves-as",
         "phrase:ing-tail",
         "chat:preamble",
@@ -2249,8 +2253,13 @@
         "chat:feel-free",
         "chat:let-me-know",
         "chat:happy-to",
+        "chat:sycophancy",
+        "chat:offer",
+        "chat:knowledge-limit",
         "chat:as-an-ai",
         "chat:heres-summary",
+        "heading:title-case",
+        "heading:emoji",
         "hedge:filler",
         "hedge:the-fact"
       ],
@@ -8012,6 +8021,577 @@
           "end_col": 28,
           "end_line": 13,
           "line": 12,
+          "words": 13
+        }
+      ]
+    },
+    "spans_consistent": true
+  },
+  "residue.md": {
+    "cli": {
+      "detell --json": {
+        "fixes": {},
+        "flags": [
+          {
+            "count": 1,
+            "rule": "word:vocabulary",
+            "samples": [
+              "…estone for the network. Additionally, the depot functions as…"
+            ]
+          },
+          {
+            "count": 1,
+            "rule": "phrase:not-x-its-y",
+            "samples": [
+              "…aft the migration? This doesn't mean a rewrite. It means a migration. Let that s…"
+            ]
+          },
+          {
+            "count": 1,
+            "rule": "phrase:closer-line",
+            "samples": [
+              "…. It means a migration. Let that sink in. ## What we checked This…"
+            ]
+          },
+          {
+            "count": 1,
+            "rule": "phrase:borrowed-authority",
+            "samples": [
+              "…you through the change. Studies show operators prefer fewer…"
+            ]
+          },
+          {
+            "count": 1,
+            "rule": "phrase:significance",
+            "samples": [
+              "…prices, and the launch marks a major milestone for the network. Additi…"
+            ]
+          },
+          {
+            "count": 1,
+            "rule": "phrase:doc-narration",
+            "samples": [
+              "…right about the tariff. This guide will walk you through the change.…"
+            ]
+          },
+          {
+            "count": 1,
+            "rule": "phrase:serves-as",
+            "samples": [
+              "…Additionally, the depot functions as a hub. ## Risks 🚧 As of m…"
+            ]
+          },
+          {
+            "count": 1,
+            "rule": "chat:sycophancy",
+            "samples": [
+              "…lan For The Pilot Sites You're absolutely right about the tariff. This…"
+            ]
+          },
+          {
+            "count": 1,
+            "rule": "chat:offer",
+            "samples": [
+              "…e, the API was in beta. Would you like me to draft the migration? Th…"
+            ]
+          },
+          {
+            "count": 1,
+            "rule": "chat:knowledge-limit",
+            "samples": [
+              "…ns as a hub. ## Risks 🚧 As of my last update, the API was in beta. W…"
+            ]
+          },
+          {
+            "count": 1,
+            "rule": "heading:title-case",
+            "samples": [
+              "# Rollout Plan For The Pilot Sites  You're absolutely righ…"
+            ]
+          },
+          {
+            "count": 1,
+            "rule": "heading:emoji",
+            "samples": [
+              "…ot functions as a hub.  ## Risks 🚧  As of my last update,…"
+            ]
+          }
+        ],
+        "total_fixes": 0,
+        "total_flags": 12
+      },
+      "detell --report": {
+        "exit": 0,
+        "stderr": "── detell report ─────────────────────────────\nFIXED: nothing (already clean typography)\nFLAGGED (needs a human/voice pass, 12):\n    1  word:vocabulary\n         · …estone for the network. Additionally, the depot functions as…\n    1  phrase:not-x-its-y\n         · …aft the migration? This doesn't mean a rewrite. It means a migration. Let that s…\n    1  phrase:closer-line\n         · …. It means a migration. Let that sink in. ## What we checked This…\n    1  phrase:borrowed-authority\n         · …you through the change. Studies show operators prefer fewer…\n    1  phrase:significance\n         · …prices, and the launch marks a major milestone for the network. Additi…\n    1  phrase:doc-narration\n         · …right about the tariff. This guide will walk you through the change.…\n    1  phrase:serves-as\n         · …Additionally, the depot functions as a hub. ## Risks 🚧 As of m…\n    1  chat:sycophancy\n         · …lan For The Pilot Sites You're absolutely right about the tariff. This…\n    1  chat:offer\n         · …e, the API was in beta. Would you like me to draft the migration? Th…\n    1  chat:knowledge-limit\n         · …ns as a hub. ## Risks 🚧 As of my last update, the API was in beta. W…\n    1  heading:title-case\n         · # Rollout Plan For The Pilot Sites  You're absolutely righ…\n    1  heading:emoji\n         · …ot functions as a hub.  ## Risks 🚧  As of my last update,…\n──────────────────────────────────────────────\n"
+      },
+      "simplify --check --baseline --insight --json": {
+        "compression": {
+          "after": 102,
+          "before": 102,
+          "cut_pct": 0.0,
+          "explaining": 0.0,
+          "explaining_words": 0,
+          "growth": 1.5,
+          "limit": null,
+          "ok": false,
+          "rest_words": 102,
+          "scored": true,
+          "target": 40.0
+        },
+        "explanation": {
+          "joints": {
+            "after": 0,
+            "gated": false,
+            "ok": true,
+            "required": 0,
+            "source": 0
+          },
+          "lists": {
+            "lost": [],
+            "ok": true,
+            "promised_not_unpacked_after": [],
+            "promised_not_unpacked_before": 0
+          }
+        },
+        "fixes": {},
+        "flags": [
+          {
+            "count": 1,
+            "hint": "filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")",
+            "rule": "padding",
+            "samples": [
+              "...For The Pilot Sites  You're absolutely right about the tariff. Thi..."
+            ]
+          }
+        ],
+        "insight": [
+          {
+            "check": "sections",
+            "detail": "missing template section(s): Context, Insight Description, Significance, Customer Details"
+          },
+          {
+            "check": "significance",
+            "detail": "found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line"
+          }
+        ],
+        "joined_sentences": [],
+        "long_sentences": [],
+        "metrics": {
+          "flesch_kincaid_grade": 3.5,
+          "flesch_reading_ease": 82.2,
+          "max_paragraph_words": 37,
+          "max_sentence_words": 16,
+          "mean_sentence_words": 6.8,
+          "paragraphs": 6,
+          "pct_long_sentences": 0.0,
+          "pct_long_words": 7.8,
+          "pct_ly_adverbs": 2.0,
+          "pct_passive_sentences": 0.0,
+          "sentences": 15,
+          "words": 102
+        },
+        "over_budget": [],
+        "promised_not_unpacked": [],
+        "scored": true,
+        "total_fixes": 0,
+        "total_flags": 1
+      },
+      "simplify --check --baseline --insight --report": {
+        "exit": 1,
+        "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED (needs the rewrite pass, 1):\n    1  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . ...For The Pilot Sites  You're absolutely right about the tariff. Thi...\nSCORECARD  (102 words, 15 sentences, 6 paragraphs):\n  [PASS]  mean_sentence_words        6.8   budget <= 18.0\n  [PASS]  max_sentence_words          16   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       82.2   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       3.5   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words             7.8   budget <= 20.0\n  [PASS]  max_paragraph_words         37   budget <= 90\n  [PASS]  pct_ly_adverbs             2.0   budget <= 4.0\nLENGTH  [SHORT]  102 -> 102 words, cut 0.0%   target >= 40.0%\nINSIGHT STRUCTURE  [FAIL] (2):\n  [FAIL]  sections           missing template section(s): Context, Insight Description, Significance, Customer Details\n  [FAIL]  significance       found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line\nVERDICT: OVER BUDGET on length, insight structure\n=============================================\n",
+        "stdout": "# Rollout Plan For The Pilot Sites\n\nYou're absolutely right about the tariff. This guide will walk you through\nthe change. Studies show operators prefer fewer prices, and the launch marks a\nmajor milestone for the network. Additionally, the depot functions as a hub.\n\n## Risks 🚧\n\nAs of my last update, the API was in beta. Would you like me to draft the\nmigration? This doesn't mean a rewrite. It means a migration. Let that sink in.\n\n## What we checked\n\nThis document describes the interface. The table below lists the sites. That's\nthe point of the gate: rotate the API key before the 9–5 shift.\n"
+      },
+      "simplify --check --baseline --json": {
+        "compression": {
+          "after": 102,
+          "before": 102,
+          "cut_pct": 0.0,
+          "explaining": 0.0,
+          "explaining_words": 0,
+          "growth": 1.5,
+          "limit": null,
+          "ok": false,
+          "rest_words": 102,
+          "scored": true,
+          "target": 40.0
+        },
+        "explanation": {
+          "joints": {
+            "after": 0,
+            "gated": false,
+            "ok": true,
+            "required": 0,
+            "source": 0
+          },
+          "lists": {
+            "lost": [],
+            "ok": true,
+            "promised_not_unpacked_after": [],
+            "promised_not_unpacked_before": 0
+          }
+        },
+        "fixes": {},
+        "flags": [
+          {
+            "count": 1,
+            "hint": "filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")",
+            "rule": "padding",
+            "samples": [
+              "...For The Pilot Sites  You're absolutely right about the tariff. Thi..."
+            ]
+          }
+        ],
+        "insight": null,
+        "joined_sentences": [],
+        "long_sentences": [],
+        "metrics": {
+          "flesch_kincaid_grade": 3.5,
+          "flesch_reading_ease": 82.2,
+          "max_paragraph_words": 37,
+          "max_sentence_words": 16,
+          "mean_sentence_words": 6.8,
+          "paragraphs": 6,
+          "pct_long_sentences": 0.0,
+          "pct_long_words": 7.8,
+          "pct_ly_adverbs": 2.0,
+          "pct_passive_sentences": 0.0,
+          "sentences": 15,
+          "words": 102
+        },
+        "over_budget": [],
+        "promised_not_unpacked": [],
+        "scored": true,
+        "total_fixes": 0,
+        "total_flags": 1
+      },
+      "simplify --check --baseline --report": {
+        "exit": 1,
+        "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED (needs the rewrite pass, 1):\n    1  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . ...For The Pilot Sites  You're absolutely right about the tariff. Thi...\nSCORECARD  (102 words, 15 sentences, 6 paragraphs):\n  [PASS]  mean_sentence_words        6.8   budget <= 18.0\n  [PASS]  max_sentence_words          16   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       82.2   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       3.5   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words             7.8   budget <= 20.0\n  [PASS]  max_paragraph_words         37   budget <= 90\n  [PASS]  pct_ly_adverbs             2.0   budget <= 4.0\nLENGTH  [SHORT]  102 -> 102 words, cut 0.0%   target >= 40.0%\nVERDICT: OVER BUDGET on length\n=============================================\n",
+        "stdout": "# Rollout Plan For The Pilot Sites\n\nYou're absolutely right about the tariff. This guide will walk you through\nthe change. Studies show operators prefer fewer prices, and the launch marks a\nmajor milestone for the network. Additionally, the depot functions as a hub.\n\n## Risks 🚧\n\nAs of my last update, the API was in beta. Would you like me to draft the\nmigration? This doesn't mean a rewrite. It means a migration. Let that sink in.\n\n## What we checked\n\nThis document describes the interface. The table below lists the sites. That's\nthe point of the gate: rotate the API key before the 9–5 shift.\n"
+      }
+    },
+    "detell": {
+      "cleaned": "# Rollout Plan For The Pilot Sites\n\nYou're absolutely right about the tariff. This guide will walk you through\nthe change. Studies show operators prefer fewer prices, and the launch marks a\nmajor milestone for the network. Additionally, the depot functions as a hub.\n\n## Risks 🚧\n\nAs of my last update, the API was in beta. Would you like me to draft the\nmigration? This doesn't mean a rewrite. It means a migration. Let that sink in.\n\n## What we checked\n\nThis document describes the interface. The table below lists the sites. That's\nthe point of the gate: rotate the API key before the 9–5 shift.\n",
+      "fixes": {},
+      "flags": {
+        "chat:knowledge-limit": 1,
+        "chat:offer": 1,
+        "chat:sycophancy": 1,
+        "heading:emoji": 1,
+        "heading:title-case": 1,
+        "phrase:borrowed-authority": 1,
+        "phrase:closer-line": 1,
+        "phrase:doc-narration": 1,
+        "phrase:not-x-its-y": 1,
+        "phrase:serves-as": 1,
+        "phrase:significance": 1,
+        "word:vocabulary": 1
+      }
+    },
+    "insight": [
+      {
+        "check": "sections",
+        "detail": "missing template section(s): Context, Insight Description, Significance, Customer Details"
+      },
+      {
+        "check": "significance",
+        "detail": "found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line"
+      }
+    ],
+    "locate": {
+      "detell": [
+        [
+          "heading:title-case",
+          "tell",
+          1,
+          1,
+          1,
+          35,
+          "# Rollout Plan For The Pilot Sites"
+        ],
+        [
+          "chat:sycophancy",
+          "tell",
+          3,
+          1,
+          3,
+          24,
+          "You're absolutely right"
+        ],
+        [
+          "phrase:doc-narration",
+          "tell",
+          3,
+          43,
+          3,
+          63,
+          "This guide will walk"
+        ],
+        [
+          "phrase:borrowed-authority",
+          "tell",
+          4,
+          13,
+          4,
+          25,
+          "Studies show"
+        ],
+        [
+          "phrase:significance",
+          "tell",
+          4,
+          72,
+          5,
+          16,
+          "marks a\nmajor milestone"
+        ],
+        [
+          "word:vocabulary",
+          "tell",
+          5,
+          34,
+          5,
+          46,
+          "Additionally"
+        ],
+        [
+          "phrase:serves-as",
+          "tell",
+          5,
+          58,
+          5,
+          72,
+          "functions as a"
+        ],
+        [
+          "heading:emoji",
+          "tell",
+          7,
+          1,
+          7,
+          11,
+          "## Risks 🚧"
+        ],
+        [
+          "chat:knowledge-limit",
+          "tell",
+          9,
+          1,
+          9,
+          21,
+          "As of my last update"
+        ],
+        [
+          "chat:offer",
+          "tell",
+          9,
+          44,
+          9,
+          64,
+          "Would you like me to"
+        ],
+        [
+          "phrase:not-x-its-y",
+          "tell",
+          10,
+          17,
+          10,
+          49,
+          "doesn't mean a rewrite. It means"
+        ],
+        [
+          "phrase:closer-line",
+          "tell",
+          10,
+          63,
+          10,
+          80,
+          "Let that sink in."
+        ]
+      ],
+      "simplify": [
+        [
+          "padding",
+          "complexity",
+          3,
+          8,
+          3,
+          18,
+          "absolutely"
+        ]
+      ]
+    },
+    "simplify": {
+      "fixes": {},
+      "flags": {
+        "padding": 1
+      },
+      "metrics": {
+        "flesch_kincaid_grade": 3.5,
+        "flesch_reading_ease": 82.2,
+        "max_paragraph_words": 37,
+        "max_sentence_words": 16,
+        "mean_sentence_words": 6.8,
+        "paragraphs": 6,
+        "pct_long_sentences": 0.0,
+        "pct_long_words": 7.8,
+        "pct_ly_adverbs": 2.0,
+        "pct_passive_sentences": 0.0,
+        "sentences": 15,
+        "words": 102
+      },
+      "over_budget": [],
+      "scored": true
+    },
+    "spans": {
+      "paragraphs": [
+        {
+          "col": 1,
+          "end_col": 35,
+          "end_line": 1,
+          "line": 1,
+          "words": 6
+        },
+        {
+          "col": 1,
+          "end_col": 77,
+          "end_line": 5,
+          "line": 3,
+          "words": 37
+        },
+        {
+          "col": 1,
+          "end_col": 11,
+          "end_line": 7,
+          "line": 7,
+          "words": 1
+        },
+        {
+          "col": 1,
+          "end_col": 80,
+          "end_line": 10,
+          "line": 9,
+          "words": 31
+        },
+        {
+          "col": 1,
+          "end_col": 19,
+          "end_line": 12,
+          "line": 12,
+          "words": 3
+        },
+        {
+          "col": 1,
+          "end_col": 64,
+          "end_line": 15,
+          "line": 14,
+          "words": 24
+        }
+      ],
+      "sentences": [
+        {
+          "col": 1,
+          "end_col": 35,
+          "end_line": 1,
+          "line": 1,
+          "words": 6
+        },
+        {
+          "col": 1,
+          "end_col": 42,
+          "end_line": 3,
+          "line": 3,
+          "words": 6
+        },
+        {
+          "col": 43,
+          "end_col": 12,
+          "end_line": 4,
+          "line": 3,
+          "words": 8
+        },
+        {
+          "col": 13,
+          "end_col": 33,
+          "end_line": 5,
+          "line": 4,
+          "words": 16
+        },
+        {
+          "col": 34,
+          "end_col": 77,
+          "end_line": 5,
+          "line": 5,
+          "words": 7
+        },
+        {
+          "col": 1,
+          "end_col": 11,
+          "end_line": 7,
+          "line": 7,
+          "words": 1
+        },
+        {
+          "col": 1,
+          "end_col": 43,
+          "end_line": 9,
+          "line": 9,
+          "words": 10
+        },
+        {
+          "col": 44,
+          "end_col": 11,
+          "end_line": 10,
+          "line": 9,
+          "words": 8
+        },
+        {
+          "col": 12,
+          "end_col": 40,
+          "end_line": 10,
+          "line": 10,
+          "words": 5
+        },
+        {
+          "col": 41,
+          "end_col": 62,
+          "end_line": 10,
+          "line": 10,
+          "words": 4
+        },
+        {
+          "col": 63,
+          "end_col": 80,
+          "end_line": 10,
+          "line": 10,
+          "words": 4
+        },
+        {
+          "col": 1,
+          "end_col": 19,
+          "end_line": 12,
+          "line": 12,
+          "words": 3
+        },
+        {
+          "col": 1,
+          "end_col": 39,
+          "end_line": 14,
+          "line": 14,
+          "words": 5
+        },
+        {
+          "col": 40,
+          "end_col": 72,
+          "end_line": 14,
+          "line": 14,
+          "words": 6
+        },
+        {
+          "col": 73,
+          "end_col": 64,
+          "end_line": 15,
+          "line": 14,
           "words": 13
         }
       ]

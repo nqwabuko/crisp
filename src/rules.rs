@@ -313,6 +313,22 @@ pub static DETELL_FLAG: LazyLock<Vec<FlagRule>> = LazyLock::new(|| {
                 "innovative",
                 "spearhead",
                 "boasts",
+                // humanizer's list, less the words work writing needs ("key",
+                // "highlight", and "enhance", which release notes use).
+                "additionally",
+                "garner",
+                "garners",
+                "garnered",
+                "interplay",
+                "bolster",
+                "bolsters",
+                "bolstered",
+                "enduring",
+                "nestled",
+                "renowned",
+                "stunning",
+                "breathtaking",
+                "groundbreaking",
             ]),
         ),
         // Sentence scaffolds ChatGPT reaches for.
@@ -400,6 +416,7 @@ pub static DETELL_FLAG: LazyLock<Vec<FlagRule>> = LazyLock::new(|| {
                 r"[^.!?\n]{1,60},\s*(?:it|this|that|they)(?:'s|'re| is| are| was)\b",
                 r"|\bit'?s not (?:a|an|the)\b[^.!?\n]{1,60},\s*it'?s\b",
                 r"|\bless about\b[^.!?\n]{1,60}\bmore about\b",
+                r"|\b(?:does not|doesn'?t) mean\b[^.!?\n]{1,80}[.!?]\s+it means\b",
             )),
         ),
         // "No guesswork. No spreadsheets. Just answers.": the slogan run.
@@ -421,10 +438,50 @@ pub static DETELL_FLAG: LazyLock<Vec<FlagRule>> = LazyLock::new(|| {
                 r"|(?-i:\b(?:Honestly|Frankly|Seriously)\?|\bLook, )",
             )),
         ),
-        // Avoiding "is": "serves as a reminder", "stands as a testament".
+        // The one-line closer that tells the reader how to feel. Only at a
+        // sentence end, so "that's the point of the gate" never counts.
+        rule(
+            "phrase:closer-line",
+            re(concat!(
+                r"(?i)\b(?:let that sink in|(?:and )?that changes everything",
+                r"|(?:and )?that'?s the (?:whole |real )?point|that'?s the real (?:win|story|lesson)",
+                r"|the rest is history)[.!]",
+            )),
+        ),
+        // Authority with no source: name the study or drop the claim.
+        rule(
+            "phrase:borrowed-authority",
+            re(concat!(
+                r"(?i)\b(?:experts (?:agree|say|suggest|believe)|studies (?:show|suggest|have shown)",
+                r"|research (?:shows|suggests|has shown)|(?:many|most) experts\b",
+                r"|it(?: is|'?s) widely (?:accepted|known|believed|recogni[sz]ed))\b",
+            )),
+        ),
+        // Inflated significance: the milestone that marks itself.
+        rule(
+            "phrase:significance",
+            re(concat!(
+                r"(?i)\bmarks? (?:a|an) (?:significant|major|pivotal|important|key|new|historic)",
+                r" (?:milestone|moment|shift|step|chapter|turning point)\b",
+                r"|\bthe future (?:looks|is) bright\b|\b(?:an|a) (?:enduring|lasting) legacy\b",
+            )),
+        ),
+        // A document announcing what it is about to do. "This document
+        // describes" is left alone: formal documents (a tender response) open
+        // that way on purpose. "In this post we'll cover" is `phrase:we-will`.
+        rule(
+            "phrase:doc-narration",
+            re(
+                r"(?i)\bthis (?:document|doc|post|article|guide) (?:aims to|will (?:explore|walk|take|cover|discuss|dive))\b",
+            ),
+        ),
+        // Avoiding "is": "serves as a reminder", "stands as a testament",
+        // "functions as a hub". Only the verb "functions", never the noun.
         rule(
             "phrase:serves-as",
-            re(r"(?i)\b(?:serves?|served|serving|stands?|stood) as (?:a|an|the)\b"),
+            re(
+                r"(?i)\b(?:serves?|served|serving|stands?|stood|functions|functioned) as (?:a|an|the)\b",
+            ),
         ),
         // The -ing rider tacked on after a comma to claim significance:
         // ", highlighting the need", ", ensuring a smooth rollout". Both
@@ -448,6 +505,19 @@ pub static DETELL_FLAG: LazyLock<Vec<FlagRule>> = LazyLock::new(|| {
         rule("chat:feel-free", re(r"(?i)\bfeel free to\b")),
         rule("chat:let-me-know", re(r"(?i)\blet me know if\b")),
         rule("chat:happy-to", re(r"(?i)\bi'?d be happy to\b")),
+        rule(
+            "chat:sycophancy",
+            re(r"(?i)\byou'?re (?:absolutely|completely|totally) right\b"),
+        ),
+        rule("chat:offer", re(r"(?i)\bwould you like me to\b")),
+        rule(
+            "chat:knowledge-limit",
+            re(concat!(
+                r"(?i)\bas of my (?:last|latest) (?:update|knowledge update|training)\b",
+                r"|\bmy (?:knowledge|training) (?:cutoff|cut-off)\b",
+                r"|\bi (?:don'?t|do not) have (?:access to )?real-time\b",
+            )),
+        ),
         // "as an AI, I..." only. The bare noun phrase is ordinary prose
         // ("reads as an AI tell"), so the comma or the qualifier is the tell.
         rule(
@@ -457,6 +527,21 @@ pub static DETELL_FLAG: LazyLock<Vec<FlagRule>> = LazyLock::new(|| {
         rule(
             "chat:heres-summary",
             re(r"(?i)\bhere'?s (?:a|the) (?:quick )?(?:breakdown|rundown|summary|overview)\b"),
+        ),
+        // Headings: crisp writes sentence case, the British convention, and a
+        // heading never needs an emoji. Title Case is three or more
+        // capitalised words, short joining words allowed between them.
+        anchored(
+            "heading:title-case",
+            re(concat!(
+                r"(?m)^#{1,6}[ \t]+[A-Z][\w'-]*",
+                r"(?:[ \t]+(?:(?:a|an|and|as|at|but|by|for|in|of|on|or|the|to|vs|with)[ \t]+)*[A-Z][\w'-]*){2,}",
+                r"[ \t]*$",
+            )),
+        ),
+        anchored(
+            "heading:emoji",
+            re(r"(?m)^#{1,6}[ \t]+[^\n]*[\x{1F300}-\x{1FAFF}\x{2600}-\x{27BF}]"),
         ),
         // Hedges / filler: usually deletable with zero loss.
         rule(
@@ -1259,6 +1344,7 @@ mod tests {
             "It's not a bug, it's a feature.",
             "They aren't customers. They're partners.",
             "The work is less about code and more about judgement.",
+            "This doesn't mean a rewrite. It means a migration.",
         ] {
             assert_eq!(flagged(text), ["phrase:not-x-its-y"], "{text}");
         }
@@ -1322,6 +1408,10 @@ mod tests {
             flagged("The site stands as the largest in the fleet."),
             ["phrase:serves-as"]
         );
+        assert_eq!(
+            flagged("The depot functions as a hub."),
+            ["phrase:serves-as"]
+        );
         assert!(flagged("He stood as he spoke.").is_empty());
         for text in [
             "Revenue rose 4%, highlighting the need for capacity.",
@@ -1334,5 +1424,53 @@ mod tests {
             assert_eq!(flagged(text), ["phrase:ing-tail"], "{text}");
         }
         assert!(flagged("Ensuring rollback is quick matters.").is_empty());
+    }
+
+    #[test]
+    fn the_cheap_batch_fires_on_its_tells_and_not_on_work_prose() {
+        for (text, want) in [
+            ("Let that sink in.", "phrase:closer-line"),
+            ("And that changes everything.", "phrase:closer-line"),
+            ("Studies show users prefer it.", "phrase:borrowed-authority"),
+            (
+                "It's widely recognised as best practice.",
+                "phrase:borrowed-authority",
+            ),
+            ("The launch marks a major milestone.", "phrase:significance"),
+            (
+                "This guide will walk you through setup.",
+                "phrase:doc-narration",
+            ),
+            (
+                "This article aims to explain pricing.",
+                "phrase:doc-narration",
+            ),
+            (
+                "You're absolutely right about the tariff.",
+                "chat:sycophancy",
+            ),
+            ("Would you like me to draft it?", "chat:offer"),
+            (
+                "As of my last update, it was in beta.",
+                "chat:knowledge-limit",
+            ),
+            ("# Plan For The Rollout", "heading:title-case"),
+            ("## Risks and Mitigations Overview", "heading:title-case"),
+            ("## Rollout plan \u{1F680}", "heading:emoji"),
+            ("Additionally, the meter resets.", "word:vocabulary"),
+        ] {
+            assert_eq!(flagged(text), [want], "{text}");
+        }
+        for text in [
+            "That's the point of the gate.",
+            "This document describes the interface.",
+            "The table below lists the sites.",
+            "Rotate the API key and enhance the logs.",
+            "# Plan for the rollout",
+            "## OCPP message flow",
+            "Want me to set up a call?",
+        ] {
+            assert!(flagged(text).is_empty(), "{text}: {:?}", flagged(text));
+        }
     }
 }

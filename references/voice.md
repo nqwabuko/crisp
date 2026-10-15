@@ -56,6 +56,16 @@ cultivate, endeavour/endeavor, paramount.
   does what. Make it its own sentence with a real subject and verb ("The
   dashboard refreshes every 15 minutes, so operators see the latest state."),
   or cut it if it adds nothing.
+- `phrase:closer-line`: "Let that sink in", "And that changes everything",
+  "That's the real win". The reader decides how to feel; cut the line and end
+  on the last concrete fact or the next step.
+- `phrase:borrowed-authority`: "Studies show", "Experts agree", "It's widely
+  recognised". Name the source or drop the claim to what you know.
+- `phrase:significance`: "marks a major milestone", "the future looks bright".
+  Say what changed and for whom.
+- `phrase:doc-narration`: "This guide will walk you through...". Start with
+  the first step.
+- `heading:title-case` / `heading:emoji`: headings in sentence case, no emoji.
 - "Let's dive in" / "dive deeper into": delete; just start.
 - "In today's fast-paced/digital world": delete the opener.
 - "It's worth noting that" / "It's important to note": delete; state the thing.
@@ -67,7 +77,8 @@ cultivate, endeavour/endeavor, paramount.
 
 **Chat residue (must never survive into prose):**
 "Certainly!", "Absolutely!", "Great question", "I hope this helps", "Feel free
-to", "Let me know if". Delete on sight.
+to", "Let me know if", "You're absolutely right", "Would you like me to", "As of
+my last update". Delete on sight.
 
 **Hedges / filler (default: delete, zero loss):**
 very, really, quite, just, actually, basically, essentially, simply, truly,
