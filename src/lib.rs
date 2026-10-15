@@ -812,7 +812,7 @@ mod tests {
     fn typography_keeps_numeric_ranges() {
         assert_eq!(
             typography("3\u{2013}5 items \u{2013} really"),
-            "3-5 items, really"
+            "3\u{2013}5 items, really"
         );
     }
 

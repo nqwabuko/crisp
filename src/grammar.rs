@@ -31,7 +31,7 @@ pub const OFF: &[(&str, &str)] = &[
     ),
     (
         "NumericRangeEnDash",
-        "detell's endash_range makes ranges hyphens; Harper wants en dashes",
+        "detell allows a hyphen or an en dash in a range; Harper insists on the en dash",
     ),
     (
         "UseEllipsisCharacter",

@@ -16,7 +16,10 @@ rest, because removing them changes meaning. Your job is to act on the flags.
 - Em dashes become commas. Sometimes a period or colon reads better, upgrade
   where the clause is really two sentences or a setup+payoff. Never reintroduce
   the em dash. (House rule: commas, colons, parentheses, or two sentences.)
-- En dashes: kept as hyphens inside number ranges (3-5), commas elsewhere.
+- En dashes: kept inside ranges ("3–5", "Mon–Fri"), where they are correct
+  typography. A spaced en dash (" – ") is the em dash in British dress, so it
+  becomes a comma, as does a typed " -- ". Hyphens in compounds
+  ("well-known", "day-ahead") are never touched.
 - Straight quotes and `...` only.
 
 **Vocabulary to kill (research-backed AI fingerprints).** Replace with the plain
@@ -30,7 +33,29 @@ cultivate, endeavour/endeavor, paramount.
 **Sentence scaffolds to rewrite:**
 - "It's not just X, it's Y" / "It's not about X, it's about Y", the single most
   recognisable tell. Rewrite to a direct claim: say what it *is*.
+- `phrase:not-x-its-y`: "This isn't X. It's Y.", "It isn't X, it's Y",
+  "less about X, more about Y". The tell is a contrast staged with a full stop
+  or a comma and no connective. First ask whether anyone actually believes X.
+  If nobody does, X is a strawman: drop it and state Y ("It's a decision
+  engine."). If the reader really holds X, the contrast is explanation: keep
+  it and give it its joint ("Most teams treat this as reporting, but it
+  decides what ships."). Never delete a `but` or `instead` that was already
+  there; the JOINTS gate counts it. A plain status ("It isn't live yet. It's
+  in review.") is not a reframe; leave it.
+- `phrase:no-x-no-y`: "No guesswork. No spreadsheets. Just answers." A slogan,
+  not a sentence. Say what the thing does, once.
 - "Not only X but also Y": join with "and" or split.
+- `phrase:run-up`: "Here's the thing", "Here's why", "Honestly?", "Look,",
+  "Let's be clear", "The reality is". Delete the run-up and start with the
+  point. For "Here's why", give the reason in the same sentence ("That matters
+  because..."). Anticipations that name what the reader is thinking ("You
+  might think the meter lies") are explanation and stay.
+- `phrase:serves-as`: "serves as", "stands as". Usually just "is".
+- `phrase:ing-tail`: ", ensuring...", ", highlighting...", ", marking...",
+  ", making it easier to...". The rider claims a consequence without saying who
+  does what. Make it its own sentence with a real subject and verb ("The
+  dashboard refreshes every 15 minutes, so operators see the latest state."),
+  or cut it if it adds nothing.
 - "Let's dive in" / "dive deeper into": delete; just start.
 - "In today's fast-paced/digital world": delete the opener.
 - "It's worth noting that" / "It's important to note": delete; state the thing.
