@@ -300,6 +300,7 @@
       "stderr": {
         "compression": null,
         "explanation": null,
+        "facts": null,
         "fixes": {},
         "flags": [],
         "insight": [
@@ -341,6 +342,7 @@
       "stderr": {
         "compression": null,
         "explanation": null,
+        "facts": null,
         "fixes": {},
         "flags": [],
         "insight": [
@@ -378,6 +380,7 @@
       "stderr": {
         "compression": null,
         "explanation": null,
+        "facts": null,
         "fixes": {},
         "flags": [],
         "insight": [],
@@ -410,6 +413,7 @@
       "stderr": {
         "compression": null,
         "explanation": null,
+        "facts": null,
         "fixes": {},
         "flags": [],
         "insight": [
@@ -447,6 +451,7 @@
       "stderr": {
         "compression": null,
         "explanation": null,
+        "facts": null,
         "fixes": {},
         "flags": [],
         "insight": [],
@@ -1453,6 +1458,75 @@
       "stderr": "",
       "stdout": "**Context** x. **Insight Description** y.\n\nLow\n\n**Significance**, **Customer Details**: z.\n"
     },
+    "simplify --json --check --baseline fixtures/cases/facts-source.md fixtures/cases/facts-dropped.md": {
+      "exit": 1,
+      "stderr": {
+        "compression": {
+          "after": 22,
+          "before": 34,
+          "cut_pct": 35.3,
+          "explaining": 0.0,
+          "explaining_words": 0,
+          "growth": 1.5,
+          "limit": null,
+          "ok": false,
+          "rest_words": 34,
+          "scored": true,
+          "target": 40.0
+        },
+        "explanation": {
+          "joints": {
+            "after": 0,
+            "gated": false,
+            "ok": true,
+            "required": 0,
+            "source": 0
+          },
+          "lists": {
+            "lost": [],
+            "ok": true,
+            "promised_not_unpacked_after": [],
+            "promised_not_unpacked_before": 0
+          }
+        },
+        "facts": {
+          "kept": 5,
+          "missing": [
+            {
+              "kind": "number",
+              "line": 1,
+              "text": "22 kW"
+            },
+            {
+              "kind": "date",
+              "line": 2,
+              "text": "Q4 2026"
+            },
+            {
+              "kind": "number",
+              "line": 3,
+              "text": "£0.45"
+            }
+          ],
+          "source": 8
+        },
+        "fixes": {},
+        "flags": [],
+        "insight": null,
+        "joined_sentences": [],
+        "long_sentences": [],
+        "metrics": {
+          "sentences": 3,
+          "words": 22
+        },
+        "over_budget": [],
+        "promised_not_unpacked": [],
+        "scored": false,
+        "total_fixes": 0,
+        "total_flags": 0
+      },
+      "stdout": "The pilot ran for six weeks from 14 October 2026 and served 18000 sessions with\nno faults. The depot stayed busy. Run `crisp detell` before every rewrite.\n"
+    },
     "simplify --json --check --baseline fixtures/explanatory.md fixtures/cases/explanatory-kept.md": {
       "exit": 0,
       "stderr": {
@@ -1483,6 +1557,11 @@
             "promised_not_unpacked_after": [],
             "promised_not_unpacked_before": 0
           }
+        },
+        "facts": {
+          "kept": 0,
+          "missing": [],
+          "source": 0
         },
         "fixes": {},
         "flags": [
@@ -1569,6 +1648,11 @@
             "promised_not_unpacked_before": 0
           }
         },
+        "facts": {
+          "kept": 0,
+          "missing": [],
+          "source": 0
+        },
         "fixes": {},
         "flags": [
           {
@@ -1639,6 +1723,11 @@
             "promised_not_unpacked_before": 0
           }
         },
+        "facts": {
+          "kept": 0,
+          "missing": [],
+          "source": 0
+        },
         "fixes": {},
         "flags": [],
         "insight": null,
@@ -1671,6 +1760,7 @@
       "stderr": {
         "compression": null,
         "explanation": null,
+        "facts": null,
         "fixes": {
           "clutter:during": 1,
           "clutter:regularly": 1
@@ -1734,6 +1824,7 @@
       "stderr": {
         "compression": null,
         "explanation": null,
+        "facts": null,
         "fixes": {
           "clutter:basis": 1,
           "clutter:before": 1,
@@ -2103,6 +2194,11 @@
         }
       }
     },
+    "simplify --report --check --baseline fixtures/cases/facts-source.md fixtures/cases/facts-dropped.md": {
+      "exit": 1,
+      "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD: skipped, only 22 words (need 30+ to score)\nLENGTH  [SHORT]  34 -> 22 words, cut 35.3%   target >= 40.0%\nFACTS   [CHECK]  5 of 8 kept; missing: \"22 kW\" (line 1), \"Q4 2026\" (line 2), \"£0.45\" (line 3) (report only: restore it, or confirm the cut)\nVERDICT: OVER BUDGET on length\n=============================================\n",
+      "stdout": "The pilot ran for six weeks from 14 October 2026 and served 18000 sessions with\nno faults. The depot stayed busy. Run `crisp detell` before every rewrite.\n"
+    },
     "simplify --report --check --baseline fixtures/explanatory.md fixtures/cases/explanatory-kept.md": {
       "exit": 0,
       "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED (needs the rewrite pass, 1):\n    1  passive  -> passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")\n         . ...st of heat minutes after it was paid for.  It works in two steps...\nSCORECARD  (156 words, 10 sentences, 4 paragraphs):\n  [PASS]  mean_sentence_words       15.6   budget <= 18.0\n  [PASS]  max_sentence_words          33   budget <= 30   (22 without joined sentences)\n  [PASS]  pct_long_sentences        20.0   budget <= 15.0   (0.0 without joined sentences)\n  [PASS]  flesch_reading_ease       75.5   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       6.6   budget <= 12.0\n  [PASS]  pct_passive_sentences     10.0   budget <= 10.0\n  [PASS]  pct_long_words             7.7   budget <= 20.0\n  [PASS]  max_paragraph_words         68   budget <= 90\n  [PASS]  pct_ly_adverbs             0.0   budget <= 4.0\nLENGTH  [PASS]  169 -> 156 words, at most 219\n        77.5% of the source explains (131 words, may grow 1.5x); the rest (38 words) owes a 40.0% cut\nJOINTS  [PASS]  3 in the sentences that survived, 4 in the rewrite (because/so/but/if...)\nLISTS   [PASS]  2 unpacked list(s), every part kept\nJOINED SENTENCES (explanation, every clause within 25 words: excused):\n   33w  The boiler heats water, the water heats the radiator, and only then d...\n   27w  Second, the heat already stored in the water and the radiator keeps a...\nPASSIVE SENTENCES (name the actor):\n       The boiler heats water, the water heats the radiator, and only then d...\nVERDICT: within budget\n=============================================\n",
@@ -2456,6 +2552,11 @@
             "promised_not_unpacked_before": 0
           }
         },
+        "facts": {
+          "kept": 2,
+          "missing": [],
+          "source": 2
+        },
         "fixes": {
           "padding:note": 1
         },
@@ -2503,7 +2604,7 @@
       },
       "simplify --check --baseline --insight --report": {
         "exit": 1,
-        "stderr": "== simplify report ==========================\nCLUTTER CUT (auto, 1):\n    1  padding:note\nFLAGGED (needs the rewrite pass, 1):\n    1  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . Certainly! Let's delve into the tapes...\nSCORECARD  (43 words, 7 sentences, 3 paragraphs):\n  [PASS]  mean_sentence_words        6.1   budget <= 18.0\n  [PASS]  max_sentence_words          15   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       70.7   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       4.9   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words            16.3   budget <= 20.0\n  [PASS]  max_paragraph_words         24   budget <= 90\n  [PASS]  pct_ly_adverbs             2.3   budget <= 4.0\nLENGTH  [SHORT]  47 -> 43 words, cut 8.5%   target >= 40.0%\nINSIGHT STRUCTURE  [FAIL] (2):\n  [FAIL]  sections           missing template section(s): Context, Insight Description, Significance, Customer Details\n  [FAIL]  significance       found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line\nVERDICT: OVER BUDGET on length, insight structure\n=============================================\n",
+        "stderr": "== simplify report ==========================\nCLUTTER CUT (auto, 1):\n    1  padding:note\nFLAGGED (needs the rewrite pass, 1):\n    1  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . Certainly! Let's delve into the tapes...\nSCORECARD  (43 words, 7 sentences, 3 paragraphs):\n  [PASS]  mean_sentence_words        6.1   budget <= 18.0\n  [PASS]  max_sentence_words          15   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       70.7   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       4.9   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words            16.3   budget <= 20.0\n  [PASS]  max_paragraph_words         24   budget <= 90\n  [PASS]  pct_ly_adverbs             2.3   budget <= 4.0\nLENGTH  [SHORT]  47 -> 43 words, cut 8.5%   target >= 40.0%\nFACTS   [KEPT]  2 of 2 numbers, dates, quotes and code spans\nINSIGHT STRUCTURE  [FAIL] (2):\n  [FAIL]  sections           missing template section(s): Context, Insight Description, Significance, Customer Details\n  [FAIL]  significance       found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line\nVERDICT: OVER BUDGET on length, insight structure\n=============================================\n",
         "stdout": "Certainly! Let's delve into the tapestry of results, it is a testament to\nthe robust landscape. In today's fast-paced world we must leverage synergy.\n\nThe 3–5 day window is crucial. Feel free to reach out.\n\nOverall, this is a game-changer... I hope this helps.\n"
       },
       "simplify --check --baseline --json": {
@@ -2534,6 +2635,11 @@
             "promised_not_unpacked_after": [],
             "promised_not_unpacked_before": 0
           }
+        },
+        "facts": {
+          "kept": 2,
+          "missing": [],
+          "source": 2
         },
         "fixes": {
           "padding:note": 1
@@ -2573,7 +2679,7 @@
       },
       "simplify --check --baseline --report": {
         "exit": 1,
-        "stderr": "== simplify report ==========================\nCLUTTER CUT (auto, 1):\n    1  padding:note\nFLAGGED (needs the rewrite pass, 1):\n    1  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . Certainly! Let's delve into the tapes...\nSCORECARD  (43 words, 7 sentences, 3 paragraphs):\n  [PASS]  mean_sentence_words        6.1   budget <= 18.0\n  [PASS]  max_sentence_words          15   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       70.7   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       4.9   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words            16.3   budget <= 20.0\n  [PASS]  max_paragraph_words         24   budget <= 90\n  [PASS]  pct_ly_adverbs             2.3   budget <= 4.0\nLENGTH  [SHORT]  47 -> 43 words, cut 8.5%   target >= 40.0%\nVERDICT: OVER BUDGET on length\n=============================================\n",
+        "stderr": "== simplify report ==========================\nCLUTTER CUT (auto, 1):\n    1  padding:note\nFLAGGED (needs the rewrite pass, 1):\n    1  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . Certainly! Let's delve into the tapes...\nSCORECARD  (43 words, 7 sentences, 3 paragraphs):\n  [PASS]  mean_sentence_words        6.1   budget <= 18.0\n  [PASS]  max_sentence_words          15   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       70.7   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       4.9   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words            16.3   budget <= 20.0\n  [PASS]  max_paragraph_words         24   budget <= 90\n  [PASS]  pct_ly_adverbs             2.3   budget <= 4.0\nLENGTH  [SHORT]  47 -> 43 words, cut 8.5%   target >= 40.0%\nFACTS   [KEPT]  2 of 2 numbers, dates, quotes and code spans\nVERDICT: OVER BUDGET on length\n=============================================\n",
         "stdout": "Certainly! Let's delve into the tapestry of results, it is a testament to\nthe robust landscape. In today's fast-paced world we must leverage synergy.\n\nThe 3–5 day window is crucial. Feel free to reach out.\n\nOverall, this is a game-changer... I hope this helps.\n"
       }
     },
@@ -2918,6 +3024,11 @@
             "promised_not_unpacked_before": 0
           }
         },
+        "facts": {
+          "kept": 0,
+          "missing": [],
+          "source": 0
+        },
         "fixes": {
           "clutter:because": 1,
           "clutter:before": 1,
@@ -3100,6 +3211,11 @@
             "promised_not_unpacked_after": [],
             "promised_not_unpacked_before": 0
           }
+        },
+        "facts": {
+          "kept": 0,
+          "missing": [],
+          "source": 0
         },
         "fixes": {
           "clutter:because": 1,
@@ -3769,6 +3885,11 @@
             "promised_not_unpacked_before": 0
           }
         },
+        "facts": {
+          "kept": 1,
+          "missing": [],
+          "source": 1
+        },
         "fixes": {
           "clutter:before": 1
         },
@@ -3806,7 +3927,7 @@
       },
       "simplify --check --baseline --insight --report": {
         "exit": 1,
-        "stderr": "== simplify report ==========================\nCLUTTER CUT (auto, 1):\n    1  clutter:before\nFLAGGED (needs the rewrite pass, 1):\n    1  long-word  -> short word available: start/end/try/help/do/get/need/change/tell/check/about/so/also/but\n         . ...Before the review we should ascertain whether the fallback is rob...\nSCORECARD: skipped, only 19 words (need 30+ to score)\nLENGTH: 20 -> 19 words (source under 30 words, no cut required)\nINSIGHT STRUCTURE  [FAIL] (2):\n  [FAIL]  sections           missing template section(s): Context, Insight Description, Significance, Customer Details\n  [FAIL]  significance       found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line\n=============================================\n",
+        "stderr": "== simplify report ==========================\nCLUTTER CUT (auto, 1):\n    1  clutter:before\nFLAGGED (needs the rewrite pass, 1):\n    1  long-word  -> short word available: start/end/try/help/do/get/need/change/tell/check/about/so/also/but\n         . ...Before the review we should ascertain whether the fallback is rob...\nSCORECARD: skipped, only 19 words (need 30+ to score)\nLENGTH: 20 -> 19 words (source under 30 words, no cut required)\nFACTS   [KEPT]  1 of 1 numbers, dates, quotes and code spans\nINSIGHT STRUCTURE  [FAIL] (2):\n  [FAIL]  sections           missing template section(s): Context, Insight Description, Significance, Customer Details\n  [FAIL]  significance       found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line\n=============================================\n",
         "stdout": "The endpoint returns the current limit. Use `leverage the utilize flag` sparingly.\n\n```python\n# The implementation of the delve tapestry was utilized prior to launch.\ndef facilitate(x):\n    return x\n```\n\nBefore the review we should ascertain whether the fallback is robust.\n"
       },
       "simplify --check --baseline --json": {
@@ -3838,6 +3959,11 @@
             "promised_not_unpacked_before": 0
           }
         },
+        "facts": {
+          "kept": 1,
+          "missing": [],
+          "source": 1
+        },
         "fixes": {
           "clutter:before": 1
         },
@@ -3866,7 +3992,7 @@
       },
       "simplify --check --baseline --report": {
         "exit": 0,
-        "stderr": "== simplify report ==========================\nCLUTTER CUT (auto, 1):\n    1  clutter:before\nFLAGGED (needs the rewrite pass, 1):\n    1  long-word  -> short word available: start/end/try/help/do/get/need/change/tell/check/about/so/also/but\n         . ...Before the review we should ascertain whether the fallback is rob...\nSCORECARD: skipped, only 19 words (need 30+ to score)\nLENGTH: 20 -> 19 words (source under 30 words, no cut required)\n=============================================\n",
+        "stderr": "== simplify report ==========================\nCLUTTER CUT (auto, 1):\n    1  clutter:before\nFLAGGED (needs the rewrite pass, 1):\n    1  long-word  -> short word available: start/end/try/help/do/get/need/change/tell/check/about/so/also/but\n         . ...Before the review we should ascertain whether the fallback is rob...\nSCORECARD: skipped, only 19 words (need 30+ to score)\nLENGTH: 20 -> 19 words (source under 30 words, no cut required)\nFACTS   [KEPT]  1 of 1 numbers, dates, quotes and code spans\n=============================================\n",
         "stdout": "The endpoint returns the current limit. Use `leverage the utilize flag` sparingly.\n\n```python\n# The implementation of the delve tapestry was utilized prior to launch.\ndef facilitate(x):\n    return x\n```\n\nBefore the review we should ascertain whether the fallback is robust.\n"
       }
     },
@@ -4041,6 +4167,11 @@
             "promised_not_unpacked_before": 0
           }
         },
+        "facts": {
+          "kept": 0,
+          "missing": [],
+          "source": 0
+        },
         "fixes": {
           "padding:note": 1,
           "padding:ultimately": 1
@@ -4146,6 +4277,11 @@
             "promised_not_unpacked_after": [],
             "promised_not_unpacked_before": 0
           }
+        },
+        "facts": {
+          "kept": 0,
+          "missing": [],
+          "source": 0
         },
         "fixes": {
           "padding:note": 1,
@@ -4527,6 +4663,11 @@
             "promised_not_unpacked_before": 0
           }
         },
+        "facts": {
+          "kept": 0,
+          "missing": [],
+          "source": 0
+        },
         "fixes": {
           "clutter:during": 1,
           "clutter:regularly": 1
@@ -4625,6 +4766,11 @@
             "promised_not_unpacked_after": [],
             "promised_not_unpacked_before": 0
           }
+        },
+        "facts": {
+          "kept": 0,
+          "missing": [],
+          "source": 0
         },
         "fixes": {
           "clutter:during": 1,
@@ -4882,6 +5028,11 @@
             "promised_not_unpacked_before": 0
           }
         },
+        "facts": {
+          "kept": 7,
+          "missing": [],
+          "source": 7
+        },
         "fixes": {},
         "flags": [],
         "insight": [
@@ -4928,7 +5079,7 @@
       },
       "simplify --check --baseline --insight --report": {
         "exit": 1,
-        "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD  (60 words, 8 sentences, 5 paragraphs):\n  [PASS]  mean_sentence_words        7.5   budget <= 18.0\n  [PASS]  max_sentence_words          15   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [OVER]  flesch_reading_ease       46.9   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       8.6   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words            18.3   budget <= 20.0\n  [PASS]  max_paragraph_words         27   budget <= 90\n  [PASS]  pct_ly_adverbs             0.0   budget <= 4.0\nLENGTH  [SHORT]  60 -> 60 words, cut 0.0%   target >= 40.0%\nINSIGHT STRUCTURE  [FAIL] (4):\n  [FAIL]  no_internal_refs   source file path: core/app/Providers/EventServiceProvider.php:1090, core/modules-marketplace/app-manifest/src/Enums/TriggerKindEnum.php:7-12\n  [FAIL]  no_internal_refs   class/static reference: ConnectorService::updatePowerOptions\n  [FAIL]  no_internal_refs   object property access: $chargePoint->load_group_id\n  [FAIL]  no_customer_metrics customer estate size: \"18,000 residential chargers\" — describe it qualitatively instead (\"a large estate\"); the number is the customer's to disclose\nVERDICT: OVER BUDGET on flesch_reading_ease, length, insight structure\n=============================================\n",
+        "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD  (60 words, 8 sentences, 5 paragraphs):\n  [PASS]  mean_sentence_words        7.5   budget <= 18.0\n  [PASS]  max_sentence_words          15   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [OVER]  flesch_reading_ease       46.9   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       8.6   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words            18.3   budget <= 20.0\n  [PASS]  max_paragraph_words         27   budget <= 90\n  [PASS]  pct_ly_adverbs             0.0   budget <= 4.0\nLENGTH  [SHORT]  60 -> 60 words, cut 0.0%   target >= 40.0%\nFACTS   [KEPT]  7 of 7 numbers, dates, quotes and code spans\nINSIGHT STRUCTURE  [FAIL] (4):\n  [FAIL]  no_internal_refs   source file path: core/app/Providers/EventServiceProvider.php:1090, core/modules-marketplace/app-manifest/src/Enums/TriggerKindEnum.php:7-12\n  [FAIL]  no_internal_refs   class/static reference: ConnectorService::updatePowerOptions\n  [FAIL]  no_internal_refs   object property access: $chargePoint->load_group_id\n  [FAIL]  no_customer_metrics customer estate size: \"18,000 residential chargers\" — describe it qualitatively instead (\"a large estate\"); the number is the customer's to disclose\nVERDICT: OVER BUDGET on flesch_reading_ease, length, insight structure\n=============================================\n",
         "stdout": "# INSIGHT\n\n**Context**\nDana at Halcyon asked for boot-time configuration refresh across 18,000 residential chargers. The platform cannot react to a charger event today without customer-hosted middleware sitting in between.\n\n**Insight Description**\nThe gap is that `TriggerKindEnum` in `core/modules-marketplace/app-manifest/src/Enums/TriggerKindEnum.php:7-12` has only four cases. Nine listeners hang off `ChargePointBootNotificationReceived`, registered in `core/app/Providers/EventServiceProvider.php:1090`. The write path exists via `ConnectorService::updatePowerOptions` and `$chargePoint->load_group_id`.\n\n**Significance**\nHigh\n\n**Customer Details**\nCustomer Name(s): Halcyon Energy\n"
       },
       "simplify --check --baseline --json": {
@@ -4960,6 +5111,11 @@
             "promised_not_unpacked_before": 0
           }
         },
+        "facts": {
+          "kept": 7,
+          "missing": [],
+          "source": 7
+        },
         "fixes": {},
         "flags": [],
         "insight": null,
@@ -4989,7 +5145,7 @@
       },
       "simplify --check --baseline --report": {
         "exit": 1,
-        "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD  (60 words, 8 sentences, 5 paragraphs):\n  [PASS]  mean_sentence_words        7.5   budget <= 18.0\n  [PASS]  max_sentence_words          15   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [OVER]  flesch_reading_ease       46.9   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       8.6   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words            18.3   budget <= 20.0\n  [PASS]  max_paragraph_words         27   budget <= 90\n  [PASS]  pct_ly_adverbs             0.0   budget <= 4.0\nLENGTH  [SHORT]  60 -> 60 words, cut 0.0%   target >= 40.0%\nVERDICT: OVER BUDGET on flesch_reading_ease, length\n=============================================\n",
+        "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD  (60 words, 8 sentences, 5 paragraphs):\n  [PASS]  mean_sentence_words        7.5   budget <= 18.0\n  [PASS]  max_sentence_words          15   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [OVER]  flesch_reading_ease       46.9   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       8.6   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words            18.3   budget <= 20.0\n  [PASS]  max_paragraph_words         27   budget <= 90\n  [PASS]  pct_ly_adverbs             0.0   budget <= 4.0\nLENGTH  [SHORT]  60 -> 60 words, cut 0.0%   target >= 40.0%\nFACTS   [KEPT]  7 of 7 numbers, dates, quotes and code spans\nVERDICT: OVER BUDGET on flesch_reading_ease, length\n=============================================\n",
         "stdout": "# INSIGHT\n\n**Context**\nDana at Halcyon asked for boot-time configuration refresh across 18,000 residential chargers. The platform cannot react to a charger event today without customer-hosted middleware sitting in between.\n\n**Insight Description**\nThe gap is that `TriggerKindEnum` in `core/modules-marketplace/app-manifest/src/Enums/TriggerKindEnum.php:7-12` has only four cases. Nine listeners hang off `ChargePointBootNotificationReceived`, registered in `core/app/Providers/EventServiceProvider.php:1090`. The write path exists via `ConnectorService::updatePowerOptions` and `$chargePoint->load_group_id`.\n\n**Significance**\nHigh\n\n**Customer Details**\nCustomer Name(s): Halcyon Energy\n"
       }
     },
@@ -5182,6 +5338,11 @@
             "promised_not_unpacked_before": 0
           }
         },
+        "facts": {
+          "kept": 3,
+          "missing": [],
+          "source": 3
+        },
         "fixes": {},
         "flags": [],
         "insight": [
@@ -5223,7 +5384,7 @@
       },
       "simplify --check --baseline --insight --report": {
         "exit": 1,
-        "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD  (305 words, 27 sentences, 14 paragraphs):\n  [PASS]  mean_sentence_words       11.3   budget <= 18.0\n  [PASS]  max_sentence_words          26   budget <= 30\n  [PASS]  pct_long_sentences         3.7   budget <= 15.0\n  [PASS]  flesch_reading_ease       63.9   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       7.2   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words            12.1   budget <= 20.0\n  [PASS]  max_paragraph_words         56   budget <= 90\n  [PASS]  pct_ly_adverbs             0.0   budget <= 4.0\nLENGTH  [SHORT]  305 -> 305 words, at most 211\n        10.5% of the source explains (32 words, may grow 1.5x); the rest (273 words) owes a 40.0% cut\nJOINTS  [PASS]  4 in the sentences that survived, 4 in the rewrite (because/so/but/if...)\nLONGEST SENTENCES (over 25 words, cut or split):\n   26w  Dana Whitfield (Product Manager, Halcyon Energy) asked on 2026-09-09...\nINSIGHT STRUCTURE  [FAIL] (2):\n  [FAIL]  no_customer_metrics customer estate size: \"18,000 units\" — describe it qualitatively instead (\"a large estate\"); the number is the customer's to disclose\n  [FAIL]  no_customer_metrics customer estate size: \"18,000 chargers\" — describe it qualitatively instead (\"a large estate\"); the number is the customer's to disclose\nVERDICT: OVER BUDGET on length, insight structure\n=============================================\n",
+        "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD  (305 words, 27 sentences, 14 paragraphs):\n  [PASS]  mean_sentence_words       11.3   budget <= 18.0\n  [PASS]  max_sentence_words          26   budget <= 30\n  [PASS]  pct_long_sentences         3.7   budget <= 15.0\n  [PASS]  flesch_reading_ease       63.9   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       7.2   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words            12.1   budget <= 20.0\n  [PASS]  max_paragraph_words         56   budget <= 90\n  [PASS]  pct_ly_adverbs             0.0   budget <= 4.0\nLENGTH  [SHORT]  305 -> 305 words, at most 211\n        10.5% of the source explains (32 words, may grow 1.5x); the rest (273 words) owes a 40.0% cut\nJOINTS  [PASS]  4 in the sentences that survived, 4 in the rewrite (because/so/but/if...)\nFACTS   [KEPT]  3 of 3 numbers, dates, quotes and code spans\nLONGEST SENTENCES (over 25 words, cut or split):\n   26w  Dana Whitfield (Product Manager, Halcyon Energy) asked on 2026-09-09...\nINSIGHT STRUCTURE  [FAIL] (2):\n  [FAIL]  no_customer_metrics customer estate size: \"18,000 units\" — describe it qualitatively instead (\"a large estate\"); the number is the customer's to disclose\n  [FAIL]  no_customer_metrics customer estate size: \"18,000 chargers\" — describe it qualitatively instead (\"a large estate\"); the number is the customer's to disclose\nVERDICT: OVER BUDGET on length, insight structure\n=============================================\n",
         "stdout": "**The ask**\n\nA general workflow builder for the marketplace, like IFTTT: watch for a trigger, then do something. Halcyon is the first example. When a charger boots, send a DataTransfer, then use the response to update the charger and EVSE records.\n\n# INSIGHT\n\n**Context**\n\nDana Whitfield (Product Manager, Halcyon Energy) asked on 2026-09-09 that the platform read a charger's real configuration each time it boots, and keep our record in step. Halcyon's residential migration is around 18,000 units, and the drivers moving across want Dynamic Load Management and Power Sharing.\n\nThe charger, not the platform, is the source of truth. A driver can change the maximum current with a physical switch on the unit. When our record drifts, load management runs on the wrong numbers and breaks the one feature they migrated for.\n\n**Insight Description**\n\nThe platform can tell a customer that something happened on a charger, but cannot act on it. We already ask the charger for its configuration after boot, then send the result out as a webhook. Customers can write values back through the API, and we already run their code as marketplace apps. Nothing joins them up.\n\nSo Halcyon's only route is to keep a service running around the clock, catching that webhook and calling us back to write the result. That is the middleware they are paying us to take over.\n\nThis request keeps coming back. Brightline Fleet asked in 2025, and Cavendish Motors asked for event-driven throttling. Halcyon named two more of their own uses on the call: credit card handling, and Halcyon Ultra sending user details.\n\n**Significance**\n\nHigh\n\nHalcyon's residential migration is around 18,000 chargers and gates the second contract. Not Critical, because Halcyon can host the middleware themselves. But that asks them to keep running the system they are replacing.\n\n**Customer Details**\nCustomer Name(s): Halcyon Energy, Canada\nURL (tenant environment): https://halcyon.tenant.example.com/\n"
       },
       "simplify --check --baseline --json": {
@@ -5254,6 +5415,11 @@
             "promised_not_unpacked_after": [],
             "promised_not_unpacked_before": 0
           }
+        },
+        "facts": {
+          "kept": 3,
+          "missing": [],
+          "source": 3
         },
         "fixes": {},
         "flags": [],
@@ -5287,7 +5453,7 @@
       },
       "simplify --check --baseline --report": {
         "exit": 1,
-        "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD  (305 words, 27 sentences, 14 paragraphs):\n  [PASS]  mean_sentence_words       11.3   budget <= 18.0\n  [PASS]  max_sentence_words          26   budget <= 30\n  [PASS]  pct_long_sentences         3.7   budget <= 15.0\n  [PASS]  flesch_reading_ease       63.9   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       7.2   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words            12.1   budget <= 20.0\n  [PASS]  max_paragraph_words         56   budget <= 90\n  [PASS]  pct_ly_adverbs             0.0   budget <= 4.0\nLENGTH  [SHORT]  305 -> 305 words, at most 211\n        10.5% of the source explains (32 words, may grow 1.5x); the rest (273 words) owes a 40.0% cut\nJOINTS  [PASS]  4 in the sentences that survived, 4 in the rewrite (because/so/but/if...)\nLONGEST SENTENCES (over 25 words, cut or split):\n   26w  Dana Whitfield (Product Manager, Halcyon Energy) asked on 2026-09-09...\nVERDICT: OVER BUDGET on length\n=============================================\n",
+        "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD  (305 words, 27 sentences, 14 paragraphs):\n  [PASS]  mean_sentence_words       11.3   budget <= 18.0\n  [PASS]  max_sentence_words          26   budget <= 30\n  [PASS]  pct_long_sentences         3.7   budget <= 15.0\n  [PASS]  flesch_reading_ease       63.9   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       7.2   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words            12.1   budget <= 20.0\n  [PASS]  max_paragraph_words         56   budget <= 90\n  [PASS]  pct_ly_adverbs             0.0   budget <= 4.0\nLENGTH  [SHORT]  305 -> 305 words, at most 211\n        10.5% of the source explains (32 words, may grow 1.5x); the rest (273 words) owes a 40.0% cut\nJOINTS  [PASS]  4 in the sentences that survived, 4 in the rewrite (because/so/but/if...)\nFACTS   [KEPT]  3 of 3 numbers, dates, quotes and code spans\nLONGEST SENTENCES (over 25 words, cut or split):\n   26w  Dana Whitfield (Product Manager, Halcyon Energy) asked on 2026-09-09...\nVERDICT: OVER BUDGET on length\n=============================================\n",
         "stdout": "**The ask**\n\nA general workflow builder for the marketplace, like IFTTT: watch for a trigger, then do something. Halcyon is the first example. When a charger boots, send a DataTransfer, then use the response to update the charger and EVSE records.\n\n# INSIGHT\n\n**Context**\n\nDana Whitfield (Product Manager, Halcyon Energy) asked on 2026-09-09 that the platform read a charger's real configuration each time it boots, and keep our record in step. Halcyon's residential migration is around 18,000 units, and the drivers moving across want Dynamic Load Management and Power Sharing.\n\nThe charger, not the platform, is the source of truth. A driver can change the maximum current with a physical switch on the unit. When our record drifts, load management runs on the wrong numbers and breaks the one feature they migrated for.\n\n**Insight Description**\n\nThe platform can tell a customer that something happened on a charger, but cannot act on it. We already ask the charger for its configuration after boot, then send the result out as a webhook. Customers can write values back through the API, and we already run their code as marketplace apps. Nothing joins them up.\n\nSo Halcyon's only route is to keep a service running around the clock, catching that webhook and calling us back to write the result. That is the middleware they are paying us to take over.\n\nThis request keeps coming back. Brightline Fleet asked in 2025, and Cavendish Motors asked for event-driven throttling. Halcyon named two more of their own uses on the call: credit card handling, and Halcyon Ultra sending user details.\n\n**Significance**\n\nHigh\n\nHalcyon's residential migration is around 18,000 chargers and gates the second contract. Not Critical, because Halcyon can host the middleware themselves. But that asks them to keep running the system they are replacing.\n\n**Customer Details**\nCustomer Name(s): Halcyon Energy, Canada\nURL (tenant environment): https://halcyon.tenant.example.com/\n"
       }
     },
@@ -5776,6 +5942,11 @@
             "promised_not_unpacked_before": 0
           }
         },
+        "facts": {
+          "kept": 0,
+          "missing": [],
+          "source": 0
+        },
         "fixes": {},
         "flags": [
           {
@@ -5867,6 +6038,11 @@
             "promised_not_unpacked_after": [],
             "promised_not_unpacked_before": 0
           }
+        },
+        "facts": {
+          "kept": 0,
+          "missing": [],
+          "source": 0
         },
         "fixes": {},
         "flags": [
@@ -6540,6 +6716,17 @@
             "promised_not_unpacked_before": 0
           }
         },
+        "facts": {
+          "kept": 1,
+          "missing": [
+            {
+              "kind": "quote",
+              "line": 11,
+              "text": "needless to say, it broke"
+            }
+          ],
+          "source": 2
+        },
         "fixes": {
           "clutter:before": 1,
           "clutter:bonus": 1,
@@ -6613,7 +6800,7 @@
       },
       "simplify --check --baseline --insight --report": {
         "exit": 1,
-        "stderr": "== simplify report ==========================\nCLUTTER CUT (auto, 16):\n    2  padding:note\n    2  padding:fact\n    1  clutter:before\n    1  clutter:result\n    1  clutter:history\n    1  clutter:plan\n    1  clutter:together\n    1  clutter:essential\n    1  clutter:near\n    1  padding:ultimately\n    1  clutter:revert\n    1  clutter:eliminate\n    1  clutter:bonus\n    1  clutter:summary\nFLAGGED (needs the rewrite pass, 10):\n    9  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . .... The result is that we can basically plan for phase two, which i...\n         . ...ntial.  The history here is quite complex. The two teams coll...\n         . ...nd the migration script was really just a very simple change t...\n    1  passive  -> passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")\n         . ...dundancy  The depot rollout was signed off before the deadline. Th...\nSCORECARD  (87 words, 8 sentences, 5 paragraphs):\n  [PASS]  mean_sentence_words       10.9   budget <= 18.0\n  [PASS]  max_sentence_words          20   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       64.5   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       7.0   budget <= 12.0\n  [OVER]  pct_passive_sentences     12.5   budget <= 10.0\n  [PASS]  pct_long_words            14.9   budget <= 20.0\n  [PASS]  max_paragraph_words         24   budget <= 90\n  [OVER]  pct_ly_adverbs             4.6   budget <= 4.0\nLENGTH  [SHORT]  122 -> 87 words, cut 28.7%   target >= 40.0%\nPASSIVE SENTENCES (name the actor):\n       The depot rollout was signed off before the deadline.\nINSIGHT STRUCTURE  [FAIL] (2):\n  [FAIL]  sections           missing template section(s): Context, Insight Description, Significance, Customer Details\n  [FAIL]  significance       found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line\nVERDICT: OVER BUDGET on pct_passive_sentences, pct_ly_adverbs, length, insight structure\n=============================================\n",
+        "stderr": "== simplify report ==========================\nCLUTTER CUT (auto, 16):\n    2  padding:note\n    2  padding:fact\n    1  clutter:before\n    1  clutter:result\n    1  clutter:history\n    1  clutter:plan\n    1  clutter:together\n    1  clutter:essential\n    1  clutter:near\n    1  padding:ultimately\n    1  clutter:revert\n    1  clutter:eliminate\n    1  clutter:bonus\n    1  clutter:summary\nFLAGGED (needs the rewrite pass, 10):\n    9  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . .... The result is that we can basically plan for phase two, which i...\n         . ...ntial.  The history here is quite complex. The two teams coll...\n         . ...nd the migration script was really just a very simple change t...\n    1  passive  -> passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")\n         . ...dundancy  The depot rollout was signed off before the deadline. Th...\nSCORECARD  (87 words, 8 sentences, 5 paragraphs):\n  [PASS]  mean_sentence_words       10.9   budget <= 18.0\n  [PASS]  max_sentence_words          20   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       64.5   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       7.0   budget <= 12.0\n  [OVER]  pct_passive_sentences     12.5   budget <= 10.0\n  [PASS]  pct_long_words            14.9   budget <= 20.0\n  [PASS]  max_paragraph_words         24   budget <= 90\n  [OVER]  pct_ly_adverbs             4.6   budget <= 4.0\nLENGTH  [SHORT]  122 -> 87 words, cut 28.7%   target >= 40.0%\nFACTS   [CHECK]  1 of 2 kept; missing: \"needless to say, it broke\" (line 11) (report only: restore it, or confirm the cut)\nPASSIVE SENTENCES (name the actor):\n       The depot rollout was signed off before the deadline.\nINSIGHT STRUCTURE  [FAIL] (2):\n  [FAIL]  sections           missing template section(s): Context, Insight Description, Significance, Customer Details\n  [FAIL]  significance       found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line\nVERDICT: OVER BUDGET on pct_passive_sentences, pct_ly_adverbs, length, insight structure\n=============================================\n",
         "stdout": "# Padding and redundancy\n\nThe depot rollout was signed off before the\ndeadline. The result is that we can basically plan for phase two, which is essential.\n\nThe history here is quite complex. The two teams collaborated near go-live, and the\nmigration script was really just a very simple change to `tariff_id`.\n\nThe customer said, \"it broke\", and it did. As such, we reverted and eliminated the retry loop:\n\n```python\n# padding words inside code must survive: it should be noted that basically\nresult = very_simple(x)\n```\n\nThat said, the bonus is a summary in the console, so obviously the\noperator can see which limit actually applied.\n"
       },
       "simplify --check --baseline --json": {
@@ -6644,6 +6831,17 @@
             "promised_not_unpacked_after": [],
             "promised_not_unpacked_before": 0
           }
+        },
+        "facts": {
+          "kept": 1,
+          "missing": [
+            {
+              "kind": "quote",
+              "line": 11,
+              "text": "needless to say, it broke"
+            }
+          ],
+          "source": 2
         },
         "fixes": {
           "clutter:before": 1,
@@ -6709,7 +6907,7 @@
       },
       "simplify --check --baseline --report": {
         "exit": 1,
-        "stderr": "== simplify report ==========================\nCLUTTER CUT (auto, 16):\n    2  padding:note\n    2  padding:fact\n    1  clutter:before\n    1  clutter:result\n    1  clutter:history\n    1  clutter:plan\n    1  clutter:together\n    1  clutter:essential\n    1  clutter:near\n    1  padding:ultimately\n    1  clutter:revert\n    1  clutter:eliminate\n    1  clutter:bonus\n    1  clutter:summary\nFLAGGED (needs the rewrite pass, 10):\n    9  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . .... The result is that we can basically plan for phase two, which i...\n         . ...ntial.  The history here is quite complex. The two teams coll...\n         . ...nd the migration script was really just a very simple change t...\n    1  passive  -> passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")\n         . ...dundancy  The depot rollout was signed off before the deadline. Th...\nSCORECARD  (87 words, 8 sentences, 5 paragraphs):\n  [PASS]  mean_sentence_words       10.9   budget <= 18.0\n  [PASS]  max_sentence_words          20   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       64.5   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       7.0   budget <= 12.0\n  [OVER]  pct_passive_sentences     12.5   budget <= 10.0\n  [PASS]  pct_long_words            14.9   budget <= 20.0\n  [PASS]  max_paragraph_words         24   budget <= 90\n  [OVER]  pct_ly_adverbs             4.6   budget <= 4.0\nLENGTH  [SHORT]  122 -> 87 words, cut 28.7%   target >= 40.0%\nPASSIVE SENTENCES (name the actor):\n       The depot rollout was signed off before the deadline.\nVERDICT: OVER BUDGET on pct_passive_sentences, pct_ly_adverbs, length\n=============================================\n",
+        "stderr": "== simplify report ==========================\nCLUTTER CUT (auto, 16):\n    2  padding:note\n    2  padding:fact\n    1  clutter:before\n    1  clutter:result\n    1  clutter:history\n    1  clutter:plan\n    1  clutter:together\n    1  clutter:essential\n    1  clutter:near\n    1  padding:ultimately\n    1  clutter:revert\n    1  clutter:eliminate\n    1  clutter:bonus\n    1  clutter:summary\nFLAGGED (needs the rewrite pass, 10):\n    9  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . .... The result is that we can basically plan for phase two, which i...\n         . ...ntial.  The history here is quite complex. The two teams coll...\n         . ...nd the migration script was really just a very simple change t...\n    1  passive  -> passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")\n         . ...dundancy  The depot rollout was signed off before the deadline. Th...\nSCORECARD  (87 words, 8 sentences, 5 paragraphs):\n  [PASS]  mean_sentence_words       10.9   budget <= 18.0\n  [PASS]  max_sentence_words          20   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       64.5   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       7.0   budget <= 12.0\n  [OVER]  pct_passive_sentences     12.5   budget <= 10.0\n  [PASS]  pct_long_words            14.9   budget <= 20.0\n  [PASS]  max_paragraph_words         24   budget <= 90\n  [OVER]  pct_ly_adverbs             4.6   budget <= 4.0\nLENGTH  [SHORT]  122 -> 87 words, cut 28.7%   target >= 40.0%\nFACTS   [CHECK]  1 of 2 kept; missing: \"needless to say, it broke\" (line 11) (report only: restore it, or confirm the cut)\nPASSIVE SENTENCES (name the actor):\n       The depot rollout was signed off before the deadline.\nVERDICT: OVER BUDGET on pct_passive_sentences, pct_ly_adverbs, length\n=============================================\n",
         "stdout": "# Padding and redundancy\n\nThe depot rollout was signed off before the\ndeadline. The result is that we can basically plan for phase two, which is essential.\n\nThe history here is quite complex. The two teams collaborated near go-live, and the\nmigration script was really just a very simple change to `tariff_id`.\n\nThe customer said, \"it broke\", and it did. As such, we reverted and eliminated the retry loop:\n\n```python\n# padding words inside code must survive: it should be noted that basically\nresult = very_simple(x)\n```\n\nThat said, the bonus is a summary in the console, so obviously the\noperator can see which limit actually applied.\n"
       }
     },
@@ -7291,6 +7489,11 @@
             "promised_not_unpacked_before": 0
           }
         },
+        "facts": {
+          "kept": 0,
+          "missing": [],
+          "source": 0
+        },
         "fixes": {},
         "flags": [],
         "insight": [
@@ -7358,6 +7561,11 @@
             "promised_not_unpacked_after": [],
             "promised_not_unpacked_before": 0
           }
+        },
+        "facts": {
+          "kept": 0,
+          "missing": [],
+          "source": 0
         },
         "fixes": {},
         "flags": [],
@@ -7626,6 +7834,11 @@
             "promised_not_unpacked_before": 0
           }
         },
+        "facts": {
+          "kept": 3,
+          "missing": [],
+          "source": 3
+        },
         "fixes": {},
         "flags": [
           {
@@ -7671,7 +7884,7 @@
       },
       "simplify --check --baseline --insight --report": {
         "exit": 1,
-        "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED (needs the rewrite pass, 1):\n    1  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . ...guesswork. No spreadsheets. Just answers. Honestly? The work...\nSCORECARD  (118 words, 14 sentences, 4 paragraphs):\n  [PASS]  mean_sentence_words        8.4   budget <= 18.0\n  [PASS]  max_sentence_words          23   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       81.4   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       4.0   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words             5.9   budget <= 20.0\n  [PASS]  max_paragraph_words         40   budget <= 90\n  [PASS]  pct_ly_adverbs             0.8   budget <= 4.0\nLENGTH  [SHORT]  118 -> 118 words, at most 87\n        16.1% of the source explains (19 words, may grow 1.5x); the rest (99 words) owes a 40.0% cut\nJOINTS  [PASS]  3 in the sentences that survived, 3 in the rewrite (because/so/but/if...)\nINSIGHT STRUCTURE  [FAIL] (2):\n  [FAIL]  sections           missing template section(s): Context, Insight Description, Significance, Customer Details\n  [FAIL]  significance       found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line\nVERDICT: OVER BUDGET on length, insight structure\n=============================================\n",
+        "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED (needs the rewrite pass, 1):\n    1  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . ...guesswork. No spreadsheets. Just answers. Honestly? The work...\nSCORECARD  (118 words, 14 sentences, 4 paragraphs):\n  [PASS]  mean_sentence_words        8.4   budget <= 18.0\n  [PASS]  max_sentence_words          23   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       81.4   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       4.0   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words             5.9   budget <= 20.0\n  [PASS]  max_paragraph_words         40   budget <= 90\n  [PASS]  pct_ly_adverbs             0.8   budget <= 4.0\nLENGTH  [SHORT]  118 -> 118 words, at most 87\n        16.1% of the source explains (19 words, may grow 1.5x); the rest (99 words) owes a 40.0% cut\nJOINTS  [PASS]  3 in the sentences that survived, 3 in the rewrite (because/so/but/if...)\nFACTS   [KEPT]  3 of 3 numbers, dates, quotes and code spans\nINSIGHT STRUCTURE  [FAIL] (2):\n  [FAIL]  sections           missing template section(s): Context, Insight Description, Significance, Customer Details\n  [FAIL]  significance       found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line\nVERDICT: OVER BUDGET on length, insight structure\n=============================================\n",
         "stdout": "Here's the thing: this isn't a reporting tool. It's a decision engine. The\npilot serves as a template for the wider rollout, and the dashboard refreshes\nevery 15 minutes, ensuring operators always see the latest state.\n\nNo guesswork. No spreadsheets. Just answers. Honestly? The work is less about\ncode and more about judgement. Here's why that matters for the 9–5 shift.\n\nThe charger isn't online yet, but the fix is in review. Look, the queue is\nfull on Mon–Fri. The release ships Friday, marking the end of the pilot, and\nthe cache warms on start, making it easier to scale.\n\nYou might think the meter lies. It does not: the clock drifts, so readings\narrive late and look wrong.\n"
       },
       "simplify --check --baseline --json": {
@@ -7702,6 +7915,11 @@
             "promised_not_unpacked_after": [],
             "promised_not_unpacked_before": 0
           }
+        },
+        "facts": {
+          "kept": 3,
+          "missing": [],
+          "source": 3
         },
         "fixes": {},
         "flags": [
@@ -7739,7 +7957,7 @@
       },
       "simplify --check --baseline --report": {
         "exit": 1,
-        "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED (needs the rewrite pass, 1):\n    1  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . ...guesswork. No spreadsheets. Just answers. Honestly? The work...\nSCORECARD  (118 words, 14 sentences, 4 paragraphs):\n  [PASS]  mean_sentence_words        8.4   budget <= 18.0\n  [PASS]  max_sentence_words          23   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       81.4   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       4.0   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words             5.9   budget <= 20.0\n  [PASS]  max_paragraph_words         40   budget <= 90\n  [PASS]  pct_ly_adverbs             0.8   budget <= 4.0\nLENGTH  [SHORT]  118 -> 118 words, at most 87\n        16.1% of the source explains (19 words, may grow 1.5x); the rest (99 words) owes a 40.0% cut\nJOINTS  [PASS]  3 in the sentences that survived, 3 in the rewrite (because/so/but/if...)\nVERDICT: OVER BUDGET on length\n=============================================\n",
+        "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED (needs the rewrite pass, 1):\n    1  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . ...guesswork. No spreadsheets. Just answers. Honestly? The work...\nSCORECARD  (118 words, 14 sentences, 4 paragraphs):\n  [PASS]  mean_sentence_words        8.4   budget <= 18.0\n  [PASS]  max_sentence_words          23   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       81.4   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       4.0   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words             5.9   budget <= 20.0\n  [PASS]  max_paragraph_words         40   budget <= 90\n  [PASS]  pct_ly_adverbs             0.8   budget <= 4.0\nLENGTH  [SHORT]  118 -> 118 words, at most 87\n        16.1% of the source explains (19 words, may grow 1.5x); the rest (99 words) owes a 40.0% cut\nJOINTS  [PASS]  3 in the sentences that survived, 3 in the rewrite (because/so/but/if...)\nFACTS   [KEPT]  3 of 3 numbers, dates, quotes and code spans\nVERDICT: OVER BUDGET on length\n=============================================\n",
         "stdout": "Here's the thing: this isn't a reporting tool. It's a decision engine. The\npilot serves as a template for the wider rollout, and the dashboard refreshes\nevery 15 minutes, ensuring operators always see the latest state.\n\nNo guesswork. No spreadsheets. Just answers. Honestly? The work is less about\ncode and more about judgement. Here's why that matters for the 9–5 shift.\n\nThe charger isn't online yet, but the fix is in review. Look, the queue is\nfull on Mon–Fri. The release ships Friday, marking the end of the pilot, and\nthe cache warms on start, making it easier to scale.\n\nYou might think the meter lies. It does not: the clock drifts, so readings\narrive late and look wrong.\n"
       }
     },
@@ -8163,6 +8381,11 @@
             "promised_not_unpacked_before": 0
           }
         },
+        "facts": {
+          "kept": 2,
+          "missing": [],
+          "source": 2
+        },
         "fixes": {},
         "flags": [
           {
@@ -8208,7 +8431,7 @@
       },
       "simplify --check --baseline --insight --report": {
         "exit": 1,
-        "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED (needs the rewrite pass, 1):\n    1  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . ...For The Pilot Sites  You're absolutely right about the tariff. Thi...\nSCORECARD  (102 words, 15 sentences, 6 paragraphs):\n  [PASS]  mean_sentence_words        6.8   budget <= 18.0\n  [PASS]  max_sentence_words          16   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       82.2   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       3.5   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words             7.8   budget <= 20.0\n  [PASS]  max_paragraph_words         37   budget <= 90\n  [PASS]  pct_ly_adverbs             2.0   budget <= 4.0\nLENGTH  [SHORT]  102 -> 102 words, cut 0.0%   target >= 40.0%\nINSIGHT STRUCTURE  [FAIL] (2):\n  [FAIL]  sections           missing template section(s): Context, Insight Description, Significance, Customer Details\n  [FAIL]  significance       found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line\nVERDICT: OVER BUDGET on length, insight structure\n=============================================\n",
+        "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED (needs the rewrite pass, 1):\n    1  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . ...For The Pilot Sites  You're absolutely right about the tariff. Thi...\nSCORECARD  (102 words, 15 sentences, 6 paragraphs):\n  [PASS]  mean_sentence_words        6.8   budget <= 18.0\n  [PASS]  max_sentence_words          16   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       82.2   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       3.5   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words             7.8   budget <= 20.0\n  [PASS]  max_paragraph_words         37   budget <= 90\n  [PASS]  pct_ly_adverbs             2.0   budget <= 4.0\nLENGTH  [SHORT]  102 -> 102 words, cut 0.0%   target >= 40.0%\nFACTS   [KEPT]  2 of 2 numbers, dates, quotes and code spans\nINSIGHT STRUCTURE  [FAIL] (2):\n  [FAIL]  sections           missing template section(s): Context, Insight Description, Significance, Customer Details\n  [FAIL]  significance       found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line\nVERDICT: OVER BUDGET on length, insight structure\n=============================================\n",
         "stdout": "# Rollout Plan For The Pilot Sites\n\nYou're absolutely right about the tariff. This guide will walk you through\nthe change. Studies show operators prefer fewer prices, and the launch marks a\nmajor milestone for the network. Additionally, the depot functions as a hub.\n\n## Risks 🚧\n\nAs of my last update, the API was in beta. Would you like me to draft the\nmigration? This doesn't mean a rewrite. It means a migration. Let that sink in.\n\n## What we checked\n\nThis document describes the interface. The table below lists the sites. That's\nthe point of the gate: rotate the API key before the 9–5 shift.\n"
       },
       "simplify --check --baseline --json": {
@@ -8239,6 +8462,11 @@
             "promised_not_unpacked_after": [],
             "promised_not_unpacked_before": 0
           }
+        },
+        "facts": {
+          "kept": 2,
+          "missing": [],
+          "source": 2
         },
         "fixes": {},
         "flags": [
@@ -8276,7 +8504,7 @@
       },
       "simplify --check --baseline --report": {
         "exit": 1,
-        "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED (needs the rewrite pass, 1):\n    1  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . ...For The Pilot Sites  You're absolutely right about the tariff. Thi...\nSCORECARD  (102 words, 15 sentences, 6 paragraphs):\n  [PASS]  mean_sentence_words        6.8   budget <= 18.0\n  [PASS]  max_sentence_words          16   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       82.2   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       3.5   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words             7.8   budget <= 20.0\n  [PASS]  max_paragraph_words         37   budget <= 90\n  [PASS]  pct_ly_adverbs             2.0   budget <= 4.0\nLENGTH  [SHORT]  102 -> 102 words, cut 0.0%   target >= 40.0%\nVERDICT: OVER BUDGET on length\n=============================================\n",
+        "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED (needs the rewrite pass, 1):\n    1  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . ...For The Pilot Sites  You're absolutely right about the tariff. Thi...\nSCORECARD  (102 words, 15 sentences, 6 paragraphs):\n  [PASS]  mean_sentence_words        6.8   budget <= 18.0\n  [PASS]  max_sentence_words          16   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       82.2   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       3.5   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words             7.8   budget <= 20.0\n  [PASS]  max_paragraph_words         37   budget <= 90\n  [PASS]  pct_ly_adverbs             2.0   budget <= 4.0\nLENGTH  [SHORT]  102 -> 102 words, cut 0.0%   target >= 40.0%\nFACTS   [KEPT]  2 of 2 numbers, dates, quotes and code spans\nVERDICT: OVER BUDGET on length\n=============================================\n",
         "stdout": "# Rollout Plan For The Pilot Sites\n\nYou're absolutely right about the tariff. This guide will walk you through\nthe change. Studies show operators prefer fewer prices, and the launch marks a\nmajor milestone for the network. Additionally, the depot functions as a hub.\n\n## Risks 🚧\n\nAs of my last update, the API was in beta. Would you like me to draft the\nmigration? This doesn't mean a rewrite. It means a migration. Let that sink in.\n\n## What we checked\n\nThis document describes the interface. The table below lists the sites. That's\nthe point of the gate: rotate the API key before the 9–5 shift.\n"
       }
     },
@@ -8649,6 +8877,11 @@
             "promised_not_unpacked_before": 0
           }
         },
+        "facts": {
+          "kept": 0,
+          "missing": [],
+          "source": 0
+        },
         "fixes": {},
         "flags": [],
         "insight": [
@@ -8716,6 +8949,11 @@
             "promised_not_unpacked_after": [],
             "promised_not_unpacked_before": 0
           }
+        },
+        "facts": {
+          "kept": 0,
+          "missing": [],
+          "source": 0
         },
         "fixes": {},
         "flags": [],
@@ -8920,6 +9158,11 @@
             "promised_not_unpacked_before": 0
           }
         },
+        "facts": {
+          "kept": 0,
+          "missing": [],
+          "source": 0
+        },
         "fixes": {
           "clutter:before": 1
         },
@@ -8979,6 +9222,11 @@
             "promised_not_unpacked_after": [],
             "promised_not_unpacked_before": 0
           }
+        },
+        "facts": {
+          "kept": 0,
+          "missing": [],
+          "source": 0
         },
         "fixes": {
           "clutter:before": 1

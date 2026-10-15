@@ -7,6 +7,7 @@
 //! Python's: right-aligned counts, and numbers printed as Python prints an int
 //! or a float.
 
+use super::facts::Survival;
 use super::rewrite::{self, Rewrite};
 use super::rules::{Bound, Budget};
 use super::{COMPRESSION_TARGET, EXPLANATION_GROWTH, LONG_SENTENCE, MIN_WORDS_TO_SCORE, Metrics};
@@ -342,6 +343,9 @@ pub struct Simplified {
     pub explanation: Option<Explanation>,
     /// How many lists the baseline unpacked, for the report's PASS line.
     pub source_lists: usize,
+    /// Also only with a baseline: the numbers, dates, quotes and code the
+    /// rewrite dropped. Reported, never gated.
+    pub facts: Option<Survival>,
 }
 
 impl Simplified {
@@ -356,12 +360,14 @@ impl Simplified {
                 .filter(|p| p.unpacked)
                 .count()
         });
+        let facts = baseline.map(|source| Survival::between(source, &rewrite.text));
         Simplified {
             rewrite,
             metrics,
             compression,
             explanation,
             source_lists,
+            facts,
         }
     }
 
@@ -449,6 +455,32 @@ fn explanation_lines(s: &Simplified) -> Vec<String> {
     l
 }
 
+/// One line, and only with a baseline whose source has facts. Never a verdict:
+/// the writer decides whether a missing fact was packaging or a loss.
+fn fact_lines(facts: Option<&Survival>) -> Vec<String> {
+    let Some(f) = facts.filter(|f| f.source > 0) else {
+        return Vec::new();
+    };
+    if f.missing.is_empty() {
+        return vec![format!(
+            "FACTS   [KEPT]  {} of {} numbers, dates, quotes and code spans",
+            f.kept(),
+            f.source
+        )];
+    }
+    let missing: Vec<String> = f
+        .missing
+        .iter()
+        .map(|m| format!("\"{}\" (line {})", m.text, m.line))
+        .collect();
+    vec![format!(
+        "FACTS   [CHECK]  {} of {} kept; missing: {} (report only: restore it, or confirm the cut)",
+        f.kept(),
+        f.source,
+        missing.join(", ")
+    )]
+}
+
 pub fn simplify_text(s: &Simplified, budget: &Budget) -> String {
     let r = &s.rewrite;
     let mut l = vec!["== simplify report ==========================".to_string()];
@@ -491,6 +523,7 @@ pub fn simplify_text(s: &Simplified, budget: &Budget) -> String {
         ));
         l.extend(length_lines(s.compression));
         l.extend(explanation_lines(s));
+        l.extend(fact_lines(s.facts.as_ref()));
         let mut over: Vec<&str> = Vec::new();
         if s.short() {
             over.push("length");
@@ -534,6 +567,7 @@ pub fn simplify_text(s: &Simplified, budget: &Budget) -> String {
 
     l.extend(length_lines(s.compression));
     l.extend(explanation_lines(s));
+    l.extend(fact_lines(s.facts.as_ref()));
 
     if !m.long_sentences.is_empty() {
         l.push(format!(
@@ -604,6 +638,11 @@ pub fn simplify_json(s: &Simplified, budget: &Budget) -> Value {
         "total_flags": r.total_flags(),
         "compression": s.compression.map(|c| c.json()),
         "explanation": s.explanation.as_ref().map(Explanation::json),
+        "facts": s.facts.as_ref().map(|f| json!({
+            "source": f.source,
+            "kept": f.kept(),
+            "missing": f.missing,
+        })),
         "promised_not_unpacked": super::explain::promises(&r.text)
             .into_iter()
             .filter(|p| !p.unpacked)

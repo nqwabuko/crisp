@@ -681,6 +681,31 @@ const CASES: &[(&str, bool, &[&str])] = &[
             "fixtures/explanatory.md",
         ],
     ),
+    // Fact survival: a rewrite that kept a figure in another form ("six",
+    // "18000", "14 October 2026") and dropped three ("22 kW", "Q4 2026",
+    // "£0.45"). Reported, never a verdict.
+    (
+        "fixtures/cases/facts-dropped.md",
+        false,
+        &[
+            "simplify",
+            "--report",
+            "--check",
+            "--baseline",
+            "fixtures/cases/facts-source.md",
+        ],
+    ),
+    (
+        "fixtures/cases/facts-dropped.md",
+        false,
+        &[
+            "simplify",
+            "--json",
+            "--check",
+            "--baseline",
+            "fixtures/cases/facts-source.md",
+        ],
+    ),
     // A rewrite that clears every gate, so the passing verdict is pinned: the
     // padding cut, the joints and the lists kept, the sentences inside budget.
     (

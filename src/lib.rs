@@ -17,6 +17,7 @@
 //! is crisp's tuning, and every function that judges takes a `&Budget`.
 
 pub mod explain;
+pub mod facts;
 #[cfg(feature = "grammar")]
 pub mod grammar;
 pub mod insight;

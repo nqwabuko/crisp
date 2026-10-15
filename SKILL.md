@@ -229,6 +229,15 @@ number, a name, a real caveat or a joint.
 Never buy the number by cutting one of those (`references/simplify.md` Part D is
 the do-not-cut list).
 
+**Facts survive.** With `--baseline`, the report ends with a `FACTS` line: the
+numbers (with their units), dates, quoted words and code spans of the source
+that the rewrite no longer has. `[KEPT]` means all of them made it. `[CHECK]`
+lists each missing one with its line. It is report only and never fails the run,
+because some cuts are right (a date that only said when a meeting was). For each
+missing fact, either put it back or be able to say why it was packaging. A
+missing figure is almost never packaging. A fact rewritten in another form
+("six" for "6", "18000" for "18,000", "14 October" for "14 Oct") counts as kept.
+
 ### Pass step B. Voice and simplification rewrite (the judgement)
 Read `references/voice.md` and `references/simplify.md`, then rewrite:
 - Act on every FLAG from both reports (kill AI vocabulary, rewrite the scaffolds,
