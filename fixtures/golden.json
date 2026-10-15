@@ -6689,9 +6689,9 @@
       },
       "simplify --check --baseline --insight --json": {
         "compression": {
-          "after": 87,
+          "after": 90,
           "before": 122,
-          "cut_pct": 28.7,
+          "cut_pct": 26.2,
           "explaining": 0.0,
           "explaining_words": 0,
           "growth": 1.5,
@@ -6717,14 +6717,8 @@
           }
         },
         "facts": {
-          "kept": 1,
-          "missing": [
-            {
-              "kind": "quote",
-              "line": 11,
-              "text": "needless to say, it broke"
-            }
-          ],
+          "kept": 2,
+          "missing": [],
           "source": 2
         },
         "fixes": {
@@ -6739,7 +6733,7 @@
           "clutter:revert": 1,
           "clutter:summary": 1,
           "clutter:together": 1,
-          "padding:fact": 2,
+          "padding:fact": 1,
           "padding:note": 2,
           "padding:ultimately": 1
         },
@@ -6777,17 +6771,17 @@
         "long_sentences": [],
         "metrics": {
           "flesch_kincaid_grade": 7.0,
-          "flesch_reading_ease": 64.5,
+          "flesch_reading_ease": 64.8,
           "max_paragraph_words": 24,
           "max_sentence_words": 20,
-          "mean_sentence_words": 10.9,
+          "mean_sentence_words": 11.2,
           "paragraphs": 5,
           "pct_long_sentences": 0.0,
-          "pct_long_words": 14.9,
-          "pct_ly_adverbs": 4.6,
+          "pct_long_words": 14.4,
+          "pct_ly_adverbs": 4.4,
           "pct_passive_sentences": 12.5,
           "sentences": 8,
-          "words": 87
+          "words": 90
         },
         "over_budget": [
           "pct_passive_sentences",
@@ -6795,19 +6789,19 @@
         ],
         "promised_not_unpacked": [],
         "scored": true,
-        "total_fixes": 16,
+        "total_fixes": 15,
         "total_flags": 10
       },
       "simplify --check --baseline --insight --report": {
         "exit": 1,
-        "stderr": "== simplify report ==========================\nCLUTTER CUT (auto, 16):\n    2  padding:note\n    2  padding:fact\n    1  clutter:before\n    1  clutter:result\n    1  clutter:history\n    1  clutter:plan\n    1  clutter:together\n    1  clutter:essential\n    1  clutter:near\n    1  padding:ultimately\n    1  clutter:revert\n    1  clutter:eliminate\n    1  clutter:bonus\n    1  clutter:summary\nFLAGGED (needs the rewrite pass, 10):\n    9  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . .... The result is that we can basically plan for phase two, which i...\n         . ...ntial.  The history here is quite complex. The two teams coll...\n         . ...nd the migration script was really just a very simple change t...\n    1  passive  -> passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")\n         . ...dundancy  The depot rollout was signed off before the deadline. Th...\nSCORECARD  (87 words, 8 sentences, 5 paragraphs):\n  [PASS]  mean_sentence_words       10.9   budget <= 18.0\n  [PASS]  max_sentence_words          20   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       64.5   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       7.0   budget <= 12.0\n  [OVER]  pct_passive_sentences     12.5   budget <= 10.0\n  [PASS]  pct_long_words            14.9   budget <= 20.0\n  [PASS]  max_paragraph_words         24   budget <= 90\n  [OVER]  pct_ly_adverbs             4.6   budget <= 4.0\nLENGTH  [SHORT]  122 -> 87 words, cut 28.7%   target >= 40.0%\nFACTS   [CHECK]  1 of 2 kept; missing: \"needless to say, it broke\" (line 11) (report only: restore it, or confirm the cut)\nPASSIVE SENTENCES (name the actor):\n       The depot rollout was signed off before the deadline.\nINSIGHT STRUCTURE  [FAIL] (2):\n  [FAIL]  sections           missing template section(s): Context, Insight Description, Significance, Customer Details\n  [FAIL]  significance       found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line\nVERDICT: OVER BUDGET on pct_passive_sentences, pct_ly_adverbs, length, insight structure\n=============================================\n",
-        "stdout": "# Padding and redundancy\n\nThe depot rollout was signed off before the\ndeadline. The result is that we can basically plan for phase two, which is essential.\n\nThe history here is quite complex. The two teams collaborated near go-live, and the\nmigration script was really just a very simple change to `tariff_id`.\n\nThe customer said, \"it broke\", and it did. As such, we reverted and eliminated the retry loop:\n\n```python\n# padding words inside code must survive: it should be noted that basically\nresult = very_simple(x)\n```\n\nThat said, the bonus is a summary in the console, so obviously the\noperator can see which limit actually applied.\n"
+        "stderr": "== simplify report ==========================\nCLUTTER CUT (auto, 15):\n    2  padding:note\n    1  clutter:before\n    1  clutter:result\n    1  clutter:history\n    1  clutter:plan\n    1  clutter:together\n    1  clutter:essential\n    1  clutter:near\n    1  padding:fact\n    1  padding:ultimately\n    1  clutter:revert\n    1  clutter:eliminate\n    1  clutter:bonus\n    1  clutter:summary\nFLAGGED (needs the rewrite pass, 10):\n    9  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . .... The result is that we can basically plan for phase two, which i...\n         . ...ntial.  The history here is quite complex. The two teams coll...\n         . ...nd the migration script was really just a very simple change t...\n    1  passive  -> passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")\n         . ...dundancy  The depot rollout was signed off before the deadline. Th...\nSCORECARD  (90 words, 8 sentences, 5 paragraphs):\n  [PASS]  mean_sentence_words       11.2   budget <= 18.0\n  [PASS]  max_sentence_words          20   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       64.8   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       7.0   budget <= 12.0\n  [OVER]  pct_passive_sentences     12.5   budget <= 10.0\n  [PASS]  pct_long_words            14.4   budget <= 20.0\n  [PASS]  max_paragraph_words         24   budget <= 90\n  [OVER]  pct_ly_adverbs             4.4   budget <= 4.0\nLENGTH  [SHORT]  122 -> 90 words, cut 26.2%   target >= 40.0%\nFACTS   [KEPT]  2 of 2 numbers, dates, quotes and code spans\nPASSIVE SENTENCES (name the actor):\n       The depot rollout was signed off before the deadline.\nINSIGHT STRUCTURE  [FAIL] (2):\n  [FAIL]  sections           missing template section(s): Context, Insight Description, Significance, Customer Details\n  [FAIL]  significance       found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line\nVERDICT: OVER BUDGET on pct_passive_sentences, pct_ly_adverbs, length, insight structure\n=============================================\n",
+        "stdout": "# Padding and redundancy\n\nThe depot rollout was signed off before the\ndeadline. The result is that we can basically plan for phase two, which is essential.\n\nThe history here is quite complex. The two teams collaborated near go-live, and the\nmigration script was really just a very simple change to `tariff_id`.\n\nThe customer said, \"needless to say, it broke\", and it did. As such, we reverted and eliminated the retry loop:\n\n```python\n# padding words inside code must survive: it should be noted that basically\nresult = very_simple(x)\n```\n\nThat said, the bonus is a summary in the console, so obviously the\noperator can see which limit actually applied.\n"
       },
       "simplify --check --baseline --json": {
         "compression": {
-          "after": 87,
+          "after": 90,
           "before": 122,
-          "cut_pct": 28.7,
+          "cut_pct": 26.2,
           "explaining": 0.0,
           "explaining_words": 0,
           "growth": 1.5,
@@ -6833,14 +6827,8 @@
           }
         },
         "facts": {
-          "kept": 1,
-          "missing": [
-            {
-              "kind": "quote",
-              "line": 11,
-              "text": "needless to say, it broke"
-            }
-          ],
+          "kept": 2,
+          "missing": [],
           "source": 2
         },
         "fixes": {
@@ -6855,7 +6843,7 @@
           "clutter:revert": 1,
           "clutter:summary": 1,
           "clutter:together": 1,
-          "padding:fact": 2,
+          "padding:fact": 1,
           "padding:note": 2,
           "padding:ultimately": 1
         },
@@ -6884,17 +6872,17 @@
         "long_sentences": [],
         "metrics": {
           "flesch_kincaid_grade": 7.0,
-          "flesch_reading_ease": 64.5,
+          "flesch_reading_ease": 64.8,
           "max_paragraph_words": 24,
           "max_sentence_words": 20,
-          "mean_sentence_words": 10.9,
+          "mean_sentence_words": 11.2,
           "paragraphs": 5,
           "pct_long_sentences": 0.0,
-          "pct_long_words": 14.9,
-          "pct_ly_adverbs": 4.6,
+          "pct_long_words": 14.4,
+          "pct_ly_adverbs": 4.4,
           "pct_passive_sentences": 12.5,
           "sentences": 8,
-          "words": 87
+          "words": 90
         },
         "over_budget": [
           "pct_passive_sentences",
@@ -6902,13 +6890,13 @@
         ],
         "promised_not_unpacked": [],
         "scored": true,
-        "total_fixes": 16,
+        "total_fixes": 15,
         "total_flags": 10
       },
       "simplify --check --baseline --report": {
         "exit": 1,
-        "stderr": "== simplify report ==========================\nCLUTTER CUT (auto, 16):\n    2  padding:note\n    2  padding:fact\n    1  clutter:before\n    1  clutter:result\n    1  clutter:history\n    1  clutter:plan\n    1  clutter:together\n    1  clutter:essential\n    1  clutter:near\n    1  padding:ultimately\n    1  clutter:revert\n    1  clutter:eliminate\n    1  clutter:bonus\n    1  clutter:summary\nFLAGGED (needs the rewrite pass, 10):\n    9  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . .... The result is that we can basically plan for phase two, which i...\n         . ...ntial.  The history here is quite complex. The two teams coll...\n         . ...nd the migration script was really just a very simple change t...\n    1  passive  -> passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")\n         . ...dundancy  The depot rollout was signed off before the deadline. Th...\nSCORECARD  (87 words, 8 sentences, 5 paragraphs):\n  [PASS]  mean_sentence_words       10.9   budget <= 18.0\n  [PASS]  max_sentence_words          20   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       64.5   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       7.0   budget <= 12.0\n  [OVER]  pct_passive_sentences     12.5   budget <= 10.0\n  [PASS]  pct_long_words            14.9   budget <= 20.0\n  [PASS]  max_paragraph_words         24   budget <= 90\n  [OVER]  pct_ly_adverbs             4.6   budget <= 4.0\nLENGTH  [SHORT]  122 -> 87 words, cut 28.7%   target >= 40.0%\nFACTS   [CHECK]  1 of 2 kept; missing: \"needless to say, it broke\" (line 11) (report only: restore it, or confirm the cut)\nPASSIVE SENTENCES (name the actor):\n       The depot rollout was signed off before the deadline.\nVERDICT: OVER BUDGET on pct_passive_sentences, pct_ly_adverbs, length\n=============================================\n",
-        "stdout": "# Padding and redundancy\n\nThe depot rollout was signed off before the\ndeadline. The result is that we can basically plan for phase two, which is essential.\n\nThe history here is quite complex. The two teams collaborated near go-live, and the\nmigration script was really just a very simple change to `tariff_id`.\n\nThe customer said, \"it broke\", and it did. As such, we reverted and eliminated the retry loop:\n\n```python\n# padding words inside code must survive: it should be noted that basically\nresult = very_simple(x)\n```\n\nThat said, the bonus is a summary in the console, so obviously the\noperator can see which limit actually applied.\n"
+        "stderr": "== simplify report ==========================\nCLUTTER CUT (auto, 15):\n    2  padding:note\n    1  clutter:before\n    1  clutter:result\n    1  clutter:history\n    1  clutter:plan\n    1  clutter:together\n    1  clutter:essential\n    1  clutter:near\n    1  padding:fact\n    1  padding:ultimately\n    1  clutter:revert\n    1  clutter:eliminate\n    1  clutter:bonus\n    1  clutter:summary\nFLAGGED (needs the rewrite pass, 10):\n    9  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . .... The result is that we can basically plan for phase two, which i...\n         . ...ntial.  The history here is quite complex. The two teams coll...\n         . ...nd the migration script was really just a very simple change t...\n    1  passive  -> passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")\n         . ...dundancy  The depot rollout was signed off before the deadline. Th...\nSCORECARD  (90 words, 8 sentences, 5 paragraphs):\n  [PASS]  mean_sentence_words       11.2   budget <= 18.0\n  [PASS]  max_sentence_words          20   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       64.8   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       7.0   budget <= 12.0\n  [OVER]  pct_passive_sentences     12.5   budget <= 10.0\n  [PASS]  pct_long_words            14.4   budget <= 20.0\n  [PASS]  max_paragraph_words         24   budget <= 90\n  [OVER]  pct_ly_adverbs             4.4   budget <= 4.0\nLENGTH  [SHORT]  122 -> 90 words, cut 26.2%   target >= 40.0%\nFACTS   [KEPT]  2 of 2 numbers, dates, quotes and code spans\nPASSIVE SENTENCES (name the actor):\n       The depot rollout was signed off before the deadline.\nVERDICT: OVER BUDGET on pct_passive_sentences, pct_ly_adverbs, length\n=============================================\n",
+        "stdout": "# Padding and redundancy\n\nThe depot rollout was signed off before the\ndeadline. The result is that we can basically plan for phase two, which is essential.\n\nThe history here is quite complex. The two teams collaborated near go-live, and the\nmigration script was really just a very simple change to `tariff_id`.\n\nThe customer said, \"needless to say, it broke\", and it did. As such, we reverted and eliminated the retry loop:\n\n```python\n# padding words inside code must survive: it should be noted that basically\nresult = very_simple(x)\n```\n\nThat said, the bonus is a summary in the console, so obviously the\noperator can see which limit actually applied.\n"
       }
     },
     "detell": {
@@ -7226,15 +7214,6 @@
           "very"
         ],
         [
-          "padding:fact",
-          "clutter",
-          11,
-          21,
-          11,
-          39,
-          "needless to say, i"
-        ],
-        [
           "padding",
           "complexity",
           11,
@@ -7321,7 +7300,7 @@
         "clutter:revert": 1,
         "clutter:summary": 1,
         "clutter:together": 1,
-        "padding:fact": 2,
+        "padding:fact": 1,
         "padding:note": 2,
         "padding:ultimately": 1
       },
@@ -7331,17 +7310,17 @@
       },
       "metrics": {
         "flesch_kincaid_grade": 7.0,
-        "flesch_reading_ease": 64.5,
+        "flesch_reading_ease": 64.8,
         "max_paragraph_words": 24,
         "max_sentence_words": 20,
-        "mean_sentence_words": 10.9,
+        "mean_sentence_words": 11.2,
         "paragraphs": 5,
         "pct_long_sentences": 0.0,
-        "pct_long_words": 14.9,
-        "pct_ly_adverbs": 4.6,
+        "pct_long_words": 14.4,
+        "pct_ly_adverbs": 4.4,
         "pct_passive_sentences": 12.5,
         "sentences": 8,
-        "words": 87
+        "words": 90
       },
       "over_budget": [
         "pct_passive_sentences",

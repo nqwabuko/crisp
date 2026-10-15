@@ -123,6 +123,26 @@ pub fn prose_spans(text: &str) -> Vec<(usize, &str)> {
         .collect()
 }
 
+/// A double-quoted passage, straight or curly, inside one paragraph.
+static QUOTED: LazyLock<Regex> =
+    LazyLock::new(|| re("\"[^\"]{0,400}\"|\u{201c}[^\u{201c}\u{201d}]{0,400}\u{201d}"));
+
+/// `(start, end)` of every quoted passage in `s`: somebody's actual words,
+/// which a rewrite must never edit. A quote never spans a blank line, so an
+/// unbalanced mark can't swallow the paragraphs after it.
+pub fn quoted_ranges(s: &str) -> Vec<(usize, usize)> {
+    QUOTED
+        .find_iter(s)
+        .filter(|m| !m.as_str().contains("\n\n"))
+        .map(|m| (m.start(), m.end()))
+        .collect()
+}
+
+/// Does `at` fall inside one of `ranges`?
+pub fn inside(ranges: &[(usize, usize)], at: usize) -> bool {
+    ranges.iter().any(|&(a, b)| a < at && at < b)
+}
+
 /// Apply `f` to prose only; fenced blocks and inline code pass through.
 pub fn map_prose(text: &str, f: impl Fn(&str) -> String) -> String {
     let mut out = String::with_capacity(text.len());

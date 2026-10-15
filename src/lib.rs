@@ -264,6 +264,9 @@ pub fn simplify_locate(text: &str) -> Vec<Hit> {
     let mut found = Vec::new();
 
     for (base, span) in text::prose_spans(text) {
+        // A clutter fix inside a quote would edit somebody's words, so the
+        // rewrite skips it and locate does not offer it.
+        let quotes = text::quoted_ranges(span);
         for rule @ ClutterRule {
             name, pat, guard, ..
         } in rules::CLUTTER.iter()
@@ -273,6 +276,9 @@ pub fn simplify_locate(text: &str) -> Vec<Hit> {
                     continue;
                 }
                 let m = caps.get(0).expect("group 0 always exists");
+                if text::inside(&quotes, m.start()) {
+                    continue;
+                }
                 found.push(Hit {
                     rule: name,
                     kind: Kind::Clutter,

@@ -119,7 +119,7 @@ fn apply_fix(rule: &FixRule, s: &str) -> (String, usize) {
             c.expand(template, &mut out);
             out
         }),
-        Fix::Case(pat, plain) => replace(pat, None, s, |c| rules::cased(plain, &c[0])),
+        Fix::Case(pat, plain) => replace_unquoted(pat, None, s, |c| rules::cased(plain, &c[0])),
         Fix::Scan(f) => {
             let out = f(s);
             let n = scanned(rule.name, s, &out);
@@ -162,7 +162,7 @@ pub fn simplify(text: &str) -> Rewrite {
             name, pat, guard, ..
         } in rules::CLUTTER.iter()
         {
-            let (out, n) = replace(pat, *guard, &s, |c| rules::clutter_fix(rule, c));
+            let (out, n) = replace_unquoted(pat, *guard, &s, |c| rules::clutter_fix(rule, c));
             fixes.add(name, n);
             s = out;
         }
@@ -259,6 +259,31 @@ fn replace(
     (out, n)
 }
 
+/// `replace`, leaving quoted passages alone: a word rewrite inside quotation
+/// marks edits somebody's actual words. Typography (`Fix::Sub`) still applies
+/// inside quotes; only the rules that change words go through here.
+fn replace_unquoted(
+    pat: &Regex,
+    guard: Option<Guard>,
+    s: &str,
+    with: impl Fn(&Captures) -> String,
+) -> (String, usize) {
+    let quotes = text::quoted_ranges(s);
+    let (mut out, mut last, mut n) = (String::with_capacity(s.len()), 0, 0);
+    for c in kept(pat, guard, s) {
+        let m = c.get(0).expect("group 0 always exists");
+        if text::inside(&quotes, m.start()) {
+            continue;
+        }
+        out.push_str(&s[last..m.start()]);
+        out.push_str(&with(&c));
+        last = m.end();
+        n += 1;
+    }
+    out.push_str(&s[last..]);
+    (out, n)
+}
+
 /// Fold one span's hits for one rule into the running list, as crisp does: the
 /// count accumulates across spans and the samples stop at three.
 fn merge(
@@ -339,6 +364,19 @@ mod tests {
             out.text,
             "Mon\u{2013}Fri, 9\u{2013}5. It works, mostly. Ship it, today. Run --json.\n"
         );
+    }
+
+    #[test]
+    fn word_rewrites_never_edit_a_quote() {
+        let out = simplify(
+            "The customer said \"needless to say, it broke\" and, needless to say, it did.\n",
+        );
+        assert_eq!(
+            out.text,
+            "The customer said \"needless to say, it broke\" and, it did.\n"
+        );
+        let out = detell("She wrote \u{201c}in order to ship\u{201d}, in order to ship.\n");
+        assert_eq!(out.text, "She wrote \"in order to ship\", to ship.\n");
     }
 
     #[test]
