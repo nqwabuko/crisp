@@ -24,6 +24,12 @@ equivalent, so a script applies it. A FLAG changes meaning, so the script only
 locates it and says why; a human or an agent decides. The scripts never quietly
 reweight what you said.
 
+![The crisp binary runs the mechanical passes, two fresh agents rewrite in turn, and the binary gates the result against the original draft](docs/figures/crispPipeline.png)
+
+*Two deterministic passes of the crisp binary around two rewrites by fresh
+agents. The second agent gets the first one's text, never its reasoning, and
+the gates measure the rewrite against the original draft.*
+
 crisp began as two Python scripts. The Rust was held byte-identical to them
 until they retired on 13 Oct 2026; `docs/rust.md` has the story.
 
@@ -68,6 +74,20 @@ paragraphs owe no cut and may grow up to 1.5x. Two more lines then gate the
 rewrite: `JOINTS` fails if a joint went missing from a source sentence that
 survived, and `LISTS` fails if "it has three parts" lost one of its parts. The research behind this is in
 `references/simplify.md` Part E.
+
+![A passage with a list, an anticipation and a joint in an explaining paragraph, then a padding paragraph](docs/figures/explanationAnatomy.png)
+
+*What the explanation gates look for in a source paragraph, and what each kind
+of paragraph owes the length gate.*
+
+The sentence budget knows the difference too. Inside an explanatory paragraph, a
+long sentence is excused when its joints break it into at most three clauses of
+25 words or fewer, 45 words in all; the report lists it under `JOINED
+SENTENCES` and keeps the true length on the scorecard.
+
+![Three sentences of about 29 to 45 words: one joined by "so" is excused, one with no joint and one of seven stacked ifs are judged long](docs/figures/joinedVsStacked.png)
+
+*Long because joined is not long because stacked.*
 
 `--insight` adds a structure gate for a document being filed to the product
 backlog: the four template sections must be present, significance must be exactly

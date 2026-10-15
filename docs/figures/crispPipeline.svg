@@ -1,0 +1,152 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 700" width="900" height="700">
+<style>
+.box{fill:#FFFFFF;stroke:#12201E;stroke-width:2.5}
+.box-focus{fill:#FFFFFF;stroke:#12201E;stroke-width:5}
+.box-power{fill:#D5EDE8;stroke:#12201E;stroke-width:2.5}
+.box-signal{fill:#E7E2FB;stroke:#12201E;stroke-width:2.5}
+.box-meter{fill:#F6E8CF;stroke:#12201E;stroke-width:2.5}
+.box-fuse{fill:#F8DEDB;stroke:#12201E;stroke-width:2.5}
+.box-ext{fill:#B9C4C1;stroke:#33423F;stroke-width:2.5}
+.container{fill:#F2F4F3;stroke:#B9C4C1;stroke-width:2;stroke-dasharray:8 6}
+.person{fill:#FFFFFF;stroke:#12201E;stroke-width:2.5}
+.badge{fill:#12201E;stroke:none}
+.frame{fill:none;stroke:#33423F;stroke-width:2}
+.frame-tag{fill:#F2F4F3;stroke:#33423F;stroke-width:2}
+.frame-sep{fill:none;stroke:#B9C4C1;stroke-width:2;stroke-dasharray:8 6}
+.brace{fill:none;stroke:#33423F;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.loupe{fill:none;stroke:#12201E;stroke-width:3}
+.stock{fill:#FFFFFF;stroke:#12201E;stroke-width:2.5}
+.loop-badge{fill:#FFFFFF;stroke:#12201E;stroke-width:2.5}
+.sum{fill:#FFFFFF;stroke:#12201E;stroke-width:2.5}
+.f-power{fill:#D5EDE8;stroke:none}
+.f-signal{fill:#E7E2FB;stroke:none}
+.f-meter{fill:#F6E8CF;stroke:none}
+.f-plain{fill:#F2F4F3;stroke:none}
+.w-power{fill:none;stroke:#0E7A6B;stroke-width:4;stroke-dasharray:1 9;stroke-linecap:round}
+.w-signal{fill:none;stroke:#6246D6;stroke-width:3;stroke-dasharray:10 7}
+.w-meter{fill:none;stroke:#A86B12;stroke-width:3;stroke-dasharray:16 6}
+.w-fuse{fill:none;stroke:#C7332A;stroke-width:3}
+.w-plain{fill:none;stroke:#33423F;stroke-width:2.5}
+.w-struct{fill:none;stroke:#33423F;stroke-width:2}
+.w-leader{fill:none;stroke:#33423F;stroke-width:1.5}
+.grid{fill:none;stroke:#B9C4C1;stroke-width:1}
+.d-power{fill:none;stroke:#0E7A6B;stroke-width:3;stroke-dasharray:1 9;stroke-linecap:round;stroke-linejoin:round}
+.d-signal{fill:none;stroke:#6246D6;stroke-width:3;stroke-dasharray:10 7;stroke-linejoin:round}
+.d-meter{fill:none;stroke:#A86B12;stroke-width:3;stroke-dasharray:16 6;stroke-linejoin:round}
+.d-fuse{fill:none;stroke:#C7332A;stroke-width:3;stroke-linejoin:round}
+.d-plain{fill:none;stroke:#33423F;stroke-width:3;stroke-linejoin:round}
+.belief{stroke-opacity:0.5}
+.p-power{fill:#0E7A6B;stroke:none}
+.p-signal{fill:#6246D6;stroke:none}
+.p-meter{fill:#A86B12;stroke:none}
+.p-fuse{fill:#C7332A;stroke:none}
+.p-plain{fill:#33423F;stroke:none}
+.t-title{font-family:'Barlow Condensed','Avenir Next Condensed',sans-serif;font-weight:600;font-size:27px;fill:#12201E}
+.t-body{font-family:'Atkinson Hyperlegible','Avenir Next',sans-serif;font-size:22px;fill:#12201E}
+.t-note{font-family:'Atkinson Hyperlegible','Avenir Next',sans-serif;font-size:21px;fill:#33423F}
+.t-mono{font-family:'JetBrains Mono',Menlo,monospace;font-size:20px;fill:#12201E}
+.t-cont{font-family:'Barlow Condensed','Avenir Next Condensed',sans-serif;font-weight:600;font-size:22px;fill:#33423F}
+.t-badge{font-family:'Atkinson Hyperlegible','Avenir Next',sans-serif;font-weight:700;font-size:20px;fill:#FFFFFF}
+.t-eq{font-family:'Atkinson Hyperlegible','Avenir Next',sans-serif;font-size:48px;fill:#12201E}
+.t-var{font-family:'STIX Two Text';font-style:italic}
+.t-op{font-family:'STIX Two Text';font-style:normal}
+.t-sub{font-size:30px}
+.k-power{fill:#0E7A6B}
+.k-signal{fill:#6246D6}
+.k-meter{fill:#A86B12}
+.k-fuse{fill:#C7332A}
+.l-power{font-family:'Atkinson Hyperlegible','Avenir Next',sans-serif;font-weight:700;font-size:21px;fill:#0E7A6B}
+.l-signal{font-family:'Atkinson Hyperlegible','Avenir Next',sans-serif;font-weight:700;font-size:21px;fill:#6246D6}
+.l-meter{font-family:'Atkinson Hyperlegible','Avenir Next',sans-serif;font-weight:700;font-size:21px;fill:#A86B12}
+.l-fuse{font-family:'Atkinson Hyperlegible','Avenir Next',sans-serif;font-weight:700;font-size:21px;fill:#C7332A}
+.c{text-anchor:middle}
+.r{text-anchor:end}
+</style>
+<defs>
+<marker id="a-power" viewBox="0 0 10 10" refX="2.85" refY="5" markerWidth="13" markerHeight="13" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#0E7A6B"/></marker>
+<marker id="a-signal" viewBox="0 0 10 10" refX="2.85" refY="5" markerWidth="13" markerHeight="13" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#6246D6"/></marker>
+<marker id="a-meter" viewBox="0 0 10 10" refX="2.85" refY="5" markerWidth="13" markerHeight="13" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#A86B12"/></marker>
+<marker id="a-fuse" viewBox="0 0 10 10" refX="2.85" refY="5" markerWidth="13" markerHeight="13" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#C7332A"/></marker>
+<marker id="a-plain" viewBox="0 0 10 10" refX="2.85" refY="5" markerWidth="13" markerHeight="13" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#33423F"/></marker>
+<marker id="a-stop" viewBox="0 0 6 22" refX="3" refY="11" markerWidth="6" markerHeight="22" markerUnits="userSpaceOnUse" orient="auto"><path d="M0 0 H6 V22 H0 z" fill="#C7332A"/></marker>
+<marker id="a-signal-reply" viewBox="0 0 10 10" refX="2.85" refY="5" markerWidth="13" markerHeight="13" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M1 1 L9 5 L1 9 z" fill="#FFFFFF" stroke="#6246D6" stroke-width="1.5" stroke-linejoin="round"/></marker>
+<marker id="a-signal-async" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="13" markerHeight="13" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#6246D6" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="a-meter-reply" viewBox="0 0 10 10" refX="2.85" refY="5" markerWidth="13" markerHeight="13" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M1 1 L9 5 L1 9 z" fill="#FFFFFF" stroke="#A86B12" stroke-width="1.5" stroke-linejoin="round"/></marker>
+<marker id="a-meter-async" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="13" markerHeight="13" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#A86B12" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="a-fuse-reply" viewBox="0 0 10 10" refX="2.85" refY="5" markerWidth="13" markerHeight="13" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M1 1 L9 5 L1 9 z" fill="#FFFFFF" stroke="#C7332A" stroke-width="1.5" stroke-linejoin="round"/></marker>
+<marker id="a-fuse-async" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="13" markerHeight="13" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#C7332A" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="a-plain-reply" viewBox="0 0 10 10" refX="2.85" refY="5" markerWidth="13" markerHeight="13" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M1 1 L9 5 L1 9 z" fill="#FFFFFF" stroke="#33423F" stroke-width="1.5" stroke-linejoin="round"/></marker>
+<marker id="a-plain-async" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="13" markerHeight="13" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#33423F" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="a-delay" viewBox="0 0 14 24" refX="7" refY="12" markerWidth="14" markerHeight="24" markerUnits="userSpaceOnUse" orient="auto"><rect x="2" y="8" width="10" height="8" fill="#FFFFFF"/><path d="M3 1 V23 M11 1 V23" fill="none" stroke="#12201E" stroke-width="2.5" stroke-linecap="round"/></marker>
+<marker id="a-valve" viewBox="0 0 26 26" refX="13" refY="13" markerWidth="26" markerHeight="26" markerUnits="userSpaceOnUse" orient="auto"><path d="M1 1 L25 25 V1 L1 25 Z" fill="#FFFFFF" stroke="#12201E" stroke-width="2.5" stroke-linejoin="round"/></marker>
+</defs>
+<rect width="900" height="700" fill="#FFFFFF"/>
+
+<!-- containers: what is deterministic, what is judgement -->
+<rect x="30" y="80" width="320" height="440" rx="10" class="container"/>
+<text x="80" y="106" class="t-cont">crisp binary</text>
+<rect x="550" y="80" width="320" height="440" rx="10" class="container"/>
+<text x="566" y="106" class="t-cont">fresh agents</text>
+
+<!-- the draft comes in from outside: to the passes, and kept as the baseline for the gates -->
+<path d="M60 34 V183 Q60 195 72 195 H84" class="w-signal" marker-end="url(#a-signal)"/>
+<path d="M60 195 V413 Q60 425 72 425 H84" class="w-signal" marker-end="url(#a-signal)"/>
+<circle cx="60" cy="195" r="6" class="p-signal"/>
+<text x="80" y="54" class="l-signal">draft</text>
+<text x="80" y="318" class="l-signal">baseline</text>
+
+<!-- 1: the mechanical passes -->
+<rect x="100" y="140" width="240" height="110" rx="10" class="box"/>
+<text x="220" y="187" class="t-title c">Mechanical passes</text>
+<text x="220" y="222" class="t-body c">fix, flag, score</text>
+<circle cx="100" cy="140" r="15" class="badge"/><text x="100" y="147" class="t-badge c">1</text>
+
+<!-- 2: first rewrite -->
+<rect x="580" y="140" width="260" height="110" rx="10" class="box"/>
+<text x="710" y="187" class="t-title c">Rewrite, agent A</text>
+<text x="710" y="222" class="t-body c">cuts the padding</text>
+<circle cx="580" cy="140" r="15" class="badge"/><text x="580" y="147" class="t-badge c">2</text>
+
+<!-- 3: second rewrite, a new agent that never saw the first one's reasoning -->
+<rect x="580" y="370" width="260" height="110" rx="10" class="box"/>
+<text x="710" y="417" class="t-title c">Rewrite, agent B</text>
+<text x="710" y="452" class="t-body c">cuts again, cold</text>
+<circle cx="580" cy="370" r="15" class="badge"/><text x="580" y="377" class="t-badge c">3</text>
+
+<!-- 4: the gates, the same binary again, measured against the baseline -->
+<rect x="100" y="370" width="240" height="110" rx="10" class="box-focus"/>
+<text x="220" y="417" class="t-title c">Gates</text>
+<text x="220" y="452" class="t-body c">every check again</text>
+<circle cx="100" cy="370" r="15" class="badge"/><text x="100" y="377" class="t-badge c">4</text>
+
+<!-- 1 to 2 -->
+<path d="M346 200 H564" class="w-signal" marker-end="url(#a-signal)"/>
+<circle cx="340" cy="200" r="6" class="p-signal"/>
+<text x="460" y="182" class="l-signal c">text + report</text>
+
+<!-- 2 to 3: the text, never the reasoning -->
+<path d="M650 256 V354" class="w-signal" marker-end="url(#a-signal)"/>
+<circle cx="650" cy="250" r="6" class="p-signal"/>
+<text x="670" y="310" class="l-signal">no reasoning</text>
+
+<!-- 3 to 4 -->
+<path d="M574 400 H360" class="w-signal" marker-end="url(#a-signal)"/>
+<circle cx="580" cy="400" r="6" class="p-signal"/>
+<text x="460" y="382" class="l-signal c">rewrite</text>
+
+<!-- 4 back to 3 when a gate fails -->
+<path d="M346 450 H564" class="w-fuse" marker-end="url(#a-fuse)"/>
+<circle cx="340" cy="450" r="6" class="p-fuse"/>
+<text x="460" y="490" class="l-fuse c">fails: rewrite</text>
+
+<!-- out -->
+<path d="M220 486 V582" class="w-signal" marker-end="url(#a-signal)"/>
+<circle cx="220" cy="480" r="6" class="p-signal"/>
+<text x="240" y="556" class="l-signal">final text</text>
+
+<!-- legend -->
+<g transform="translate(30,650)">
+<path d="M0 0 H40" class="w-signal"/><text x="50" y="7" class="l-signal">text and reports</text>
+<path d="M300 0 H340" class="w-fuse"/><text x="350" y="7" class="l-fuse">a gate fails</text>
+</g>
+</svg>
