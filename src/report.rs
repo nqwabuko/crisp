@@ -8,6 +8,7 @@
 //! or a float.
 
 use super::facts::Survival;
+use super::insight::Failure;
 use super::rewrite::{self, Flagged, Rewrite};
 use super::rules::{Bound, Budget};
 use super::{
@@ -554,7 +555,10 @@ fn fact_lines(facts: Option<&Survival>) -> Vec<String> {
     )]
 }
 
-pub fn simplify_text(s: &Simplified, budget: &Budget) -> String {
+/// The simplify report. With `insight`, the insight lens's result goes just
+/// before the verdict, and a scored document's verdict names a failed insight;
+/// a short one's verdict is about length alone.
+pub fn simplify_text(s: &Simplified, budget: &Budget, insight: Option<&[Failure]>) -> String {
     let r = &s.rewrite;
     let mut l = vec!["== simplify report ==========================".to_string()];
 
@@ -597,6 +601,11 @@ pub fn simplify_text(s: &Simplified, budget: &Budget) -> String {
         l.extend(length_lines(s.compression));
         l.extend(explanation_lines(s));
         l.extend(fact_lines(s.facts.as_ref()));
+        l.extend(
+            insight
+                .map(super::insight::report_lines)
+                .unwrap_or_default(),
+        );
         let mut over: Vec<&str> = Vec::new();
         if s.short() {
             over.push("length");
@@ -665,11 +674,20 @@ pub fn simplify_text(s: &Simplified, budget: &Budget) -> String {
         }
     }
 
+    l.extend(
+        insight
+            .map(super::insight::report_lines)
+            .unwrap_or_default(),
+    );
+
     let mut over: Vec<&str> = m.over_budget(budget);
     if s.short() {
         over.push("length");
     }
     over.extend(s.lost());
+    if insight.is_some_and(|f| !f.is_empty()) {
+        over.push("insight structure");
+    }
     l.push(if over.is_empty() {
         "VERDICT: within budget".to_string()
     } else {

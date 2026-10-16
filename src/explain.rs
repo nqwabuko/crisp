@@ -32,7 +32,7 @@
 
 use super::text::{self, mask_code};
 use regex::Regex;
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeMap, HashMap, HashSet};
 use std::sync::LazyLock;
 
 /// What a connective links.
@@ -109,19 +109,44 @@ fn re(pattern: &str) -> Regex {
     Regex::new(pattern).expect("an explain pattern should compile")
 }
 
+/// The last `n` characters of `s`, or all of it.
+fn near_end(s: &str, n: usize) -> &str {
+    let at = s
+        .char_indices()
+        .rev()
+        .nth(n.saturating_sub(1))
+        .map_or(0, |(i, _)| i);
+    &s[at..]
+}
+
+/// The first `n` characters of `s`, or all of it.
+fn near_start(s: &str, n: usize) -> &str {
+    let at = s.char_indices().nth(n).map_or(s.len(), |(i, _)| i);
+    &s[..at]
+}
+
 /// Every joint in `text`, as (kind, byte offset), in document order. Code never counts.
 pub fn joints(text: &str) -> Vec<(Joint, usize)> {
     let prose = mask_code(text);
-    let mut taken: Vec<(usize, usize)> = Vec::new();
+    // Start -> end of every joint kept so far. They never overlap, so the only
+    // one that can overlap a new match is the last to start before it ends.
+    let mut taken: BTreeMap<usize, usize> = BTreeMap::new();
     let mut out = Vec::new();
     for (kind, pattern) in JOINT_RES.iter() {
         for m in pattern.find_iter(&prose) {
-            if taken.iter().any(|&(s, e)| m.start() < e && s < m.end()) {
+            if taken
+                .range(..m.end())
+                .next_back()
+                .is_some_and(|(_, &e)| m.start() < e)
+            {
                 continue;
             }
             let word = m.as_str().to_lowercase();
-            let before = prose[..m.start()].trim_end();
-            let after = &prose[m.end()..];
+            // Only the few words either side decide a joint, so only they are
+            // lower-cased: lower-casing the whole prefix at every joint made a
+            // long document quadratic.
+            let before = near_end(prose[..m.start()].trim_end(), 24);
+            let after = near_start(&prose[m.end()..], 48);
             let keep = match word.as_str() {
                 "so" => {
                     let opens =
@@ -159,7 +184,7 @@ pub fn joints(text: &str) -> Vec<(Joint, usize)> {
                 _ => true,
             };
             if keep {
-                taken.push((m.start(), m.end()));
+                taken.insert(m.start(), m.end());
                 out.push((*kind, m.start()));
             }
         }

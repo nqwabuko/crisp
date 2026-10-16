@@ -14,6 +14,7 @@
 
 use super::text;
 use regex::Regex;
+use std::collections::HashSet;
 use std::sync::LazyLock;
 
 fn re(pattern: &str) -> Regex {
@@ -21,7 +22,7 @@ fn re(pattern: &str) -> Regex {
 }
 
 /// What kind of fact.
-#[derive(Clone, Copy, PartialEq, Eq, Debug, serde::Serialize)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug, serde::Serialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Kind {
     Number,
@@ -43,17 +44,19 @@ pub struct Fact {
     key: String,
 }
 
-const MONTH: &str = "jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|june?|july?|aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?";
+/// "May" and "March" only capitalised: "2 may fail" and "3 march on" are a
+/// modal and a verb, not dates.
+const MONTH: &str = "jan(?:uary)?|feb(?:ruary)?|(?-i:Mar(?:ch)?)|apr(?:il)?|(?-i:May)|june?|july?|aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?";
 
 /// Dates before numbers, so the digits in a date are not also numbers.
 static DATE: LazyLock<Regex> = LazyLock::new(|| {
     re(&format!(
-        r"(?i)\b(?:\d{{4}}-\d{{2}}-\d{{2}}|\d{{1,2}}(?:st|nd|rd|th)?\s+(?:{MONTH})\b\.?(?:\s+\d{{4}})?|(?:{MONTH})\b\.?\s+\d{{1,2}}(?:st|nd|rd|th)?(?:,?\s+\d{{4}})?|(?:{MONTH})\b\.?\s+\d{{4}}|q[1-4]\s+\d{{4}}|h[12]\s+\d{{4}})\b"
+        r"(?i)\b(?:\d{{4}}-\d{{2}}-\d{{2}}|\d{{1,2}}/\d{{1,2}}/\d{{4}}|\d{{1,2}}(?:st|nd|rd|th)?\s+(?:{MONTH})\b\.?(?:\s+\d{{4}})?|(?:{MONTH})\b\.?\s+\d{{1,2}}(?:st|nd|rd|th)?(?:,?\s+\d{{4}})?|(?:{MONTH})\b\.?\s+\d{{4}}|q[1-4]\s+\d{{4}}|h[12]\s+\d{{4}})\b"
     ))
 });
-/// A figure with its separators: "18,000", "4.5", "1.6". Units and currency
+/// A figure with its separators: "18,000", "4.5", "1.6.2". Units and currency
 /// are not part of the match; the digits are the fact.
-static NUMBER: LazyLock<Regex> = LazyLock::new(|| re(r"\d[\d,]*(?:\.\d+)?"));
+static NUMBER: LazyLock<Regex> = LazyLock::new(|| re(r"\d[\d,]*(?:\.\d+)*"));
 /// A unit or currency next to a figure, shown with it in the report so a
 /// missing "22" reads as the "22 kW" it was. Display only: the digits are the
 /// fact, so "22kW" and "22 kW" agree.
@@ -72,9 +75,44 @@ static CODE: LazyLock<Regex> = LazyLock::new(|| re(r"`([^`\n]+)`"));
 static LIST_MARKER: LazyLock<Regex> = LazyLock::new(|| re(r"(?m)^[ \t]*\d+[.)][ \t]"));
 static ORDINAL: LazyLock<Regex> = LazyLock::new(|| re(r"(?i)(\d)(?:st|nd|rd|th)\b"));
 
-/// Lower case, curly quotes straight, whitespace collapsed, ordinals bare and
-/// months to three letters, so "14th October 2026" and "14 Oct 2026" agree.
+/// A full date as year-month-day, or a month as year-month, whatever order it
+/// was written in: "14 Oct 2026", "October 14, 2026", "2026-10-14" and
+/// "14/10/2026" (day first, the British order) are one date.
+fn canonical_date(s: &str) -> Option<String> {
+    const MONTHS: [&str; 12] = [
+        "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec",
+    ];
+    let parts: Vec<String> = ORDINAL
+        .replace_all(&s.to_lowercase(), "$1")
+        .split(|c: char| !c.is_alphanumeric())
+        .filter(|p| !p.is_empty())
+        .map(String::from)
+        .collect();
+    let month = parts.iter().find_map(|p| {
+        MONTHS
+            .iter()
+            .position(|m| p.starts_with(m) && p.chars().all(|c| c.is_ascii_alphabetic()))
+    });
+    let nums: Vec<u32> = parts.iter().filter_map(|p| p.parse().ok()).collect();
+    let (y, m, d) = match (month, nums.as_slice()) {
+        (Some(m), [d, y]) if *y > 31 => (*y, m as u32 + 1, Some(*d)),
+        (Some(m), [y]) if *y > 31 => (*y, m as u32 + 1, None),
+        (None, [y, m, d]) if *y > 31 => (*y, *m, Some(*d)),
+        (None, [d, m, y]) if *y > 31 => (*y, *m, Some(*d)),
+        _ => return None,
+    };
+    Some(match d {
+        Some(d) => format!("{y}-{m:02}-{d:02}"),
+        None => format!("{y}-{m:02}"),
+    })
+}
+
+/// A date's key: its canonical form when it has one, otherwise the text lower
+/// case with ordinals bare and months to three letters ("Q3 2025").
 fn date_key(s: &str) -> String {
+    if let Some(key) = canonical_date(s) {
+        return key;
+    }
     let s = ORDINAL
         .replace_all(&s.to_lowercase(), "$1")
         .replace([',', '.'], " ");
@@ -174,8 +212,9 @@ pub fn facts(text: &str) -> Vec<Fact> {
 
     found.sort_by_key(|f| f.0);
     let mut out: Vec<Fact> = Vec::new();
+    let mut seen: HashSet<(Kind, String)> = HashSet::new();
     for (at, kind, shown, key) in found {
-        if out.iter().any(|f| f.kind == kind && f.key == key) {
+        if !seen.insert((kind, key.clone())) {
             continue;
         }
         out.push(Fact {
@@ -198,7 +237,10 @@ pub struct Survival {
 impl Survival {
     pub fn between(source: &str, rewrite: &str) -> Self {
         let wanted = facts(source);
-        let have = facts(rewrite);
+        let have: HashSet<(Kind, String)> = facts(rewrite)
+            .into_iter()
+            .map(|h| (h.kind, h.key))
+            .collect();
         let words = quote_key(rewrite);
         let rewrite = straight(rewrite);
         let missing = wanted
@@ -209,8 +251,9 @@ impl Survival {
                     Kind::Quote => words.contains(&f.key),
                     Kind::Code => rewrite.contains(&f.key),
                     Kind::Number | Kind::Date => {
-                        have.iter().any(|h| h.kind == f.kind && h.key == f.key)
-                            || (f.kind == Kind::Number && spelt_out(&f.key, &rewrite))
+                        have.contains(&(f.kind, f.key.clone()))
+                            || (f.kind == Kind::Number
+                                && (spelt_out(&f.key, &rewrite) || in_rewrite(&f.key, &rewrite)))
                     }
                 };
                 !kept
@@ -226,6 +269,13 @@ impl Survival {
     pub fn kept(&self) -> usize {
         self.source - self.missing.len()
     }
+}
+
+/// Do the digits of `key` stand as a figure anywhere in `text`, a date
+/// included? "We launch in 2026" kept as "in October 2026" keeps its 2026.
+fn in_rewrite(key: &str, text: &str) -> bool {
+    let digits = text.replace(',', "");
+    re(&format!(r"(?:^|[^\d.]){}(?:$|[^\d])", regex::escape(key))).is_match(&digits)
 }
 
 /// Is the small number `key` written out as a word in `text`?
@@ -319,6 +369,44 @@ mod tests {
         let s = Survival::between(source, "She said \"ship it now,\nnot later\" today.");
         let missing: Vec<_> = s.missing.iter().map(|f| f.text.as_str()).collect();
         assert_eq!(missing, ["run `make` now", "make"]);
+    }
+
+    #[test]
+    fn reformatted_dates_and_folded_figures_are_kept() {
+        for (source, rewrite) in [
+            ("Due October 14, 2026.", "Due 14 October 2026."),
+            ("Due 14 October 2026.", "Due 2026-10-14."),
+            ("Due 14/10/2026.", "Due 14 October 2026."),
+            ("We launch in 2026.", "We launch in October 2026."),
+        ] {
+            let s = Survival::between(source, rewrite);
+            assert!(
+                s.missing.is_empty(),
+                "{source} -> {rewrite}: {:?}",
+                s.missing
+            );
+        }
+    }
+
+    #[test]
+    fn modals_versions_and_inch_marks_are_read_right() {
+        assert_eq!(
+            shown("Option 2 may fail, and 3 march on, on 2 May 2026."),
+            [
+                (Kind::Number, "2".into()),
+                (Kind::Number, "3".into()),
+                (Kind::Date, "2 May 2026".into()),
+            ]
+        );
+        assert_eq!(
+            shown("Use version 1.6.2 now."),
+            [(Kind::Number, "1.6.2".into())]
+        );
+        assert!(
+            shown("The 5\" screen beat the 7\" one.")
+                .iter()
+                .all(|(k, _)| *k == Kind::Number)
+        );
     }
 
     #[test]

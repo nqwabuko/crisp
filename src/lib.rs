@@ -340,7 +340,7 @@ pub const SAME_OPENING_HINT: &str =
 ///
 /// Prose paragraphs only: list items, headings, quotes and tables are block
 /// units, and a list of steps that all start "Run" is a list doing its job.
-/// The word is compared case-insensitively, and code never counts.
+/// The word is compared case-insensitively, articles and code never count.
 pub fn same_openings(text: &str) -> Vec<(usize, usize)> {
     let masked = text::mask_code(text);
     let segmented = text::blank_emphasis(&masked);
@@ -353,9 +353,13 @@ pub fn same_openings(text: &str) -> Vec<(usize, usize)> {
             text::sentence_ranges(&segmented, a, b)
                 .into_iter()
                 .map(|(s, e)| {
+                    // An article never counts: "The boiler... The water... The
+                    // radiator..." is a mechanism told step by step, which
+                    // explanation keeps on purpose.
                     let first = WORD
                         .find(&segmented[s..e])
-                        .map(|m| m.as_str().to_lowercase());
+                        .map(|m| m.as_str().to_lowercase())
+                        .filter(|w| !matches!(w.as_str(), "the" | "a" | "an"));
                     (s, e, first)
                 })
                 .collect();
@@ -989,6 +993,13 @@ The value was cached. Each and every parameter was validated in a timely manner.
                     - Run the sync.\n- Run the tests.\n- Run the build.\n";
         let runs = same_openings(text);
         assert_eq!(runs.len(), 1, "two in a row and a list of steps are fine");
+        assert!(
+            same_openings(
+                "The boiler heats water. The water heats the radiator. The radiator heats the air."
+            )
+            .is_empty(),
+            "a mechanism told step by step is not a monotone"
+        );
         assert_eq!(
             &text[runs[0].0..runs[0].1],
             "We built the meter. We shipped it. We tested it."

@@ -420,8 +420,8 @@ pub static DETELL_FLAG: LazyLock<Vec<FlagRule>> = LazyLock::new(|| {
                 r"(?:['\x{2019}]s not|['\x{2019}]re not| is not| are not| was not| were not| isn['\x{2019}]?t| aren['\x{2019}]?t| wasn['\x{2019}]?t| weren['\x{2019}]?t)\b",
                 r"[^.!?\n]{1,80}[.!?]\s+(?:it|this|that|they|these|those)(?:['\x{2019}]s|['\x{2019}]re| is| are| was| were)\b",
                 r"|\b(?-i:It|This|That|They)(?: isn['\x{2019}]?t| aren['\x{2019}]?t| wasn['\x{2019}]?t| is not| was not)\b",
-                r"[^.!?\n]{1,60},\s*(?:it|this|that|they)(?:['\x{2019}]s|['\x{2019}]re| is| are| was)\b",
-                r"|\b(?-i:It)['\x{2019}]?s not (?:a|an|the)\b[^.!?\n]{1,60},\s*it['\x{2019}]?s\b",
+                r"[^.!?\n]{1,60}\s*(?:,|[\x{2014}\x{2013}]|--)\s*(?:it|this|that|they)(?:['\x{2019}]s|['\x{2019}]re| is| are| was)\b",
+                r"|\b(?-i:It)['\x{2019}]?s not (?:a|an|the)\b[^.!?\n]{1,60}?\s*(?:,|[\x{2014}\x{2013}]|--)\s*it['\x{2019}]?s\b",
                 r"|\bless about\b[^.!?\n]{1,60}\bmore about\b",
                 r"|\b(?:does not|doesn['\x{2019}]?t) mean\b[^.!?\n]{1,80}[.!?]\s+it means\b",
             )),
@@ -499,7 +499,7 @@ pub static DETELL_FLAG: LazyLock<Vec<FlagRule>> = LazyLock::new(|| {
         rule(
             "phrase:ing-tail",
             re(concat!(
-                r"(?i),\s+(?:highlighting|underscoring|reflecting|ensuring|emphasi[sz]ing|symboli[sz]ing",
+                r"(?i)(?:,\s+|\s*[\x{2014}\x{2013}]\s*)(?:highlighting|underscoring|reflecting|ensuring|emphasi[sz]ing|symboli[sz]ing",
                 r"|signall?ing|demonstrating|illustrating|cementing|solidifying|reinforcing",
                 r"|contributing to|paving the way|setting the stage",
                 r"|marking (?:a|an|the) (?:\w+ )?(?:(?:end|start|beginning|close|completion|culmination",
@@ -542,13 +542,15 @@ pub static DETELL_FLAG: LazyLock<Vec<FlagRule>> = LazyLock::new(|| {
             ),
         ),
         // Headings: crisp writes sentence case, the British convention, and a
-        // heading never needs an emoji. Title Case is three or more
-        // capitalised words, short joining words allowed between them.
+        // heading never needs an emoji. Title Case is three or more title-cased
+        // words (a capital, then lower case). Short joining words and acronyms
+        // ("OCPP", "API") may sit anywhere but never count, so a heading made of
+        // acronyms and one product name ("## ACME OCPP API") is not one.
         anchored(
             "heading:title-case",
             re(concat!(
-                r"(?m)^#{1,6}[ \t]+[A-Z][\w'\x{2019}-]*",
-                r"(?:[ \t]+(?:(?:a|an|and|as|at|but|by|for|in|of|on|or|the|to|vs|with)[ \t]+)*[A-Z][\w'\x{2019}-]*){2,}",
+                r"(?m)^#{1,6}(?:[ \t]+(?:a|an|and|as|at|but|by|for|in|of|on|or|the|to|vs|with|[A-Z][A-Z0-9&-]+))*",
+                r"(?:[ \t]+[A-Z][a-z][\w'\x{2019}-]*(?:[ \t]+(?:a|an|and|as|at|but|by|for|in|of|on|or|the|to|vs|with|[A-Z][A-Z0-9&-]+))*){3,}",
                 r"[ \t]*$",
             )),
         ),
@@ -1384,6 +1386,19 @@ mod tests {
         ] {
             assert_eq!(flagged(text), ["phrase:not-x-its-y"], "{text}");
         }
+        // An em dash, raw or spaced, is the same reframe: --locate sees the
+        // draft before detell turns the dash into a comma.
+        for text in [
+            "It isn\u{2019}t a tool \u{2014} it\u{2019}s a platform.",
+            "It isn't a tool\u{2014}it's a platform.",
+            "It's not a bug -- it's a feature.",
+        ] {
+            assert_eq!(flagged(text), ["phrase:not-x-its-y"], "{text}");
+        }
+        assert_eq!(
+            flagged("Revenue rose \u{2014} highlighting the need for capacity."),
+            ["phrase:ing-tail"]
+        );
         // The older scaffolds keep their own rule; nothing fires twice.
         assert_eq!(
             flagged("It's not just a tool, it's a platform."),
@@ -1492,6 +1507,7 @@ mod tests {
             ),
             ("# Plan For The Rollout", "heading:title-case"),
             ("## Risks and Mitigations Overview", "heading:title-case"),
+            ("## The OCPP Message Flow Guide", "heading:title-case"),
             ("## Rollout plan \u{1F680}", "heading:emoji"),
             ("Additionally, the meter resets.", "word:vocabulary"),
         ] {
@@ -1504,6 +1520,9 @@ mod tests {
             "Rotate the API key and enhance the logs.",
             "# Plan for the rollout",
             "## OCPP message flow",
+            "## ACME OCPP API",
+            "### ACME FleetHub OCPP",
+            "## OCPP 2.0 Message Flow",
             "Want me to set up a call?",
         ] {
             assert!(flagged(text).is_empty(), "{text}: {:?}", flagged(text));

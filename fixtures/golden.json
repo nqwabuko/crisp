@@ -3,9 +3,7 @@
     "detell --json < fixtures/cases/carriage-returns.md": {
       "exit": 0,
       "stderr": {
-        "fixes": {
-          "crlf": 7
-        },
+        "fixes": {},
         "flags": [
           {
             "count": 1,
@@ -22,7 +20,7 @@
             ]
           }
         ],
-        "total_fixes": 7,
+        "total_fixes": 0,
         "total_flags": 2
       },
       "stdout": "Honestly it is fine but it's not just a fix,\nit's a paradigm shift that we need.\n\nThe values are not received on a regular\nbasis, which happened during the\ncourse of the last quarter and was raised\nby multiple customers.\n"
@@ -243,7 +241,7 @@
             "kind": "tell",
             "line": 1,
             "rule": "phrase:not-just",
-            "text": "it's not just a fix,\r\nit's"
+            "text": "it's not just a fix,\nit's"
           },
           {
             "col": 34,
@@ -502,7 +500,7 @@
     },
     "detell --report < fixtures/cases/carriage-returns.md": {
       "exit": 0,
-      "stderr": "── detell report ─────────────────────────────\nFIXED (auto, 7):\n    7  crlf\nFLAGGED (needs a human/voice pass, 2):\n    1  phrase:not-just\n         · Honestly it is fine but it's not just a fix, it's a paradigm shift that w…\n    1  hedge:filler\n         · …it is fine but it's not just a fix, it's a paradigm…\n──────────────────────────────────────────────\n",
+      "stderr": "── detell report ─────────────────────────────\nFIXED: nothing (already clean typography)\nFLAGGED (needs a human/voice pass, 2):\n    1  phrase:not-just\n         · Honestly it is fine but it's not just a fix, it's a paradigm shift that w…\n    1  hedge:filler\n         · …it is fine but it's not just a fix, it's a paradigm…\n──────────────────────────────────────────────\n",
       "stdout": "Honestly it is fine but it's not just a fix,\nit's a paradigm shift that we need.\n\nThe values are not received on a regular\nbasis, which happened during the\ncourse of the last quarter and was raised\nby multiple customers.\n"
     },
     "detell --report < fixtures/cases/curly-apostrophe.md": {
@@ -2056,16 +2054,7 @@
           "source": 0
         },
         "fixes": {},
-        "flags": [
-          {
-            "count": 1,
-            "hint": "sentences in a row open with the same word: vary them, or merge them",
-            "rule": "complexity:same-opening",
-            "samples": [
-              "...er than the setting. Delay. The boiler heats water. The water heats the radiator. The radiator heats the air. The sensor learns late.  It works in two steps. The..."
-            ]
-          }
-        ],
+        "flags": [],
         "insight": null,
         "joined_sentences": [],
         "long_sentences": [],
@@ -2090,7 +2079,7 @@
         ],
         "scored": true,
         "total_fixes": 0,
-        "total_flags": 1
+        "total_flags": 0
       },
       "stdout": "# Why the radiator overshoots\n\nA thermostat loop has three parts.\n\nThe room ends up warmer than the setting. Delay. The boiler heats water. The\nwater heats the radiator. The radiator heats the air. The sensor learns late.\n\nIt works in two steps. The boiler stays on until the room is warm. Stored heat\nkeeps arriving. The room overshoots.\n"
     },
@@ -2175,7 +2164,7 @@
             "hint": "passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")",
             "rule": "passive",
             "samples": [
-              "...during the last quarter and was raised\rby multiple customers."
+              "...during the last quarter and was raised by multiple customers."
             ]
           },
           {
@@ -2183,7 +2172,7 @@
             "hint": "give the number, or say \"several\"/\"most\"",
             "rule": "vague-quantity",
             "samples": [
-              "...t quarter and was raised\rby multiple customers."
+              "...t quarter and was raised by multiple customers."
             ]
           },
           {
@@ -2191,7 +2180,7 @@
             "hint": "filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")",
             "rule": "padding",
             "samples": [
-              "...tly it is fine but it's not just a fix,\r it's a paradigm shi..."
+              "...tly it is fine but it's not just a fix, it's a paradigm shif..."
             ]
           }
         ],
@@ -2201,10 +2190,10 @@
         "metrics": {
           "flesch_kincaid_grade": 8.4,
           "flesch_reading_ease": 65.8,
-          "max_paragraph_words": 35,
+          "max_paragraph_words": 18,
           "max_sentence_words": 18,
           "mean_sentence_words": 17.5,
-          "paragraphs": 1,
+          "paragraphs": 2,
           "pct_long_sentences": 0.0,
           "pct_long_words": 14.3,
           "pct_ly_adverbs": 5.7,
@@ -2221,7 +2210,7 @@
         "total_fixes": 2,
         "total_flags": 3
       },
-      "stdout": "Honestly it is fine but it's not just a fix,\r\nit's a paradigm shift that we need.\r\r\nThe values are not received regularly, which happened during the last quarter and was raised\rby multiple customers.\r\n"
+      "stdout": "Honestly it is fine but it's not just a fix,\nit's a paradigm shift that we need.\n\nThe values are not received regularly, which happened during the last quarter and was raised\nby multiple customers.\n"
     },
     "simplify --json < fixtures/cases/rewrite-edges.txt": {
       "exit": 0,
@@ -2416,41 +2405,41 @@
           },
           {
             "col": 29,
-            "end_col": 47,
-            "end_line": 3,
+            "end_col": 6,
+            "end_line": 5,
             "fix": "regularly",
             "kind": "clutter",
-            "line": 3,
+            "line": 4,
             "rule": "clutter:regularly",
-            "text": "on a regular\rbasis"
+            "text": "on a regular\nbasis"
           },
           {
-            "col": 64,
+            "col": 23,
             "end_col": 10,
-            "end_line": 4,
+            "end_line": 6,
             "fix": "during",
             "kind": "clutter",
-            "line": 3,
+            "line": 5,
             "rule": "clutter:during",
-            "text": "during the\r\ncourse of"
+            "text": "during the\ncourse of"
           },
           {
             "col": 32,
             "end_col": 42,
-            "end_line": 4,
+            "end_line": 6,
             "hint": "passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")",
             "kind": "complexity",
-            "line": 4,
+            "line": 6,
             "rule": "passive",
             "text": "was raised"
           },
           {
-            "col": 46,
-            "end_col": 54,
-            "end_line": 4,
+            "col": 4,
+            "end_col": 12,
+            "end_line": 7,
             "hint": "give the number, or say \"several\"/\"most\"",
             "kind": "complexity",
-            "line": 4,
+            "line": 7,
             "rule": "vague-quantity",
             "text": "multiple"
           }
@@ -2458,10 +2447,10 @@
         "metrics": {
           "flesch_kincaid_grade": 8.8,
           "flesch_reading_ease": 68.4,
-          "max_paragraph_words": 41,
+          "max_paragraph_words": 24,
           "max_sentence_words": 24,
           "mean_sentence_words": 20.5,
-          "paragraphs": 1,
+          "paragraphs": 2,
           "pct_long_sentences": 0.0,
           "pct_long_words": 12.2,
           "pct_ly_adverbs": 2.4,
@@ -2478,10 +2467,17 @@
           "paragraphs": [
             {
               "col": 1,
-              "end_col": 65,
-              "end_line": 4,
+              "end_col": 36,
+              "end_line": 2,
               "line": 1,
-              "words": 41
+              "words": 17
+            },
+            {
+              "col": 1,
+              "end_col": 23,
+              "end_line": 7,
+              "line": 4,
+              "words": 24
             }
           ],
           "sentences": [
@@ -2494,9 +2490,9 @@
             },
             {
               "col": 1,
-              "end_col": 65,
-              "end_line": 4,
-              "line": 3,
+              "end_col": 23,
+              "end_line": 7,
+              "line": 4,
               "words": 24
             }
           ]
@@ -3227,6 +3223,61 @@
         "scored": true
       }
     },
+    "simplify --report --check --baseline fixtures/cases/explain/g-src.md fixtures/cases/explain/g1.md": {
+      "exit": 1,
+      "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED (needs the rewrite pass, 2):\n    1  passive  -> passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")\n         . ...coil and a valve. The coil is called the evaporator, and it pull...\n    1  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . ...d folder. The folder is now quite large. We plan to tidy it n...\nSCORECARD  (101 words, 11 sentences, 2 paragraphs):\n  [PASS]  mean_sentence_words        9.2   budget <= 18.0\n  [PASS]  max_sentence_words          13   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       93.7   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       2.5   budget <= 12.0\n  [PASS]  pct_passive_sentences      9.1   budget <= 10.0\n  [PASS]  pct_long_words             2.0   budget <= 20.0\n  [PASS]  max_paragraph_words         64   budget <= 90\n  [PASS]  pct_ly_adverbs             0.0   budget <= 4.0\nLENGTH  [LONG]  37 -> 101 words, cut -173.0%\n        padding 0 -> 53 words, cut 0.0%   target >= 40.0%\n        explanation 37 -> 48 words, at most 55 (1.5x)\nLISTS   [PASS]  1 unpacked list(s), every part kept\nPASSIVE SENTENCES (name the actor):\n       The coil is called the evaporator, and it pulls heat from outside air.\nVERDICT: OVER BUDGET on length\n=============================================\n",
+      "stdout": "A heat pump has three parts: a compressor, a coil and a valve. The coil is called the evaporator, and it pulls heat from outside air. In other words, the pump moves heat rather than making it.\n\nOur team has worked on heat pumps for a long time. We have talked to many people about them. They all had views on the topic. The meetings were long and full of ideas. We wrote notes after each one. The notes went into a shared folder. The folder is now quite large. We plan to tidy it next quarter with the whole team.\n"
+    },
+    "simplify --report --check --baseline fixtures/cases/explain/k-src.md fixtures/cases/explain/k1.md": {
+      "exit": 0,
+      "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD: skipped, only 20 words (need 30+ to score)\nLENGTH: 20 -> 20 words (source under 30 words, no cut required)\nJOINTS  [PASS]  3 owed (explanation, surviving sentences), 3 in the rewrite (because/so/but/if...)\n=============================================\n",
+      "stdout": "The cache misses because the key changed. The worker retries, so the queue grows. If the queue fills, writes block.\n\n```python\nkey = make_key(user)\nvalue = cache.get(key)\nqueue.put(value)\nworker.retry(queue)\nlog.info(queue)\n```\n"
+    },
+    "simplify --report --check --baseline fixtures/cases/explain/k2-src.md fixtures/cases/explain/k2-src.md": {
+      "exit": 1,
+      "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED (needs the rewrite pass, 1):\n    1  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . ...d folder. The folder is now quite large and needs a tidy.\nSCORECARD  (56 words, 7 sentences, 2 paragraphs):\n  [PASS]  mean_sentence_words        8.0   budget <= 18.0\n  [PASS]  max_sentence_words          10   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       97.5   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       1.6   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words             0.0   budget <= 20.0\n  [PASS]  max_paragraph_words         33   budget <= 90\n  [PASS]  pct_ly_adverbs             0.0   budget <= 4.0\nLENGTH  [SHORT]  56 -> 56 words, cut 0.0%   target >= 40.0%\nVERDICT: OVER BUDGET on length\n=============================================\n",
+      "stdout": "Our team has worked on this for a long time. We have talked to many people about it. They all had views on the queue. The meetings were long and full of ideas.\n\n```\nif ready then go else wait\nwhile busy do sleep\nunless done retry\nif a then b\n```\n\nWe wrote notes after each one. The notes went into a shared folder. The folder is now quite large and needs a tidy.\n"
+    },
+    "simplify --report --check --baseline fixtures/cases/explain/l-src.md fixtures/cases/explain/l1.md": {
+      "exit": 0,
+      "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD: skipped, only 22 words (need 30+ to score)\nLENGTH: 24 -> 22 words (source under 30 words, no cut required)\nLISTS   [PASS]  1 unpacked list(s), every part kept\n=============================================\n",
+      "stdout": "The gate is a key, a lock and a hinge. Each part wears at its own rate, and the hinge goes first.\n"
+    },
+    "simplify --report --check --baseline fixtures/cases/explain/l-src.md fixtures/cases/explain/l5b.md": {
+      "exit": 0,
+      "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD: skipped, only 24 words (need 30+ to score)\nLENGTH: 24 -> 24 words (source under 30 words, no cut required)\nLISTS   [PASS]  1 unpacked list(s), every part kept\n=============================================\n",
+      "stdout": "The gate has three parts:\na key, a lock and a hinge. Each part wears at its own rate, and the hinge goes first.\n"
+    },
+    "simplify --report --check --baseline fixtures/cases/explain/l-src.md fixtures/cases/explain/l8.md": {
+      "exit": 0,
+      "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD: skipped, only 27 words (need 30+ to score)\nLENGTH: 24 -> 27 words (source under 30 words, no cut required)\nLISTS   [PASS]  1 unpacked list(s), every part kept\n=============================================\n",
+      "stdout": "The gate has three parts. The key turns, the lock holds and the hinge swings. Each part wears at its own rate, and the hinge goes first.\n"
+    },
+    "simplify --report --check --baseline fixtures/cases/explain/n-src.md fixtures/cases/explain/n1.md": {
+      "exit": 1,
+      "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD: skipped, only 15 words (need 30+ to score)\nLENGTH: 19 -> 15 words (source under 30 words, no cut required)\nLISTS   [LOST]  \"takes 3 steps\" lost: drain, flush, refill\nLISTS   [LOST]  promised, not unpacked: \"takes 3 steps\"\nFACTS   [KEPT]  1 of 1 numbers, dates, quotes and code spans\nVERDICT: OVER BUDGET on lists\n=============================================\n",
+      "stdout": "The fix takes 3 steps. Each step needs the valve shut, so plan for an hour.\n"
+    },
+    "simplify --report --check --baseline fixtures/cases/explain/s-src.md fixtures/cases/explain/s1.md": {
+      "exit": 1,
+      "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD: skipped, only 22 words (need 30+ to score)\nLENGTH  [SHORT]  30 -> 22 words, cut 26.7%\n        padding 10 -> 9 words, cut 10.0%   target >= 40.0%\n        explanation 20 -> 13 words, at most 30 (1.5x)\nLISTS   [LOST]  \"has three parts\" lost: key\nVERDICT: OVER BUDGET on length, lists\n=============================================\n",
+      "stdout": "The gate has three parts. The hinge wears first, because it moves most.\n\nThe lock fails in two ways: this and that.\n"
+    },
+    "simplify --report --check --baseline fixtures/cases/explain/src5.md fixtures/cases/explain/rw5.md": {
+      "exit": 1,
+      "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD  (87 words, 9 sentences, 2 paragraphs):\n  [PASS]  mean_sentence_words        9.7   budget <= 18.0\n  [PASS]  max_sentence_words          20   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       91.0   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       3.0   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words             0.0   budget <= 20.0\n  [PASS]  max_paragraph_words         60   budget <= 90\n  [PASS]  pct_ly_adverbs             0.0   budget <= 4.0\nLENGTH  [SHORT]  90 -> 87 words, cut 3.3%\n        padding 63 -> 60 words, cut 4.8%   target >= 40.0%\n        explanation 27 -> 27 words, at most 40 (1.5x)\nJOINTS  [PASS]  4 owed (explanation, surviving sentences), 11 in the rewrite (because/so/but/if...)\nVERDICT: OVER BUDGET on length\n=============================================\n",
+      "stdout": "The queue grows because nothing drains it. If the worker stalls, the backlog\ndoubles. So the alarm fires late. Draining needs the lock, which means writers\nwait.\n\nOur team has worked on this for a long time, because it matters. Since we\ntalked to many people, they all had views. If a meeting ran long, it was full\nof ideas. We wrote notes, so the folder grew. Because the folder is now large,\nwe plan to tidy it next quarter, but only if the whole team helps.\n"
+    },
+    "simplify --report --check --baseline fixtures/cases/explain/src7.md fixtures/cases/explain/rw7.md": {
+      "exit": 1,
+      "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED (needs the rewrite pass, 1):\n    1  passive  -> passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")\n         . ...few minutes while the house is occupied. Nobody notices it. The bil...\nSCORECARD  (39 words, 5 sentences, 1 paragraphs):\n  [PASS]  mean_sentence_words        7.8   budget <= 18.0\n  [PASS]  max_sentence_words          13   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       83.9   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       3.5   budget <= 12.0\n  [OVER]  pct_passive_sentences     20.0   budget <= 10.0\n  [PASS]  pct_long_words             7.7   budget <= 20.0\n  [PASS]  max_paragraph_words         39   budget <= 90\n  [PASS]  pct_ly_adverbs             0.0   budget <= 4.0\nLENGTH  [PASS]  40 -> 39 words, cut 2.5%\n        padding 0 -> 0 words, cut 0.0%   target >= 40.0%\n        explanation 40 -> 39 words, at most 60 (1.5x)\nJOINTS  [PASS]  5 owed (explanation, surviving sentences), 5 in the rewrite (because/so/but/if...)\nPASSIVE SENTENCES (name the actor):\n       That means the cycle repeats every few minutes while the house is occ...\nVERDICT: OVER BUDGET on pct_passive_sentences\n=============================================\n",
+      "stdout": "The pump stops because the valve shuts, so the loop cools. If the loop cools, the boiler fires again. That means the cycle repeats every few minutes while the house is occupied. Nobody notices it. The bills show it.\n"
+    },
+    "simplify --report --check --baseline fixtures/cases/explain/src8.md fixtures/cases/explain/rw8.md": {
+      "exit": 1,
+      "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD: skipped, only 22 words (need 30+ to score)\nLENGTH  [PASS]  74 -> 22 words, cut 70.3%\n        padding 52 -> 0 words, cut 100.0%   target >= 40.0%\n        explanation 22 -> 22 words, at most 33 (1.5x)\nJOINTS  [LOST]  3 owed (explanation, surviving sentences), 1 in the rewrite (because/so/but/if...)\nVERDICT: OVER BUDGET on joints\n=============================================\n",
+      "stdout": "The queue grows because nothing drains it. The worker stalls and the backlog doubles. The alarm fires late and nobody sees it.\n"
+    },
     "simplify --report --check --baseline fixtures/cases/explanatory-recap.md fixtures/cases/explanatory-recap.md": {
       "exit": 1,
       "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED (needs the rewrite pass, 1):\n    1  passive  -> passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")\n         . ...st of heat minutes after it was paid for.  It works in two steps...\nSCORECARD  (177 words, 13 sentences, 5 paragraphs):\n  [PASS]  mean_sentence_words       13.6   budget <= 18.0\n  [PASS]  max_sentence_words          33   budget <= 30   (22 without joined sentences)\n  [PASS]  pct_long_sentences        15.4   budget <= 15.0   (0.0 without joined sentences)\n  [PASS]  flesch_reading_ease       76.9   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       5.9   budget <= 12.0\n  [PASS]  pct_passive_sentences      7.7   budget <= 10.0\n  [PASS]  pct_long_words             7.9   budget <= 20.0\n  [PASS]  max_paragraph_words         49   budget <= 90\n  [PASS]  pct_ly_adverbs             0.0   budget <= 4.0\nLENGTH  [SHORT]  177 -> 177 words, cut 0.0%\n        padding 46 -> 46 words, cut 0.0%   target >= 40.0%\n        explanation 131 -> 131 words, at most 196 (1.5x)\nJOINTS  [PASS]  3 owed (explanation, surviving sentences), 3 in the rewrite (because/so/but/if...)\nLISTS   [PASS]  2 unpacked list(s), every part kept\nJOINED SENTENCES (explanation, every clause within 25 words: excused):\n   33w  The boiler heats water, the water heats the radiator, and only then d...\n   26w  Second, the heat already in the water and the radiator keeps arriving...\nPASSIVE SENTENCES (name the actor):\n       The boiler heats water, the water heats the radiator, and only then d...\nVERDICT: OVER BUDGET on length\n=============================================\n",
@@ -3236,6 +3287,11 @@
       "exit": 1,
       "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD: skipped, only 22 words (need 30+ to score)\nLENGTH  [SHORT]  34 -> 22 words, cut 35.3%   target >= 40.0%\nFACTS   [CHECK]  5 of 8 kept; missing: \"22 kW\" (line 1), \"Q4 2026\" (line 2), \"£0.45\" (line 3) (report only: restore it, or confirm the cut)\nVERDICT: OVER BUDGET on length\n=============================================\n",
       "stdout": "The pilot ran for six weeks from 14 October 2026 and served 18000 sessions with\nno faults. The depot stayed busy. Run `crisp detell` before every rewrite.\n"
+    },
+    "simplify --report --check --baseline fixtures/cases/joined/src.md fixtures/cases/joined/status.md": {
+      "exit": 1,
+      "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD  (94 words, 9 sentences, 5 paragraphs):\n  [PASS]  mean_sentence_words       10.4   budget <= 18.0\n  [OVER]  max_sentence_words          34   budget <= 30\n  [OVER]  pct_long_sentences        22.2   budget <= 15.0\n  [PASS]  flesch_reading_ease       87.3   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       3.7   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words             4.3   budget <= 20.0\n  [PASS]  max_paragraph_words         34   budget <= 90\n  [PASS]  pct_ly_adverbs             0.0   budget <= 4.0\nLENGTH  [PASS]  165 -> 94 words, cut 43.0%   target >= 40.0%\nLONGEST SENTENCES (over 25 words, cut or split):\n   34w  Our team met with the vendor on Tuesday and walked through the full m...\n   32w  The client signed off the budget for the second phase after the steer...\nVERDICT: OVER BUDGET on max_sentence_words, pct_long_sentences\n=============================================\n",
+      "stdout": "Our team met with the vendor on Tuesday and walked through the full migration plan for the quarter, so the vendor now owns the cutover runbook and the weekend support rota for the launch.\n\nThe plan is on track.\n\nThe client signed off the budget for the second phase after the steering committee reviewed it, because the first phase landed on time and the dashboards showed the adoption numbers they wanted.\n\nRisks are low. Costs are flat. Staff are in place. Testing finished. We go live soon.\n\nWe will send the plan on Friday.\n"
     },
     "simplify --report --check --baseline fixtures/cases/quotes-inline-code.md fixtures/cases/quotes-facts.md": {
       "exit": 0,
@@ -3264,7 +3320,7 @@
     },
     "simplify --report --check --baseline fixtures/explanatory.md fixtures/cases/explanatory-overcut.md": {
       "exit": 1,
-      "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED (needs the rewrite pass, 1):\n    1  complexity:same-opening  -> sentences in a row open with the same word: vary them, or merge them\n         . ...er than the setting. Delay. The boiler heats water. The water heats the radiator. The radiator heats the air. The sensor learns late.  It works in two steps. The...\nSCORECARD  (58 words, 12 sentences, 4 paragraphs):\n  [PASS]  mean_sentence_words        4.8   budget <= 18.0\n  [PASS]  max_sentence_words           9   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       83.8   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       2.8   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words            12.1   budget <= 20.0\n  [PASS]  max_paragraph_words         27   budget <= 90\n  [PASS]  pct_ly_adverbs             0.0   budget <= 4.0\nLENGTH  [PASS]  169 -> 58 words, cut 65.7%\n        padding 38 -> 7 words, cut 81.6%   target >= 40.0%\n        explanation 131 -> 51 words, at most 196 (1.5x)\nJOINTS  [LOST]  3 owed (explanation, surviving sentences), 1 in the rewrite (because/so/but/if...)\nLISTS   [LOST]  \"has three parts\" lost: controller\nLISTS   [LOST]  promised, not unpacked: \"has three parts\"\nVERDICT: OVER BUDGET on joints, lists\n=============================================\n",
+      "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD  (58 words, 12 sentences, 4 paragraphs):\n  [PASS]  mean_sentence_words        4.8   budget <= 18.0\n  [PASS]  max_sentence_words           9   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       83.8   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       2.8   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words            12.1   budget <= 20.0\n  [PASS]  max_paragraph_words         27   budget <= 90\n  [PASS]  pct_ly_adverbs             0.0   budget <= 4.0\nLENGTH  [PASS]  169 -> 58 words, cut 65.7%\n        padding 38 -> 7 words, cut 81.6%   target >= 40.0%\n        explanation 131 -> 51 words, at most 196 (1.5x)\nJOINTS  [LOST]  3 owed (explanation, surviving sentences), 1 in the rewrite (because/so/but/if...)\nLISTS   [LOST]  \"has three parts\" lost: controller\nLISTS   [LOST]  promised, not unpacked: \"has three parts\"\nVERDICT: OVER BUDGET on joints, lists\n=============================================\n",
       "stdout": "# Why the radiator overshoots\n\nA thermostat loop has three parts.\n\nThe room ends up warmer than the setting. Delay. The boiler heats water. The\nwater heats the radiator. The radiator heats the air. The sensor learns late.\n\nIt works in two steps. The boiler stays on until the room is warm. Stored heat\nkeeps arriving. The room overshoots.\n"
     },
     "simplify --report --check --baseline fixtures/explanatory.md fixtures/cases/explanatory-padding-cut.md": {
@@ -3284,8 +3340,33 @@
     },
     "simplify --report --check < fixtures/cases/carriage-returns.md": {
       "exit": 1,
-      "stderr": "== simplify report ==========================\nCLUTTER CUT (auto, 2):\n    1  clutter:during\n    1  clutter:regularly\nFLAGGED (needs the rewrite pass, 3):\n    1  passive  -> passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")\n         . ...during the last quarter and was raised\rby multiple customers.\n    1  vague-quantity  -> give the number, or say \"several\"/\"most\"\n         . ...t quarter and was raised\rby multiple customers.\n    1  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . ...tly it is fine but it's not just a fix,\r it's a paradigm shi...\nSCORECARD  (35 words, 2 sentences, 1 paragraphs):\n  [PASS]  mean_sentence_words       17.5   budget <= 18.0\n  [PASS]  max_sentence_words          18   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       65.8   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       8.4   budget <= 12.0\n  [OVER]  pct_passive_sentences     50.0   budget <= 10.0\n  [PASS]  pct_long_words            14.3   budget <= 20.0\n  [PASS]  max_paragraph_words         35   budget <= 90\n  [OVER]  pct_ly_adverbs             5.7   budget <= 4.0\nPASSIVE SENTENCES (name the actor):\n       The values are not received regularly, which happened during the last...\nVERDICT: OVER BUDGET on pct_passive_sentences, pct_ly_adverbs\n=============================================\n",
-      "stdout": "Honestly it is fine but it's not just a fix,\r\nit's a paradigm shift that we need.\r\r\nThe values are not received regularly, which happened during the last quarter and was raised\rby multiple customers.\r\n"
+      "stderr": "== simplify report ==========================\nCLUTTER CUT (auto, 2):\n    1  clutter:during\n    1  clutter:regularly\nFLAGGED (needs the rewrite pass, 3):\n    1  passive  -> passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")\n         . ...during the last quarter and was raised by multiple customers.\n    1  vague-quantity  -> give the number, or say \"several\"/\"most\"\n         . ...t quarter and was raised by multiple customers.\n    1  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . ...tly it is fine but it's not just a fix, it's a paradigm shif...\nSCORECARD  (35 words, 2 sentences, 2 paragraphs):\n  [PASS]  mean_sentence_words       17.5   budget <= 18.0\n  [PASS]  max_sentence_words          18   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       65.8   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       8.4   budget <= 12.0\n  [OVER]  pct_passive_sentences     50.0   budget <= 10.0\n  [PASS]  pct_long_words            14.3   budget <= 20.0\n  [PASS]  max_paragraph_words         18   budget <= 90\n  [OVER]  pct_ly_adverbs             5.7   budget <= 4.0\nPASSIVE SENTENCES (name the actor):\n       The values are not received regularly, which happened during the last...\nVERDICT: OVER BUDGET on pct_passive_sentences, pct_ly_adverbs\n=============================================\n",
+      "stdout": "Honestly it is fine but it's not just a fix,\nit's a paradigm shift that we need.\n\nThe values are not received regularly, which happened during the last quarter and was raised\nby multiple customers.\n"
+    },
+    "simplify --report --check fixtures/cases/joined/dup.md": {
+      "exit": 0,
+      "stderr": "== simplify report ==========================\nCLUTTER CUT (auto, 1):\n    1  padding:note\nFLAGGED (needs the rewrite pass, 2):\n    2  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . ...e sensor says warm.  We are very excited about this. The boi...\n         . ...each burst of heat late. We really look forward to it. It is g...\nSCORECARD  (94 words, 8 sentences, 2 paragraphs):\n  [PASS]  mean_sentence_words       11.8   budget <= 18.0\n  [PASS]  max_sentence_words          29   budget <= 30\n  [PASS]  pct_long_sentences        25.0   budget <= 15.0   (12.5 without joined sentences)\n  [PASS]  flesch_reading_ease       86.0   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       4.2   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words             4.3   budget <= 20.0\n  [PASS]  max_paragraph_words         50   budget <= 90\n  [PASS]  pct_ly_adverbs             1.1   budget <= 4.0\nLONGEST SENTENCES (over 25 words, cut or split):\n   29w  The boiler heats the water, the water heats the radiator, and only th...\nJOINED SENTENCES (explanation, every clause within 25 words: excused):\n   29w  The boiler heats the water, the water heats the radiator, and only th...\nVERDICT: within budget\n=============================================\n",
+      "stdout": "The boiler heats the water, the water heats the radiator, and only then does the radiator heat the air, so the sensor learns about each burst of heat late. If the room is cold, the boiler fires. It stops when the sensor says warm.\n\nWe are very excited about this. The boiler heats the water, the water heats the radiator, and only then does the radiator heat the air, so the sensor learns about each burst of heat late. We really look forward to it. It is going to be great. We love it.\n"
+    },
+    "simplify --report --check fixtures/cases/joined/ifchain.md": {
+      "exit": 1,
+      "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD  (49 words, 2 sentences, 2 paragraphs):\n  [OVER]  mean_sentence_words       24.5   budget <= 18.0\n  [OVER]  max_sentence_words          45   budget <= 30\n  [OVER]  pct_long_sentences        50.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       78.4   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       8.4   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words             2.0   budget <= 20.0\n  [PASS]  max_paragraph_words         45   budget <= 90\n  [PASS]  pct_ly_adverbs             0.0   budget <= 4.0\nLONGEST SENTENCES (over 25 words, cut or split):\n   45w  If the cache is cold, if the disk is slow, if the network drops, if t...\nVERDICT: OVER BUDGET on mean_sentence_words, max_sentence_words, pct_long_sentences\n=============================================\n",
+      "stdout": "If the cache is cold, if the disk is slow, if the network drops, if the user retries, if the token expires, if the queue fills up, if the worker stalls, the request fails and nobody on the team can tell which one did it.\n\nLogs help a little.\n"
+    },
+    "simplify --report --check fixtures/cases/joined/nomatch.md": {
+      "exit": 0,
+      "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD  (46 words, 3 sentences, 1 paragraphs):\n  [PASS]  mean_sentence_words       15.3   budget <= 18.0\n  [PASS]  max_sentence_words          31   budget <= 30   (8 without joined sentences)\n  [PASS]  pct_long_sentences        33.3   budget <= 15.0   (0.0 without joined sentences)\n  [PASS]  flesch_reading_ease       84.6   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       5.3   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words             4.3   budget <= 20.0\n  [PASS]  max_paragraph_words         46   budget <= 90\n  [PASS]  pct_ly_adverbs             0.0   budget <= 4.0\nJOINED SENTENCES (explanation, every clause within 25 words: excused):\n   31w  The boiler heats the water, the water heats the radiator, and only th...\nVERDICT: within budget\n=============================================\n",
+      "stdout": "The boiler heats the water, the water heats the radiator, and only then does the radiator heat the air [see]*(guide)*, so the sensor learns about each burst of heat late. If the room is cold, the boiler fires. It stops when the sensor says warm.\n"
+    },
+    "simplify --report --check fixtures/cases/joined/status.md": {
+      "exit": 1,
+      "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD  (94 words, 9 sentences, 5 paragraphs):\n  [PASS]  mean_sentence_words       10.4   budget <= 18.0\n  [OVER]  max_sentence_words          34   budget <= 30\n  [OVER]  pct_long_sentences        22.2   budget <= 15.0\n  [PASS]  flesch_reading_ease       87.3   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       3.7   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words             4.3   budget <= 20.0\n  [PASS]  max_paragraph_words         34   budget <= 90\n  [PASS]  pct_ly_adverbs             0.0   budget <= 4.0\nLONGEST SENTENCES (over 25 words, cut or split):\n   34w  Our team met with the vendor on Tuesday and walked through the full m...\n   32w  The client signed off the budget for the second phase after the steer...\nVERDICT: OVER BUDGET on max_sentence_words, pct_long_sentences\n=============================================\n",
+      "stdout": "Our team met with the vendor on Tuesday and walked through the full migration plan for the quarter, so the vendor now owns the cutover runbook and the weekend support rota for the launch.\n\nThe plan is on track.\n\nThe client signed off the budget for the second phase after the steering committee reviewed it, because the first phase landed on time and the dashboards showed the adoption numbers they wanted.\n\nRisks are low. Costs are flat. Staff are in place. Testing finished. We go live soon.\n\nWe will send the plan on Friday.\n"
+    },
+    "simplify --report --check fixtures/cases/joined/title.md": {
+      "exit": 1,
+      "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD  (48 words, 2 sentences, 2 paragraphs):\n  [OVER]  mean_sentence_words       24.0   budget <= 18.0\n  [OVER]  max_sentence_words          41   budget <= 30\n  [OVER]  pct_long_sentences        50.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       52.1   budget >= 50.0\n  [PASS]  flesch_kincaid_grade      12.0   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words            12.5   budget <= 20.0\n  [PASS]  max_paragraph_words         41   budget <= 90\n  [PASS]  pct_ly_adverbs             0.0   budget <= 4.0\nLONGEST SENTENCES (over 25 words, cut or split):\n   41w  The reading list for the new starters on the platform team covers the...\nVERDICT: OVER BUDGET on mean_sentence_words, max_sentence_words, pct_long_sentences\n=============================================\n",
+      "stdout": "The reading list for the new starters on the platform team covers the onboarding pack, the style guide, the architecture overview, the book \"Because Internet\" by Gretchen McCulloch, the release calendar, the incident handbook, the on-call rota and the team charter.\n\nRead them all in the first week.\n"
     },
     "simplify --report < fixtures/cases/rewrite-edges.txt": {
       "exit": 0,
@@ -3300,7 +3381,7 @@
     "simplify < fixtures/cases/carriage-returns.md": {
       "exit": 0,
       "stderr": "",
-      "stdout": "Honestly it is fine but it's not just a fix,\r\nit's a paradigm shift that we need.\r\r\nThe values are not received regularly, which happened during the last quarter and was raised\rby multiple customers.\r\n"
+      "stdout": "Honestly it is fine but it's not just a fix,\nit's a paradigm shift that we need.\n\nThe values are not received regularly, which happened during the last quarter and was raised\nby multiple customers.\n"
     },
     "simplify < fixtures/cases/curly-apostrophe.md": {
       "exit": 0,
@@ -3315,7 +3396,7 @@
     "simplify < fixtures/cases/quotes-crlf.md": {
       "exit": 0,
       "stderr": "",
-      "stdout": "Ok \"x\r\n\r\nBefore that, it \"rained\".\r\n"
+      "stdout": "Ok \"x\n\nBefore that, it \"rained\".\n"
     },
     "simplify < fixtures/cases/quotes-inline-code.md": {
       "exit": 0,

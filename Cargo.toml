@@ -1,6 +1,6 @@
 [package]
 name = "crisp"
-version = "0.1.0"
+version = "0.1.1"
 description = "De-slop and simplify prose: crisp's rules as a library and a CLI"
 authors = ["Charlie O'Donoghue"]
 edition = "2024"

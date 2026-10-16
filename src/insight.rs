@@ -207,24 +207,6 @@ pub fn report_lines(failures: &[Failure]) -> Vec<String> {
     l
 }
 
-/// The simplify report with the insight block in it, where crisp puts it: just
-/// before the verdict, or before the closing rule when a short document has no
-/// verdict. A scored document's verdict also names a failed insight; a short
-/// one's verdict is about length alone, as crisp's is.
-pub fn into_report(report: &str, failures: &[Failure], scored: bool) -> String {
-    let mut lines: Vec<String> = report.split('\n').map(str::to_string).collect();
-    let verdict = lines.iter().rposition(|l| l.starts_with("VERDICT: "));
-    let at = verdict.unwrap_or(lines.len().saturating_sub(1));
-    if let (Some(i), true, false) = (verdict, scored, failures.is_empty()) {
-        lines[i] = match lines[i].as_str() {
-            "VERDICT: within budget" => "VERDICT: OVER BUDGET on insight structure".into(),
-            over => format!("{over}, insight structure"),
-        };
-    }
-    lines.splice(at..at, report_lines(failures));
-    lines.join("\n")
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -297,28 +279,6 @@ mod tests {
         assert_eq!(
             details("They run 18,000\u{1c}chargers.\n"),
             Vec::<String>::new()
-        );
-    }
-
-    #[test]
-    fn the_insight_block_goes_before_the_verdict_and_amends_it() {
-        let failed = [Failure {
-            check: "sections",
-            detail: "missing".into(),
-        }];
-        let report = "== r ==\nVERDICT: within budget\n=====";
-        assert_eq!(
-            into_report(report, &failed, true),
-            "== r ==\nINSIGHT STRUCTURE  [FAIL] (1):\n  [FAIL]  sections           missing\n\
-             VERDICT: OVER BUDGET on insight structure\n====="
-        );
-        let over = "== r ==\nVERDICT: OVER BUDGET on length\n=====";
-        assert!(into_report(over, &failed, true).contains("on length, insight structure"));
-        // A short document's verdict is about length alone, and it may have none.
-        assert!(into_report(over, &failed, false).contains("on length\n====="));
-        assert_eq!(
-            into_report("== r ==\n=====", &[], false),
-            "== r ==\nINSIGHT STRUCTURE  [PASS]  sections present, no internal refs\n====="
         );
     }
 }

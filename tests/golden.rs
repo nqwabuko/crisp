@@ -942,6 +942,33 @@ const CASES: &[(&str, bool, &[&str])] = &[
     ),
 ];
 
+/// `fixtures/cases/explain/`: (source, rewrite) pairs an independent verifier
+/// used to break the explanation gates' first version.
+const EXPLAIN_PAIRS: &[(&str, &str)] = &[
+    ("g-src.md", "g1.md"),
+    ("k-src.md", "k1.md"),
+    ("k2-src.md", "k2-src.md"),
+    ("l-src.md", "l1.md"),
+    ("l-src.md", "l5b.md"),
+    ("l-src.md", "l8.md"),
+    ("n-src.md", "n1.md"),
+    ("s-src.md", "s1.md"),
+    ("src5.md", "rw5.md"),
+    ("src7.md", "rw7.md"),
+    ("src8.md", "rw8.md"),
+];
+
+/// `fixtures/cases/joined/`: the joined-sentence excuse, alone and against a
+/// baseline.
+const JOINED_RUNS: &[(&str, Option<&str>)] = &[
+    ("dup.md", None),
+    ("ifchain.md", None),
+    ("nomatch.md", None),
+    ("status.md", None),
+    ("status.md", Some("src.md")),
+    ("title.md", None),
+];
+
 /// Insight documents the fixtures lack: one that passes the lens and the
 /// budget, one too short to score, one that leaks a figure once, and two whose
 /// characters (a decomposed accent, a superscript digit, the \x1c-\x1f
@@ -1029,6 +1056,21 @@ fn record_cases() -> Value {
         for args in INSIGHT_ARGS {
             put(&format!("fixtures/cases/{file}"), false, args);
         }
+    }
+    // The explanation gates' adversarial pairs (tests/explain.rs states what
+    // each must do; this records all of what it does).
+    for &(source, rewrite) in EXPLAIN_PAIRS {
+        let source = format!("fixtures/cases/explain/{source}");
+        let args = ["simplify", "--report", "--check", "--baseline", &source];
+        put(&format!("fixtures/cases/explain/{rewrite}"), false, &args);
+    }
+    for &(file, baseline) in JOINED_RUNS {
+        let base = baseline.map(|b| format!("fixtures/cases/joined/{b}"));
+        let mut args = vec!["simplify", "--report", "--check"];
+        if let Some(b) = &base {
+            args.extend(["--baseline", b.as_str()]);
+        }
+        put(&format!("fixtures/cases/joined/{file}"), false, &args);
     }
     Value::Object(out)
 }

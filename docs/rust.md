@@ -70,7 +70,11 @@ What holds the engine now:
   `CRISP_UPDATE_GOLDEN=1` re-records it.
 - `tests/invariants.rs`: verify-locate and check_spans, the checks that need no
   contract at all.
+- `tests/explain.rs`: what each explanation-gate case must do (PASS, SHORT,
+  LONG, LOST), stated as intent. `golden.json` records all of what those
+  same cases do (`EXPLAIN_PAIRS`, `JOINED_RUNS`).
 - `tests/cli.rs`: what the binary refuses, and order at a tie.
+- `tests/write_failure.rs`: a broken pipe exits 2, not 1.
 - `tests/grammar.rs`, `tests/vendorable.rs`.
 
 ## Check

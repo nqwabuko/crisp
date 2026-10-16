@@ -434,8 +434,9 @@ Each finding carries a range that maps onto the caller's buffer:
 ```
 
 - Coordinates are **1-based line and column, `end_col` exclusive**, over the
-  input exactly as passed in. The JSON says so in a `coordinates` field so a
-  consumer can't guess wrong.
+  input as passed in, with its line endings made `\n` (every command, from a
+  file or stdin). For CRLF text the lines and columns are the same either way.
+  The JSON says so in a `coordinates` field so a consumer can't guess wrong.
 - `kind` is `clutter` (carries `fix`, offer it as a one-click replacement),
   `complexity` (carries `hint`, needs judgement), or `tell` (from detell).
 - A range can span lines, because these tells routinely straddle a hard wrap.

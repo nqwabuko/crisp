@@ -44,18 +44,6 @@ enum Cmd {
     Grammar,
 }
 
-impl Cmd {
-    /// The scripts read a file in universal-newline mode, and their output
-    /// follows it. Grammar has no script: its stdout is the input, byte for byte.
-    fn universal_newlines(self) -> bool {
-        match self {
-            Cmd::Detell | Cmd::Simplify => true,
-            #[cfg(feature = "grammar")]
-            Cmd::Grammar => false,
-        }
-    }
-}
-
 /// The flags, as the scripts take them. With `--locate`, the scripts ignore
 /// `--report`, `--json` and `--baseline`, and so does `run`.
 #[derive(Debug)]
@@ -138,7 +126,11 @@ fn pretty(v: &Value) -> String {
 }
 
 /// `baseline` is the `--baseline` file's text, read by the caller.
-fn run(args: &Args, text: &str, baseline: Option<&str>) -> Out {
+/// `text` is the input with its line endings made `\n`, which every finding is
+/// located over. `raw` is the input as it arrived, which only grammar's
+/// pass-through prints: it hands the text on byte for byte.
+#[cfg_attr(not(feature = "grammar"), allow(unused_variables))]
+fn run(args: &Args, raw: &str, text: &str, baseline: Option<&str>) -> Out {
     let budget = Budget::default();
     let (stdout, stderr, failed) = match (args.cmd, args.locate) {
         // Grammar never gates: whatever it finds, it exits 0.
@@ -152,7 +144,7 @@ fn run(args: &Args, text: &str, baseline: Option<&str>) -> Out {
                 (false, true) => report::grammar_text(&flags) + "\n",
                 (false, false) => String::new(),
             };
-            (text.to_string(), stderr, false)
+            (raw.to_string(), stderr, false)
         }
         (Cmd::Detell, true) => (pretty(&detell(text)), String::new(), false),
         (Cmd::Simplify, true) => {
@@ -185,14 +177,7 @@ fn run(args: &Args, text: &str, baseline: Option<&str>) -> Out {
                     }
                     pretty(&payload)
                 }
-                (false, true) => {
-                    let text = report::simplify_text(&s, &budget);
-                    let text = match &lens {
-                        Some(failures) => insight::into_report(&text, failures, s.metrics.scored),
-                        None => text,
-                    };
-                    text + "\n"
-                }
+                (false, true) => report::simplify_text(&s, &budget, lens.as_deref()) + "\n",
                 (false, false) => String::new(),
             };
             let failed = s.failed(&budget) || failed(&lens);
@@ -292,25 +277,22 @@ fn span(s: &Span) -> Value {
 
 /// The input, or the `--baseline` source: a file, or stdin when there is none.
 /// `universal` reads a file as Python's `open()` does; stdin is never translated.
-fn read_input(file: Option<&str>, universal: bool) -> Result<String, String> {
-    let mut text = String::new();
+/// The input as it arrived, from a file or stdin. `main` makes its line
+/// endings `\n` before anything reads it, so one document has one set of
+/// coordinates however it arrives.
+fn read_input(file: Option<&str>) -> Result<String, String> {
+    let mut raw = String::new();
     match file {
         Some(path) => {
-            let raw =
-                std::fs::read_to_string(path).map_err(|e| format!("cannot read {path}: {e}"))?;
-            text = if universal {
-                universal_newlines(&raw)
-            } else {
-                raw
-            };
+            raw = std::fs::read_to_string(path).map_err(|e| format!("cannot read {path}: {e}"))?;
         }
         None => {
             std::io::stdin()
-                .read_to_string(&mut text)
+                .read_to_string(&mut raw)
                 .map_err(|e| format!("cannot read stdin: {e}"))?;
         }
     }
-    Ok(text)
+    Ok(raw)
 }
 
 fn usage_error(msg: &str) -> ExitCode {
@@ -328,18 +310,19 @@ fn main() -> ExitCode {
         Ok(args) => args,
         Err(msg) => return usage_error(&msg),
     };
-    let text = match read_input(args.file.as_deref(), args.cmd.universal_newlines()) {
-        Ok(text) => text,
+    let raw = match read_input(args.file.as_deref()) {
+        Ok(raw) => raw,
         Err(msg) => return usage_error(&msg),
     };
+    let text = universal_newlines(&raw);
     let baseline = match args.baseline.as_deref().filter(|_| !args.locate) {
-        Some(path) => match read_input(Some(path), true) {
-            Ok(text) => Some(text),
+        Some(path) => match read_input(Some(path)) {
+            Ok(raw) => Some(universal_newlines(&raw)),
             Err(msg) => return usage_error(&msg),
         },
         None => None,
     };
-    let out = run(&args, &text, baseline.as_deref());
+    let out = run(&args, &raw, &text, baseline.as_deref());
     // A write that fails exits 2, never 1: 1 is `--check`'s verdict on the text,
     // and a broken pipe or a full disk says nothing about the text. The report
     // still goes to stderr when only stdout failed.
