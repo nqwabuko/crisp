@@ -525,6 +525,26 @@
       "stderr": "",
       "stdout": "Honestly it is fine but it's not just a fix,\nit's a paradigm shift that we need.\n\nThe values are not received on a regular\nbasis, which happened during the\ncourse of the last quarter and was raised\nby multiple customers.\n"
     },
+    "detell < fixtures/cases/quotes-crlf.md": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Ok \"x\n\nPrior to that, it \"rained\".\n"
+    },
+    "detell < fixtures/cases/quotes-inline-code.md": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "She said \"use `x` in order to ship\". Prior to that, we tried it to learn.\nHe said \"run `make` prior to the launch\" and \"ship it now, not later\" too.\n"
+    },
+    "detell < fixtures/cases/quotes-single.md": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "She said 'in order to ship' and he said 'in order to ship'.\nDon't, it's in order to win. The users' data, prior to the launch, was lost.\nIn the '90s, rock 'n' roll was loud in order to sell.\nIt's the users' data, don't lose it in order to win.\nBack in the '90s, rock 'n' roll was played prior to the show.\n\nShe said 'it's the users' data, kept in order to win and prior to launch' to me. Prior to that, it rained.\n\nShe said 'the users' data, kept in order to win and prior to launch' to me. Prior to that, it rained.\n\n'Cause it rained, we left to win, and prior to that the users' data was lost.\n\n'Twas done to win, and prior to that the users' data was lost.\n\nShe said 'we were goin' home prior to the meeting' to me. Prior to that, it rained.\n\nShe said 'we were goin' home prior to the meeting' to me. Prior to that, it rained.\n"
+    },
+    "detell < fixtures/cases/quotes-stray.md": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "A stray \" mark. Needless to say, it rained. Later she said \"needless to say, it broke\".\nHe said \"ok. To win, ship. She said \"in order to win\" too.\nHe said \"hi.\n\nShe said \"prior to the meeting\" was fine. Prior to that, it rained.\nOk \"x\n\nPrior to that, it \"rained\".\n\n\"The 7\" screen broke prior to the launch, in order to win,\" she said. Prior to that, it rained.\n\n\"He wrote \"x\" in order to win and prior to that left,\" she said. Prior to that, it rained.\n\n\"The 7\" screen broke prior to the launch,\" she said. The 5\" one shipped prior to it.\n\nShe said \"I left prior to the meeting *today*\". Prior to that, it rained.\n\nShe said \"I left prior to the meeting, 'ok'\". Prior to that, it rained.\n"
+    },
     "simplify --insight --json --check fixtures/cases/classes-insight.md": {
       "exit": 1,
       "stderr": {
@@ -1757,6 +1777,59 @@
       },
       "stdout": "The pilot ran for six weeks from 14 October 2026 and served 18000 sessions with\nno faults. The depot stayed busy. Run `crisp detell` before every rewrite.\n"
     },
+    "simplify --json --check --baseline fixtures/cases/quotes-facts.md fixtures/cases/quotes-facts.md": {
+      "exit": 0,
+      "stderr": {
+        "compression": {
+          "after": 16,
+          "before": 16,
+          "cut_pct": 0.0,
+          "explaining": 0.0,
+          "explaining_words": 0,
+          "growth": 1.5,
+          "limit": null,
+          "ok": true,
+          "rest_words": 16,
+          "scored": false,
+          "target": 40.0
+        },
+        "explanation": {
+          "joints": {
+            "after": 0,
+            "gated": false,
+            "ok": true,
+            "required": 0,
+            "source": 0
+          },
+          "lists": {
+            "lost": [],
+            "ok": true,
+            "promised_not_unpacked_after": [],
+            "promised_not_unpacked_before": 0
+          }
+        },
+        "facts": {
+          "kept": 4,
+          "missing": [],
+          "source": 4
+        },
+        "fixes": {},
+        "flags": [],
+        "insight": null,
+        "joined_sentences": [],
+        "long_sentences": [],
+        "metrics": {
+          "sentences": 1,
+          "words": 16
+        },
+        "over_budget": [],
+        "promised_not_unpacked": [],
+        "scored": false,
+        "total_fixes": 0,
+        "total_flags": 0
+      },
+      "stdout": "She said \"ship it\nnow, not later\" today, and \"run `make` prior to the launch\" before 14 Oct 2026.\n"
+    },
     "simplify --json --check --baseline fixtures/explanatory.md fixtures/cases/explanatory-kept.md": {
       "exit": 0,
       "stderr": {
@@ -2751,10 +2824,317 @@
         "scored": true
       }
     },
+    "simplify --locate < fixtures/cases/quotes-crlf.md": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": {
+        "coordinates": "1-based line and column over the input; end_col exclusive",
+        "findings": [
+          {
+            "col": 1,
+            "end_col": 9,
+            "end_line": 3,
+            "fix": "Before",
+            "kind": "clutter",
+            "line": 3,
+            "rule": "clutter:before",
+            "text": "Prior to"
+          }
+        ],
+        "metrics": {
+          "sentences": 2,
+          "words": 7
+        },
+        "over_budget": [],
+        "scored": false
+      }
+    },
+    "simplify --locate < fixtures/cases/quotes-inline-code.md": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": {
+        "coordinates": "1-based line and column over the input; end_col exclusive",
+        "findings": [
+          {
+            "col": 38,
+            "end_col": 46,
+            "end_line": 1,
+            "fix": "Before",
+            "kind": "clutter",
+            "line": 1,
+            "rule": "clutter:before",
+            "text": "Prior to"
+          }
+        ],
+        "metrics": {
+          "flesch_kincaid_grade": 1.4,
+          "flesch_reading_ease": 103.6,
+          "max_paragraph_words": 31,
+          "max_sentence_words": 14,
+          "mean_sentence_words": 10.3,
+          "paragraphs": 1,
+          "pct_long_sentences": 0.0,
+          "pct_long_words": 0.0,
+          "pct_ly_adverbs": 0.0,
+          "pct_passive_sentences": 0.0,
+          "sentences": 3,
+          "words": 31
+        },
+        "over_budget": [],
+        "scored": true
+      }
+    },
+    "simplify --locate < fixtures/cases/quotes-single.md": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": {
+        "coordinates": "1-based line and column over the input; end_col exclusive",
+        "findings": [
+          {
+            "col": 68,
+            "end_col": 76,
+            "end_line": 2,
+            "hint": "passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")",
+            "kind": "complexity",
+            "line": 2,
+            "rule": "passive",
+            "text": "was lost"
+          },
+          {
+            "col": 33,
+            "end_col": 43,
+            "end_line": 5,
+            "hint": "passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")",
+            "kind": "complexity",
+            "line": 5,
+            "rule": "passive",
+            "text": "was played"
+          },
+          {
+            "col": 44,
+            "end_col": 52,
+            "end_line": 5,
+            "fix": "before",
+            "kind": "clutter",
+            "line": 5,
+            "rule": "clutter:before",
+            "text": "prior to"
+          },
+          {
+            "col": 82,
+            "end_col": 90,
+            "end_line": 7,
+            "fix": "Before",
+            "kind": "clutter",
+            "line": 7,
+            "rule": "clutter:before",
+            "text": "Prior to"
+          },
+          {
+            "col": 77,
+            "end_col": 85,
+            "end_line": 9,
+            "fix": "Before",
+            "kind": "clutter",
+            "line": 9,
+            "rule": "clutter:before",
+            "text": "Prior to"
+          },
+          {
+            "col": 48,
+            "end_col": 56,
+            "end_line": 11,
+            "fix": "before",
+            "kind": "clutter",
+            "line": 11,
+            "rule": "clutter:before",
+            "text": "prior to"
+          },
+          {
+            "col": 78,
+            "end_col": 86,
+            "end_line": 11,
+            "hint": "passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")",
+            "kind": "complexity",
+            "line": 11,
+            "rule": "passive",
+            "text": "was lost"
+          },
+          {
+            "col": 33,
+            "end_col": 41,
+            "end_line": 13,
+            "fix": "before",
+            "kind": "clutter",
+            "line": 13,
+            "rule": "clutter:before",
+            "text": "prior to"
+          },
+          {
+            "col": 63,
+            "end_col": 71,
+            "end_line": 13,
+            "hint": "passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")",
+            "kind": "complexity",
+            "line": 13,
+            "rule": "passive",
+            "text": "was lost"
+          },
+          {
+            "col": 59,
+            "end_col": 67,
+            "end_line": 15,
+            "fix": "Before",
+            "kind": "clutter",
+            "line": 15,
+            "rule": "clutter:before",
+            "text": "Prior to"
+          },
+          {
+            "col": 59,
+            "end_col": 67,
+            "end_line": 17,
+            "fix": "Before",
+            "kind": "clutter",
+            "line": 17,
+            "rule": "clutter:before",
+            "text": "Prior to"
+          }
+        ],
+        "metrics": {
+          "flesch_kincaid_grade": 2.0,
+          "flesch_reading_ease": 100.0,
+          "max_paragraph_words": 64,
+          "max_sentence_words": 18,
+          "mean_sentence_words": 10.9,
+          "paragraphs": 7,
+          "pct_long_sentences": 0.0,
+          "pct_long_words": 0.0,
+          "pct_ly_adverbs": 0.0,
+          "pct_passive_sentences": 25.0,
+          "sentences": 16,
+          "words": 174
+        },
+        "over_budget": [
+          "pct_passive_sentences"
+        ],
+        "scored": true
+      }
+    },
+    "simplify --locate < fixtures/cases/quotes-stray.md": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": {
+        "coordinates": "1-based line and column over the input; end_col exclusive",
+        "findings": [
+          {
+            "col": 17,
+            "end_col": 35,
+            "end_line": 1,
+            "fix": "I",
+            "kind": "clutter",
+            "line": 1,
+            "rule": "padding:fact",
+            "text": "Needless to say, i"
+          },
+          {
+            "col": 43,
+            "end_col": 51,
+            "end_line": 5,
+            "fix": "Before",
+            "kind": "clutter",
+            "line": 5,
+            "rule": "clutter:before",
+            "text": "Prior to"
+          },
+          {
+            "col": 1,
+            "end_col": 9,
+            "end_line": 8,
+            "fix": "Before",
+            "kind": "clutter",
+            "line": 8,
+            "rule": "clutter:before",
+            "text": "Prior to"
+          },
+          {
+            "col": 71,
+            "end_col": 79,
+            "end_line": 10,
+            "fix": "Before",
+            "kind": "clutter",
+            "line": 10,
+            "rule": "clutter:before",
+            "text": "Prior to"
+          },
+          {
+            "col": 66,
+            "end_col": 74,
+            "end_line": 12,
+            "fix": "Before",
+            "kind": "clutter",
+            "line": 12,
+            "rule": "clutter:before",
+            "text": "Prior to"
+          },
+          {
+            "col": 73,
+            "end_col": 81,
+            "end_line": 14,
+            "fix": "before",
+            "kind": "clutter",
+            "line": 14,
+            "rule": "clutter:before",
+            "text": "prior to"
+          },
+          {
+            "col": 49,
+            "end_col": 57,
+            "end_line": 16,
+            "fix": "Before",
+            "kind": "clutter",
+            "line": 16,
+            "rule": "clutter:before",
+            "text": "Prior to"
+          },
+          {
+            "col": 47,
+            "end_col": 55,
+            "end_line": 18,
+            "fix": "Before",
+            "kind": "clutter",
+            "line": 18,
+            "rule": "clutter:before",
+            "text": "Prior to"
+          }
+        ],
+        "metrics": {
+          "flesch_kincaid_grade": -0.3,
+          "flesch_reading_ease": 108.8,
+          "max_paragraph_words": 34,
+          "max_sentence_words": 14,
+          "mean_sentence_words": 6.4,
+          "paragraphs": 8,
+          "pct_long_sentences": 0.0,
+          "pct_long_words": 0.0,
+          "pct_ly_adverbs": 0.0,
+          "pct_passive_sentences": 0.0,
+          "sentences": 21,
+          "words": 134
+        },
+        "over_budget": [],
+        "scored": true
+      }
+    },
     "simplify --report --check --baseline fixtures/cases/facts-source.md fixtures/cases/facts-dropped.md": {
       "exit": 1,
       "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD: skipped, only 22 words (need 30+ to score)\nLENGTH  [SHORT]  34 -> 22 words, cut 35.3%   target >= 40.0%\nFACTS   [CHECK]  5 of 8 kept; missing: \"22 kW\" (line 1), \"Q4 2026\" (line 2), \"£0.45\" (line 3) (report only: restore it, or confirm the cut)\nVERDICT: OVER BUDGET on length\n=============================================\n",
       "stdout": "The pilot ran for six weeks from 14 October 2026 and served 18000 sessions with\nno faults. The depot stayed busy. Run `crisp detell` before every rewrite.\n"
+    },
+    "simplify --report --check --baseline fixtures/cases/quotes-inline-code.md fixtures/cases/quotes-facts.md": {
+      "exit": 0,
+      "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD: skipped, only 16 words (need 30+ to score)\nLENGTH  [PASS]  31 -> 16 words, cut 48.4%   target >= 40.0%\nFACTS   [CHECK]  3 of 5 kept; missing: \"use `x` in order to ship\" (line 1), \"x\" (line 1) (report only: restore it, or confirm the cut)\n=============================================\n",
+      "stdout": "She said \"ship it\nnow, not later\" today, and \"run `make` prior to the launch\" before 14 Oct 2026.\n"
     },
     "simplify --report --check --baseline fixtures/explanatory.md fixtures/cases/explanatory-kept.md": {
       "exit": 0,
@@ -2800,6 +3180,26 @@
       "exit": 0,
       "stderr": "",
       "stdout": "Users will have the ability to export. Operators should have the ability to override.\nIf we had had the ability to retry, we would. Users don't have the ability to delete.\nThe tool has the ability to retry. We had the ability to stop it.\nUsers will, in future, have the ability to export. Users will then also really have the ability to export.\n\nData is never used for other purposes. Shown for illustrative purposes only.\nWe log it for testing.\n\nThe plane ahead of us landed. The planet ahead was bright. We planned.\nBolt the joints together. The two groups together hold most seats. We merged the lists.\nThe front end results page is slow. Hitting a dead end results in a timeout. The end result was fine.\n\nThe majority of the users agree. The majority of users agree.\nAt this time of year it rains. At this time we have no plans.\nThe fault occurred in connection with the firmware update.\nSessions settle at the end of the day and restart at 6am.\n\nIf it isn't ready by Friday, it is pushed a week. When they aren't charging, they're idle.\nIt isn't about speed, it's trust.\nThe worker updates the row, marking the session as stopped.\nThe release ships Friday, marking the end of the pilot.\n"
+    },
+    "simplify < fixtures/cases/quotes-crlf.md": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Ok \"x\r\n\r\nBefore that, it \"rained\".\r\n"
+    },
+    "simplify < fixtures/cases/quotes-inline-code.md": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "She said \"use `x` in order to ship\". Before that, we tried it in order to learn.\nHe said \"run `make` prior to the launch\" and \"ship it now, not later\" too.\n"
+    },
+    "simplify < fixtures/cases/quotes-single.md": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "She said ‘in order to ship’ and he said 'in order to ship'.\nDon't, it's in order to win. The users' data, prior to the launch, was lost.\nIn the '90s, rock 'n' roll was loud in order to sell.\nIt’s the users’ data, don’t lose it in order to win.\nBack in the ’90s, rock ’n’ roll was played before the show.\n\nShe said ‘it’s the users’ data, kept in order to win and prior to launch’ to me. Before that, it rained.\n\nShe said 'the users' data, kept in order to win and prior to launch' to me. Before that, it rained.\n\n'Cause it rained, we left in order to win, and before that the users' data was lost.\n\n‘Twas done in order to win, and before that the users’ data was lost.\n\nShe said ‘we were goin’ home prior to the meeting’ to me. Before that, it rained.\n\nShe said 'we were goin' home prior to the meeting' to me. Before that, it rained.\n"
+    },
+    "simplify < fixtures/cases/quotes-stray.md": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "A stray \" mark. It rained. Later she said \"needless to say, it broke\".\nHe said \"ok. In order to win, ship. She said \"in order to win\" too.\nHe said \"hi.\n\nShe said \"prior to the meeting\" was fine. Before that, it rained.\nOk \"x\n\nBefore that, it \"rained\".\n\n“The 7\" screen broke prior to the launch, in order to win,” she said. Before that, it rained.\n\n“He wrote \"x\" in order to win and prior to that left,” she said. Before that, it rained.\n\n\"The 7\" screen broke prior to the launch,\" she said. The 5\" one shipped before it.\n\nShe said \"I left prior to the meeting *today*\". Before that, it rained.\n\nShe said \"I left prior to the meeting, 'ok'\". Before that, it rained.\n"
     }
   },
   "__config__": {

@@ -70,10 +70,11 @@ impl Rewrite {
 /// the rules run (crisp's `[ \t]+\Z`), and are not counted as a fix.
 pub fn detell(text: &str) -> Rewrite {
     let mut fixes = Tally::default();
-    let cleaned = map_prose(text, |span| {
+    let cleaned = map_prose(text, |span, mut quotes| {
         let mut s = span.to_string();
         for rule in rules::DETELL_FIX.iter() {
-            let (out, n) = apply_fix(rule, &s);
+            let (out, n, edits) = apply_fix(rule, &s, &quotes);
+            shift(&mut quotes, &edits);
             fixes.add(rule.name, n);
             s = out;
         }
@@ -110,20 +111,22 @@ pub fn detell(text: &str) -> Rewrite {
     }
 }
 
-/// One detell FIX rule over one prose span: the result and how many
-/// replacements it made.
-fn apply_fix(rule: &FixRule, s: &str) -> (String, usize) {
+/// One detell FIX rule over one prose span: the result, how many replacements
+/// it made, and where. `quotes` are the span's quotations, which a word rule
+/// (`Fix::Case`) leaves alone.
+fn apply_fix(rule: &FixRule, s: &str, quotes: &[(usize, usize)]) -> (String, usize, Vec<Edit>) {
     match &rule.fix {
-        Fix::Sub(pat, template) => replace(pat, None, s, |c| {
+        Fix::Sub(pat, template) => replace(pat, None, s, &[], |c| {
             let mut out = String::new();
             c.expand(template, &mut out);
             out
         }),
-        Fix::Case(pat, plain) => replace_unquoted(pat, None, s, |c| rules::cased(plain, &c[0])),
+        Fix::Case(pat, plain) => replace(pat, None, s, quotes, |c| rules::cased(plain, &c[0])),
         Fix::Scan(f) => {
             let out = f(s);
             let n = scanned(rule.name, s, &out);
-            (out, n)
+            let edits = space_edits(s, &out);
+            (out, n, edits)
         }
     }
 }
@@ -156,13 +159,15 @@ fn scanned(rule: &str, before: &str, after: &str) -> usize {
 /// found it.
 pub fn simplify(text: &str) -> Rewrite {
     let mut fixes = Tally::default();
-    let cleaned = map_prose(text, |span| {
+    let cleaned = map_prose(text, |span, mut quotes| {
         let mut s = span.to_string();
         for rule @ ClutterRule {
             name, pat, guard, ..
         } in rules::CLUTTER.iter()
         {
-            let (out, n) = replace_unquoted(pat, *guard, &s, |c| rules::clutter_fix(rule, c));
+            let (out, n, edits) =
+                replace(pat, *guard, &s, &quotes, |c| rules::clutter_fix(rule, c));
+            shift(&mut quotes, &edits);
             fixes.add(name, n);
             s = out;
         }
@@ -174,7 +179,7 @@ pub fn simplify(text: &str) -> Rewrite {
             .iter()
             .find(|r| r.name == "run_spaces")
             .expect("detell's table carries run_spaces");
-        let (out, n) = apply_fix(cleanup, &s);
+        let (out, n, _) = apply_fix(cleanup, &s, &quotes);
         fixes.add(cleanup.name, n);
         out
     });
@@ -219,16 +224,68 @@ pub fn simplify(text: &str) -> Rewrite {
 
 /// Applies `f` to the prose of `text::segments` and passes code through, for a
 /// rewrite that also counts what it did as it goes.
-fn map_prose(text: &str, mut f: impl FnMut(&str) -> String) -> String {
+///
+/// `f` also gets the span's quotations, local to the span. They are found once,
+/// on the whole text, because inline code splits a span and a quote may hold
+/// inline code: a quote cut by a span edge reaches that edge.
+fn map_prose(text: &str, mut f: impl FnMut(&str, Vec<(usize, usize)>) -> String) -> String {
+    let quotes = text::quoted_ranges(text);
     let mut out = String::with_capacity(text.len());
-    for (_, slice, is_code) in text::segments(text) {
+    for (at, slice, is_code) in text::segments(text) {
         if is_code {
             out.push_str(slice);
-        } else {
-            out.push_str(&f(slice));
+            continue;
         }
+        let end = at + slice.len();
+        let local = quotes
+            .iter()
+            .filter(|&&(a, b)| a < end && at < b)
+            .map(|&(a, b)| (a.max(at) - at, b.min(end) - at))
+            .collect();
+        out.push_str(&f(slice, local));
     }
     out
+}
+
+/// One replacement: bytes `start..end` of the old text became `len` bytes.
+type Edit = (usize, usize, usize);
+
+/// Move `ranges` to where `edits` put the text they cover. An edit before a
+/// position moves it by the edit's change in length; an edit inside a range
+/// (typography in a quote, its own marks included) moves only its end.
+fn shift(ranges: &mut [(usize, usize)], edits: &[Edit]) {
+    let moved = |p: usize| {
+        edits
+            .iter()
+            .filter(|&&(_, end, _)| end <= p)
+            .fold(p, |p, &(start, end, len)| p + len - (end - start))
+    };
+    for r in ranges.iter_mut() {
+        *r = (moved(r.0), moved(r.1));
+    }
+}
+
+/// The edits a `Fix::Scan` made. Both scans only remove spaces and tabs or
+/// shorten a run of them, so walking the two texts side by side finds every
+/// change: a byte that differs is a space or tab that went.
+fn space_edits(before: &str, after: &str) -> Vec<Edit> {
+    let (b, a) = (before.as_bytes(), after.as_bytes());
+    let blank = |c: u8| c == b' ' || c == b'\t';
+    let (mut i, mut j, mut edits) = (0, 0, Vec::new());
+    while i < b.len() {
+        if j < a.len() && b[i] == a[j] {
+            j += 1;
+        } else if j < a.len() && blank(a[j]) && !blank(b[i]) {
+            edits.push((i, i, 1));
+            j += 1;
+            continue;
+        } else {
+            debug_assert!(blank(b[i]), "a scan removed more than spaces");
+            edits.push((i, i + 1, 0));
+        }
+        i += 1;
+    }
+    edits
 }
 
 /// The matches a rule keeps: its pattern's, less any its guard rejects.
@@ -241,48 +298,32 @@ fn kept<'h>(
         .filter(move |c| guard.is_none_or(|g| g(hay, c)))
 }
 
-/// Replace every kept match with `with(match)`; the result and the count.
+/// Replace every kept match with `with(match)`, except one that would change a
+/// quotation in `quotes`: a word rewrite there edits somebody's actual words.
+/// Typography (`Fix::Sub`) passes no quotes, so it still applies inside them.
+/// The result, the count and the edits.
 fn replace(
     pat: &Regex,
     guard: Option<Guard>,
     s: &str,
+    quotes: &[(usize, usize)],
     with: impl Fn(&Captures) -> String,
-) -> (String, usize) {
-    let (mut out, mut last, mut n) = (String::with_capacity(s.len()), 0, 0);
+) -> (String, usize, Vec<Edit>) {
+    let (mut out, mut last, mut edits) = (String::with_capacity(s.len()), 0, Vec::new());
     for c in kept(pat, guard, s) {
         let m = c.get(0).expect("group 0 always exists");
-        out.push_str(&s[last..m.start()]);
-        out.push_str(&with(&c));
-        last = m.end();
-        n += 1;
-    }
-    out.push_str(&s[last..]);
-    (out, n)
-}
-
-/// `replace`, leaving quoted passages alone: a word rewrite inside quotation
-/// marks edits somebody's actual words. Typography (`Fix::Sub`) still applies
-/// inside quotes; only the rules that change words go through here.
-fn replace_unquoted(
-    pat: &Regex,
-    guard: Option<Guard>,
-    s: &str,
-    with: impl Fn(&Captures) -> String,
-) -> (String, usize) {
-    let quotes = text::quoted_ranges(s);
-    let (mut out, mut last, mut n) = (String::with_capacity(s.len()), 0, 0);
-    for c in kept(pat, guard, s) {
-        let m = c.get(0).expect("group 0 always exists");
-        if text::inside(&quotes, m.start()) {
+        let new = with(&c);
+        let Some(end) = text::unquoted_end(quotes, s, m.start(), m.end(), &new) else {
             continue;
-        }
+        };
         out.push_str(&s[last..m.start()]);
-        out.push_str(&with(&c));
+        out.push_str(&new);
+        edits.push((m.start(), end, new.len() - (m.end() - end)));
         last = m.end();
-        n += 1;
     }
     out.push_str(&s[last..]);
-    (out, n)
+    let n = edits.len();
+    (out, n, edits)
 }
 
 /// Fold one span's hits for one rule into the running list, as crisp does: the

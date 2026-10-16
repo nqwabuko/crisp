@@ -799,6 +799,64 @@ const CASES: &[(&str, bool, &[&str])] = &[
             "fixtures/explanatory.md",
         ],
     ),
+    // Quotes are somebody's words: no word rewrite edits inside one and locate
+    // offers no fix there, while the same clutter outside a quote is cut. A
+    // stray or unbalanced mark protects nothing and does not flip the pairing
+    // of the real quote after it, under LF and CRLF alike; a quote may hold
+    // inline code; British single quotes count, and apostrophes (don't, the
+    // users', '90s, rock 'n' roll, curly or straight) never do.
+    ("fixtures/cases/quotes-stray.md", true, &["simplify"]),
+    (
+        "fixtures/cases/quotes-stray.md",
+        true,
+        &["simplify", "--locate"],
+    ),
+    ("fixtures/cases/quotes-stray.md", true, &["detell"]),
+    ("fixtures/cases/quotes-inline-code.md", true, &["simplify"]),
+    (
+        "fixtures/cases/quotes-inline-code.md",
+        true,
+        &["simplify", "--locate"],
+    ),
+    ("fixtures/cases/quotes-inline-code.md", true, &["detell"]),
+    ("fixtures/cases/quotes-single.md", true, &["simplify"]),
+    (
+        "fixtures/cases/quotes-single.md",
+        true,
+        &["simplify", "--locate"],
+    ),
+    ("fixtures/cases/quotes-single.md", true, &["detell"]),
+    ("fixtures/cases/quotes-crlf.md", true, &["simplify"]),
+    (
+        "fixtures/cases/quotes-crlf.md",
+        true,
+        &["simplify", "--locate"],
+    ),
+    ("fixtures/cases/quotes-crlf.md", true, &["detell"]),
+    // A quote wrapped over a line is one fact, kept however the rewrite wraps
+    // it, and a quote holding inline code is reported as written.
+    (
+        "fixtures/cases/quotes-facts.md",
+        false,
+        &[
+            "simplify",
+            "--json",
+            "--check",
+            "--baseline",
+            "fixtures/cases/quotes-facts.md",
+        ],
+    ),
+    (
+        "fixtures/cases/quotes-facts.md",
+        false,
+        &[
+            "simplify",
+            "--report",
+            "--check",
+            "--baseline",
+            "fixtures/cases/quotes-inline-code.md",
+        ],
+    ),
 ];
 
 /// Insight documents the fixtures lack: one that passes the lens and the

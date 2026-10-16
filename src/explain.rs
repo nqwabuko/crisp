@@ -427,11 +427,6 @@ pub const JOINED_MAX_WORDS: usize = 45;
 /// rest; seven short "if"s in a row is a stack, however short each one is.
 pub const JOINED_MAX_CLAUSES: usize = 3;
 
-/// Quoted text, which is someone's words or a title ("Because Internet"), not a
-/// joint between the sentence's own clauses.
-static QUOTED: LazyLock<Regex> =
-    LazyLock::new(|| re("\"[^\"\n]*\"|\u{201c}[^\u{201d}\n]*\u{201d}"));
-
 /// A long sentence that is long because it joins clauses, not because it stacks
 /// them: it has at least one joint, every clause between its joints (and any
 /// `;` or `:`) is within `LONG_SENTENCE` words, and the whole is within
@@ -444,10 +439,9 @@ pub fn joined(sentence: &str) -> bool {
     if words <= super::LONG_SENTENCE || words > JOINED_MAX_WORDS {
         return false;
     }
-    let quoted: Vec<(usize, usize)> = QUOTED
-        .find_iter(sentence)
-        .map(|m| (m.start(), m.end()))
-        .collect();
+    // Quoted text is someone's words or a title ("Because Internet"), not a
+    // joint between the sentence's own clauses.
+    let quoted = text::quoted_ranges(sentence);
     let outside = |at: &usize| !quoted.iter().any(|&(s, e)| s <= *at && *at < e);
     let mut cuts: Vec<usize> = joints(sentence)
         .into_iter()

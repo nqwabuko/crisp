@@ -123,24 +123,235 @@ pub fn prose_spans(text: &str) -> Vec<(usize, &str)> {
         .collect()
 }
 
-/// A double-quoted passage, straight or curly, inside one paragraph.
-static QUOTED: LazyLock<Regex> =
-    LazyLock::new(|| re("\"[^\"]{0,400}\"|\u{201c}[^\u{201c}\u{201d}]{0,400}\u{201d}"));
+// ── quotations ───────────────────────────────────────────────────────────────
 
-/// `(start, end)` of every quoted passage in `s`: somebody's actual words,
-/// which a rewrite must never edit. A quote never spans a blank line, so an
-/// unbalanced mark can't swallow the paragraphs after it.
-pub fn quoted_ranges(s: &str) -> Vec<(usize, usize)> {
-    QUOTED
-        .find_iter(s)
-        .filter(|m| !m.as_str().contains("\n\n"))
-        .map(|m| (m.start(), m.end()))
-        .collect()
+/// The longest quotation, in characters between its marks. Past this a pair of
+/// marks is more likely two strays than one quote.
+pub const QUOTE_MAX: usize = 400;
+
+#[derive(Clone, Copy, PartialEq)]
+enum Role {
+    Open,
+    Close,
+    /// Could be either (`*today*".`): it closes a quotation of its kind that is
+    /// open, and otherwise opens one.
+    Either,
 }
 
-/// Does `at` fall inside one of `ranges`?
-pub fn inside(ranges: &[(usize, usize)], at: usize) -> bool {
-    ranges.iter().any(|&(a, b)| a < at && at < b)
+/// A mark that may begin a quotation when it comes straight after this: the
+/// start of the text, a space, an opening bracket, a dash, emphasis or another
+/// quotation mark (`"'nested'"`).
+fn opens_after(prev: Option<char>) -> bool {
+    prev.is_none_or(|c| {
+        c.is_whitespace() || "([{<*_/\u{2014}\u{2013}-\"'\u{201c}\u{2018}".contains(c)
+    })
+}
+
+/// A mark that may end a quotation when this comes straight after it: the end
+/// of the text, a space or punctuation.
+fn closes_before(next: Option<char>) -> bool {
+    next.is_none_or(|c| {
+        c.is_whitespace()
+            || c.is_ascii_punctuation()
+            || "\u{201d}\u{2019}\u{2026}\u{2014}\u{2013}".contains(c)
+    })
+}
+
+/// A quotation mark the text uses: which family it pairs within (straight
+/// double, curly double, straight single, curly single), whether it opens or
+/// closes, where it sits, and whether a close is in doubt (see `mark`).
+struct Mark {
+    family: u8,
+    role: Role,
+    start: usize,
+    end: usize,
+    doubtful: bool,
+}
+
+/// Words an apostrophe stands in front of ('Cause, 'em, ‘Twas, rock 'n' roll):
+/// that apostrophe opens no quotation.
+const ELISIONS: &[&str] = &[
+    "bout", "cause", "cos", "coz", "cuz", "em", "n", "nuff", "til", "tis", "twas", "twere", "twill",
+];
+
+/// Does `rest` start with an elided word, so the apostrophe before it is one?
+fn elided(rest: &str) -> bool {
+    let word: String = rest.chars().take_while(|c| c.is_alphabetic()).collect();
+    ELISIONS.contains(&word.to_lowercase().as_str())
+}
+
+/// What a quotation mark at this spot does, read from its neighbours (`rest` is
+/// the text after it): its family, its role, and whether a close is doubtful.
+/// An apostrophe is never a mark: one between two letters (don't, it's) does
+/// nothing, and one in front of a digit ('90s) or an elided word ('Cause,
+/// ‘Twas) opens nothing. Every single close is doubtful, since after a letter
+/// it may be a plural possessive (the users') or a dropped letter (goin'), and
+/// so is a straight double mark after a digit (a 7" screen).
+fn mark(c: char, prev: Option<char>, rest: &str) -> Option<(u8, Role, bool)> {
+    let next = rest.chars().next();
+    let after_word = prev.is_some_and(|p| !p.is_whitespace());
+    let in_word =
+        prev.is_some_and(char::is_alphanumeric) && next.is_some_and(char::is_alphanumeric);
+    let closes = after_word && !in_word && closes_before(next);
+    let opens_word = next.is_some_and(char::is_alphabetic) && !elided(rest);
+    // A single close is always in doubt: after a letter it may be a dropped
+    // letter (goin', nothin') or a plural possessive (the users'), so a single
+    // quotation ends at its last candidate, never its first.
+    let role = |open: bool, close: bool| match (open, close) {
+        (true, true) => Some(Role::Either),
+        (true, false) => Some(Role::Open),
+        (false, true) => Some(Role::Close),
+        (false, false) => None,
+    };
+    match c {
+        '\u{201c}' => Some((1, Role::Open, false)),
+        '\u{201d}' => Some((1, Role::Close, false)),
+        '"' => role(
+            opens_after(prev) && next.is_some_and(|n| !n.is_whitespace()),
+            closes,
+        )
+        .map(|r| (0, r, prev.is_some_and(|p| p.is_ascii_digit()))),
+        '\'' => role(opens_after(prev) && opens_word, closes).map(|r| (2, r, true)),
+        '\u{2018}' if opens_word => Some((3, Role::Open, false)),
+        '\u{2019}' if closes => Some((3, Role::Close, true)),
+        _ => None,
+    }
+}
+
+/// `text` with its code made inert, byte for byte: inline code becomes letters,
+/// so a quote around it stays one quote, and a fenced block becomes line
+/// breaks, so no quote runs through it.
+fn mask_for_quotes(text: &str) -> String {
+    let mut out = String::with_capacity(text.len());
+    for (_, slice, is_code) in segments(text) {
+        let fill = if !is_code {
+            out.push_str(slice);
+            continue;
+        } else if slice.starts_with("```") || slice.starts_with("~~~") {
+            '\n'
+        } else {
+            'x'
+        };
+        for c in slice.chars() {
+            let f = if c == '\n' { '\n' } else { fill };
+            out.extend(std::iter::repeat_n(f, c.len_utf8()));
+        }
+    }
+    out
+}
+
+/// Does `s` hold a blank line? A line of only spaces, tabs or a CR is blank,
+/// so CRLF text (`\r\n\r\n`) breaks a paragraph exactly as LF does.
+fn has_blank_line(s: &str) -> bool {
+    let lines: Vec<&str> = s.split('\n').collect();
+    lines.len() > 2
+        && lines[1..lines.len() - 1]
+            .iter()
+            .any(|line| line.chars().all(|c| matches!(c, ' ' | '\t' | '\r')))
+}
+
+/// `(start, end)` of every quotation in `text`, marks included, in order:
+/// somebody's actual words, which a word rewrite must never edit.
+///
+/// This is the one definition of a quotation, so the rewrite, `--locate`, the
+/// JOINTS gate and the facts report all agree on it. Marks pair by context, not
+/// by counting: a mark opens when it follows the start, a space or an opening
+/// bracket, and closes when a space, punctuation or the end follows it. Double
+/// marks (`"`, `“”`) and single marks (`'`, `‘’`, the British convention) pair
+/// separately, and straight marks apart from curly ones, so an inch mark inside
+/// a curly quote leaves it whole. An opening mark pairs with the first sure
+/// close before the next opening mark of its kind; failing one, a double mark
+/// takes the first doubtful close and a single mark the last, so a possessive
+/// or a dropped letter inside a quote does not end it. A straight mark that
+/// could open or close (`*today*".`) closes when a quotation is open. A mark with
+/// no partner protects nothing, and never changes how the marks after it pair.
+/// A quotation stays inside its paragraph (one line break is fine, a blank line
+/// is not), holds at most `QUOTE_MAX` characters, and a single-quoted one holds
+/// at least two. Code is masked first, so a quote may contain inline code.
+pub fn quoted_ranges(text: &str) -> Vec<(usize, usize)> {
+    let masked = mask_for_quotes(text);
+    let mut marks: Vec<Mark> = Vec::new();
+    let mut prev = None;
+    for (at, c) in masked.char_indices() {
+        let end = at + c.len_utf8();
+        if let Some((family, role, doubtful)) = mark(c, prev, &masked[end..]) {
+            marks.push(Mark {
+                family,
+                role,
+                start: at,
+                end,
+                doubtful,
+            });
+        }
+        prev = Some(c);
+    }
+
+    let mut out = Vec::new();
+    for f in 0..4 {
+        let family: Vec<&Mark> = marks.iter().filter(|m| m.family == f).collect();
+        let mut i = 0;
+        while i < family.len() {
+            let open = family[i];
+            i += 1;
+            if open.role == Role::Close {
+                continue;
+            }
+            let (mut sure, mut doubtful) = (None, None);
+            for (j, close) in family.iter().enumerate().skip(i) {
+                if close.role == Role::Open {
+                    break;
+                }
+                // An Either mark closes when it can; it only opens when no
+                // quotation of its kind is waiting for it.
+                let words = &masked[open.end..close.start];
+                if words.chars().count() > QUOTE_MAX || has_blank_line(words) {
+                    break;
+                }
+                if f >= 2 && words.trim().chars().count() < 2 {
+                    continue;
+                }
+                if !close.doubtful {
+                    sure = Some(j);
+                    break;
+                }
+                // Double marks fall back to the first doubtful close (an inch
+                // mark later in the quote); single marks to the last.
+                doubtful = if f >= 2 {
+                    Some(j)
+                } else {
+                    doubtful.or(Some(j))
+                };
+            }
+            if let Some(j) = sure.or(doubtful) {
+                out.push((open.start, family[j].end));
+                i = j + 1;
+            }
+        }
+    }
+    out.sort_unstable();
+    out
+}
+
+/// Where an edit that puts `with` in place of `text[start..end]` stops short of
+/// every quotation in `quotes`, or `None` when it would change somebody's words.
+///
+/// An edit that touches no quotation ends at `end`. One that starts before a
+/// quotation and runs into it is fine only when `with` ends with the quoted
+/// part as written: the padding cut keeps the opening mark and the first word
+/// after it, so "It is worth noting that "we" won" loses only the padding, and
+/// then the edit ends where the quotation starts.
+pub fn unquoted_end(
+    quotes: &[(usize, usize)],
+    text: &str,
+    start: usize,
+    end: usize,
+    with: &str,
+) -> Option<usize> {
+    match quotes.iter().find(|&&(a, b)| start < b && a < end) {
+        None => Some(end),
+        Some(&(a, _)) if a > start && with.ends_with(&text[a..end]) => Some(a),
+        Some(_) => None,
+    }
 }
 
 /// Code removed, the rest joined by single spaces. Right for counting, wrong
@@ -531,5 +742,129 @@ mod tests {
             unwrap_blocks(text),
             "one two three four\n\n- a bullet wrapped"
         );
+    }
+
+    /// The quoted passages of `text`, as text.
+    fn quotes(text: &str) -> Vec<&str> {
+        quoted_ranges(text)
+            .into_iter()
+            .map(|(a, b)| &text[a..b])
+            .collect()
+    }
+
+    #[test]
+    fn a_stray_mark_protects_nothing_and_flips_nothing() {
+        assert_eq!(
+            quotes("A stray \" mark. Later she said \"needless to say, it broke\"."),
+            ["\"needless to say, it broke\""]
+        );
+        assert_eq!(
+            quotes("He said \"ok. In order to win. She said \"in order to win\" too."),
+            ["\"in order to win\""]
+        );
+        assert_eq!(
+            quotes("The 5\" screen beat the 7\" one."),
+            Vec::<&str>::new()
+        );
+        let long = format!(
+            "\"{}\" Then in order to go. She said \"fine\".",
+            "word ".repeat(85)
+        );
+        assert_eq!(quotes(&long), ["\"fine\""]);
+    }
+
+    #[test]
+    fn a_quote_stays_in_its_paragraph_under_lf_and_crlf() {
+        assert_eq!(
+            quotes("He said \"hi.\n\nShe said \"prior to it\" was fine."),
+            ["\"prior to it\""]
+        );
+        assert_eq!(
+            quotes("Ok \"x\r\n\r\nPrior to that, it \"rained\".\r\n"),
+            ["\"rained\""]
+        );
+        assert_eq!(quotes("Ok \"x\n \t\nit \"rained\"."), ["\"rained\""]);
+        assert_eq!(
+            quotes("She said \"ship it\nnow\" today."),
+            ["\"ship it\nnow\""]
+        );
+        assert_eq!(quotes("A \"x\n```\ny\n```\nz\" b."), Vec::<&str>::new());
+    }
+
+    #[test]
+    fn a_quote_may_hold_inline_code_and_code_holds_no_quotes() {
+        assert_eq!(
+            quotes("She said \"use `x` in order to ship\"."),
+            ["\"use `x` in order to ship\""]
+        );
+        assert_eq!(quotes("Run `say \"hi\"` now."), Vec::<&str>::new());
+    }
+
+    #[test]
+    fn single_marks_quote_but_apostrophes_never_do() {
+        assert_eq!(
+            quotes("She said \u{2018}in order to ship\u{2019} and he said 'in order to ship'."),
+            ["\u{2018}in order to ship\u{2019}", "'in order to ship'"]
+        );
+        for text in [
+            "Don't, it's the users' data from the '90s, rock 'n' roll.",
+            "Don\u{2019}t, it\u{2019}s the users\u{2019} data from the \u{2019}90s, rock \u{2019}n\u{2019} roll.",
+            "It was rock \u{2018}n\u{2019} roll.",
+        ] {
+            assert_eq!(quotes(text), Vec::<&str>::new(), "{text}");
+        }
+        assert_eq!(
+            quotes("\"It's 'fine' now,\" she said."),
+            ["\"It's 'fine' now,\"", "'fine'"]
+        );
+    }
+
+    #[test]
+    fn a_straight_mark_inside_a_curly_quote_leaves_it_whole() {
+        let text = "\u{201c}The 7\" screen broke prior to the launch,\u{201d} she said.";
+        assert_eq!(quotes(text), [&text[..text.find(" she").unwrap()]]);
+        let text =
+            "\u{201c}He wrote \"x\" in order to win and prior to that left,\u{201d} she said.";
+        assert_eq!(quotes(text), [&text[..text.find(" she").unwrap()], "\"x\""]);
+        assert_eq!(
+            quotes("\"The 7\" screen broke prior to launch,\" she said."),
+            ["\"The 7\" screen broke prior to launch,\""]
+        );
+        assert_eq!(quotes("He said \"ok\" and the 7\" one broke."), ["\"ok\""]);
+    }
+
+    #[test]
+    fn a_possessive_or_an_elision_neither_opens_nor_ends_a_quote() {
+        let text = "She said \u{2018}it\u{2019}s the users\u{2019} data, kept prior to launch\u{2019} to me.";
+        assert_eq!(
+            quotes(text),
+            [&text[text.find('\u{2018}').unwrap()..text.find(" to me").unwrap()]]
+        );
+        assert_eq!(
+            quotes("She said 'the users' data is gone' to me."),
+            ["'the users' data is gone'"]
+        );
+        assert_eq!(
+            quotes("She said \u{2018}ask the users\u{2019} and left."),
+            ["\u{2018}ask the users\u{2019}"]
+        );
+        for text in [
+            "'Cause it rained, we left, and prior to that the users' data was lost.",
+            "\u{2018}Twas done, and prior to that the users\u{2019} data was lost.",
+            "Tell 'em the users' data is lost.",
+        ] {
+            assert_eq!(quotes(text), Vec::<&str>::new(), "{text}");
+        }
+    }
+
+    #[test]
+    fn an_edit_may_reach_into_a_quote_only_to_keep_it() {
+        let text = "It is worth noting that \"we\" won.";
+        let q = quoted_ranges(text);
+        let at = text.find('"').unwrap();
+        assert_eq!(unquoted_end(&q, text, 0, at + 2, "\"w"), Some(at));
+        assert_eq!(unquoted_end(&q, text, 0, at + 2, "\"W"), None);
+        assert_eq!(unquoted_end(&q, text, at + 1, at + 3, "us"), None);
+        assert_eq!(unquoted_end(&q, text, 0, 2, "It"), Some(2));
     }
 }

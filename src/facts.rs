@@ -67,7 +67,6 @@ const WORDS: [&str; 13] = [
     "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
     "eleven", "twelve",
 ];
-static QUOTE: LazyLock<Regex> = LazyLock::new(|| re(r#""([^"\n]{1,120})""#));
 static CODE: LazyLock<Regex> = LazyLock::new(|| re(r"`([^`\n]+)`"));
 /// An ordered-list marker is structure, not a figure.
 static LIST_MARKER: LazyLock<Regex> = LazyLock::new(|| re(r"(?m)^[ \t]*\d+[.)][ \t]"));
@@ -97,6 +96,13 @@ fn number_key(s: &str) -> String {
 
 fn straight(s: &str) -> String {
     s.replace(['\u{201c}', '\u{201d}'], "\"")
+        .replace(['\u{2018}', '\u{2019}'], "'")
+}
+
+/// A quote's words as a comparable key: marks straight, and every run of
+/// whitespace one space, so a quote wrapped over a line is one fact.
+fn quote_key(s: &str) -> String {
+    straight(s).split_whitespace().collect::<Vec<_>>().join(" ")
 }
 
 /// Blank `range` in `s`, keeping byte length, so later patterns skip it.
@@ -111,12 +117,24 @@ fn line_at(text: &str, at: usize) -> usize {
 
 /// Every fact in `text`, first occurrence of each, in document order.
 pub fn facts(text: &str) -> Vec<Fact> {
-    let text = straight(text);
     let mut found: Vec<(usize, Kind, String, String)> = Vec::new();
+
+    // Quotes from the text as written, by the one definition of a quotation:
+    // the words between the marks, inline code and all.
+    for (start, end) in text::quoted_ranges(text) {
+        let quote = &text[start..end];
+        let open = quote.chars().next().map_or(0, char::len_utf8);
+        let close = quote.chars().next_back().map_or(0, char::len_utf8);
+        let words = &quote[open..quote.len() - close];
+        let shown = words.split_whitespace().collect::<Vec<_>>().join(" ");
+        if !shown.is_empty() {
+            found.push((start + open, Kind::Quote, shown, quote_key(words)));
+        }
+    }
 
     // Code first, from the raw text: a code span is a fact, and everything
     // after reads the text with code masked.
-    for c in CODE.captures_iter(&text) {
+    for c in CODE.captures_iter(text) {
         let inner = c.get(1).unwrap();
         found.push((
             inner.start(),
@@ -125,16 +143,7 @@ pub fn facts(text: &str) -> Vec<Fact> {
             inner.as_str().into(),
         ));
     }
-    let mut prose = text::mask_code(&text);
-    for c in QUOTE.captures_iter(&prose.clone()) {
-        let inner = c.get(1).unwrap();
-        found.push((
-            inner.start(),
-            Kind::Quote,
-            inner.as_str().into(),
-            inner.as_str().into(),
-        ));
-    }
+    let mut prose = text::mask_code(text);
     for m in DATE.find_iter(&prose.clone()) {
         found.push((
             m.start(),
@@ -172,7 +181,7 @@ pub fn facts(text: &str) -> Vec<Fact> {
         out.push(Fact {
             kind,
             text: shown,
-            line: line_at(&text, at),
+            line: line_at(text, at),
             key,
         });
     }
@@ -190,13 +199,15 @@ impl Survival {
     pub fn between(source: &str, rewrite: &str) -> Self {
         let wanted = facts(source);
         let have = facts(rewrite);
+        let words = quote_key(rewrite);
         let rewrite = straight(rewrite);
         let missing = wanted
             .iter()
             .filter(|f| {
                 let kept = match f.kind {
                     // A quote or code span kept is its words, wherever they went.
-                    Kind::Quote | Kind::Code => rewrite.contains(&f.key),
+                    Kind::Quote => words.contains(&f.key),
+                    Kind::Code => rewrite.contains(&f.key),
                     Kind::Number | Kind::Date => {
                         have.iter().any(|h| h.kind == f.kind && h.key == f.key)
                             || (f.kind == Kind::Number && spelt_out(&f.key, &rewrite))
@@ -292,6 +303,22 @@ mod tests {
         let s = Survival::between("It ran for 6 weeks at 22 kW.", "It ran for six weeks.");
         let missing: Vec<_> = s.missing.iter().map(|f| f.text.as_str()).collect();
         assert_eq!(missing, ["22 kW"]);
+    }
+
+    #[test]
+    fn a_wrapped_quote_is_one_fact_and_its_code_is_shown_as_written() {
+        let source = "She said \"ship it\nnow, not later\" and \"run `make` now\" today.";
+        assert_eq!(
+            shown(source),
+            [
+                (Kind::Quote, "ship it now, not later".into()),
+                (Kind::Quote, "run `make` now".into()),
+                (Kind::Code, "make".into()),
+            ]
+        );
+        let s = Survival::between(source, "She said \"ship it now,\nnot later\" today.");
+        let missing: Vec<_> = s.missing.iter().map(|f| f.text.as_str()).collect();
+        assert_eq!(missing, ["run `make` now", "make"]);
     }
 
     #[test]

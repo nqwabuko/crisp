@@ -262,11 +262,12 @@ pub fn detell_locate(text: &str) -> Vec<Hit> {
 /// depends on meaning and the engine does not get a vote on meaning.
 pub fn simplify_locate(text: &str) -> Vec<Hit> {
     let mut found = Vec::new();
+    // A clutter fix inside a quote would edit somebody's words, so the rewrite
+    // skips it and locate does not offer it. Quotes are found on the whole
+    // text, because a quote may hold inline code, which splits a span.
+    let quotes = text::quoted_ranges(text);
 
     for (base, span) in text::prose_spans(text) {
-        // A clutter fix inside a quote would edit somebody's words, so the
-        // rewrite skips it and locate does not offer it.
-        let quotes = text::quoted_ranges(span);
         for rule @ ClutterRule {
             name, pat, guard, ..
         } in rules::CLUTTER.iter()
@@ -276,15 +277,17 @@ pub fn simplify_locate(text: &str) -> Vec<Hit> {
                     continue;
                 }
                 let m = caps.get(0).expect("group 0 always exists");
-                if text::inside(&quotes, m.start()) {
+                let fix = rules::clutter_fix(rule, &caps);
+                let (start, end) = (base + m.start(), base + m.end());
+                if text::unquoted_end(&quotes, text, start, end, &fix).is_none() {
                     continue;
                 }
                 found.push(Hit {
                     rule: name,
                     kind: Kind::Clutter,
-                    start: base + m.start(),
-                    end: base + m.end(),
-                    fix: Some(rules::clutter_fix(rule, &caps)),
+                    start,
+                    end,
+                    fix: Some(fix),
                     hint: None,
                 });
             }
