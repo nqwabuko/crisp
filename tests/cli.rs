@@ -65,23 +65,23 @@ fn a_missing_file_exits_2_with_usage() {
 }
 
 /// Order is part of the contract: document order, and at a tie the order of
-/// crisp's tables. `padded.md` opens with a clutter fix and a complexity flag
-/// at the same position, clutter first; breaking the tie by rule name, or not
+/// crisp's tables. `bloated-insight.md` has `there-is` and `hedge-stack` at
+/// the same position, in table order; breaking the tie by rule name, or not
 /// keeping it stable, would swap them.
 #[test]
 fn a_tie_keeps_the_tables_order() {
     let out = Command::new(BIN)
-        .args(["simplify", "--locate", "fixtures/padded.md"])
+        .args(["simplify", "--locate", "fixtures/bloated-insight.md"])
         .current_dir(repo())
         .output()
         .expect("crisp runs");
     let v: Value = serde_json::from_slice(&out.stdout).expect("JSON on stdout");
-    let at_3_1: Vec<&str> = v["findings"]
+    let at_17_34: Vec<&str> = v["findings"]
         .as_array()
         .expect("a list")
         .iter()
-        .filter(|f| f["line"] == 3 && f["col"] == 1)
+        .filter(|f| f["line"] == 17 && f["col"] == 34)
         .map(|f| f["rule"].as_str().expect("a rule name"))
         .collect();
-    assert_eq!(at_3_1, ["padding:note", "audience-briefing"]);
+    assert_eq!(at_17_34, ["there-is", "hedge-stack"]);
 }

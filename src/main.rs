@@ -2,10 +2,9 @@
 //!
 //! Everything this file decides is a pure function of the arguments and the text
 //! (`parse`, `run`); `main` alone reads the input and the baseline,
-//! prints and exits. The output is the Python scripts' output:
-//! `tests/conformance.rs` runs both on every fixture and requires the same
-//! stdout, the same `--report`, the same parsed JSON and the same exit code
-//! (`tests/insight.rs` does the same under `--insight`).
+//! prints and exits. The contract is `fixtures/golden.json`, recorded by
+//! `tests/golden.rs`: every fixture's stdout, `--report`, parsed JSON and exit
+//! code must match it.
 
 use crisp::insight::{self, Failure};
 use crisp::report::{self, Simplified};
@@ -105,7 +104,7 @@ fn parse(argv: &[String]) -> Result<Args, String> {
                 let file = it.next().ok_or("--baseline needs a FILE")?;
                 args.baseline = Some(file.clone());
             }
-            (_, flag) if flag.starts_with('-') && flag != "-" => {
+            (_, flag) if flag.starts_with('-') => {
                 return Err(format!("unrecognised argument: {flag}"));
             }
             (_, file) => {
@@ -147,10 +146,10 @@ fn run(args: &Args, text: &str, baseline: Option<&str>) -> Out {
         (Cmd::Grammar, true) => (pretty(&grammar(text)), String::new(), false),
         #[cfg(feature = "grammar")]
         (Cmd::Grammar, false) => {
-            let flags = grammar_flags(text);
+            let flags = report::grammar_flags(text, &crisp::grammar::grammar_locate(text));
             let stderr = match (args.json, args.report) {
-                (true, _) => pretty(&grammar_json(&flags)),
-                (false, true) => grammar_text(&flags) + "\n",
+                (true, _) => pretty(&report::grammar_json(&flags)),
+                (false, true) => report::grammar_text(&flags) + "\n",
                 (false, false) => String::new(),
             };
             (text.to_string(), stderr, false)
@@ -224,95 +223,6 @@ fn grammar(text: &str) -> Value {
     json!({
         "coordinates": COORDINATES,
         "findings": findings(text, crisp::grammar::grammar_locate(text)),
-    })
-}
-
-/// One rule's findings for the report: how many, and the first three in context.
-#[cfg(feature = "grammar")]
-#[derive(Debug, PartialEq)]
-struct Flag {
-    rule: &'static str,
-    count: usize,
-    samples: Vec<String>,
-}
-
-/// detell's report shape: one entry per rule, most frequent first, ties in the
-/// order the rules first fire.
-#[cfg(feature = "grammar")]
-fn grammar_flags(text: &str) -> Vec<Flag> {
-    let mut flags: Vec<Flag> = Vec::new();
-    for hit in crisp::grammar::grammar_locate(text) {
-        let mut sample = sample(text, hit.start, hit.end);
-        if let Some(fix) = &hit.fix {
-            sample = format!("{sample}  \u{2192} {fix:?}");
-        }
-        match flags.iter_mut().find(|f| f.rule == hit.rule) {
-            Some(f) => {
-                f.count += 1;
-                if f.samples.len() < 3 {
-                    f.samples.push(sample);
-                }
-            }
-            None => flags.push(Flag {
-                rule: hit.rule,
-                count: 1,
-                samples: vec![sample],
-            }),
-        }
-    }
-    flags.sort_by_key(|f| std::cmp::Reverse(f.count));
-    flags
-}
-
-/// detell's `_sample`: the hit with 24 characters either side, on one line.
-#[cfg(feature = "grammar")]
-fn sample(text: &str, start: usize, end: usize) -> String {
-    const PAD: usize = 24;
-    let before: Vec<(usize, char)> = text[..start].char_indices().collect();
-    let a = before.len().checked_sub(PAD).map_or(0, |i| before[i].0);
-    let b = text[end..]
-        .char_indices()
-        .nth(PAD)
-        .map_or(text.len(), |(i, _)| end + i);
-    let snip = text[a..b].replace('\n', " ");
-    format!(
-        "{}{}{}",
-        if a > 0 { "\u{2026}" } else { "" },
-        snip.trim(),
-        if b < text.len() { "\u{2026}" } else { "" }
-    )
-}
-
-#[cfg(feature = "grammar")]
-fn grammar_text(flags: &[Flag]) -> String {
-    let total: usize = flags.iter().map(|f| f.count).sum();
-    let mut l = vec!["\u{2500}\u{2500} grammar report ".to_string() + &"\u{2500}".repeat(28)];
-    if flags.is_empty() {
-        l.push("FLAGGED: nothing".into());
-    } else {
-        l.push(format!(
-            "FLAGGED (British English, needs a human pass, {total}):"
-        ));
-        for f in flags {
-            l.push(format!("  {:>3}  {}", f.count, f.rule));
-            for s in &f.samples {
-                l.push(format!("         \u{b7} {s}"));
-            }
-        }
-    }
-    l.push("\u{2500}".repeat(46));
-    l.join("\n")
-}
-
-#[cfg(feature = "grammar")]
-fn grammar_json(flags: &[Flag]) -> Value {
-    let list: Vec<Value> = flags
-        .iter()
-        .map(|f| json!({"rule": f.rule, "count": f.count, "samples": f.samples}))
-        .collect();
-    json!({
-        "flags": list,
-        "total_flags": flags.iter().map(|f| f.count).sum::<usize>(),
     })
 }
 
@@ -430,13 +340,24 @@ fn main() -> ExitCode {
         None => None,
     };
     let out = run(&args, &text, baseline.as_deref());
-    if let Err(e) = std::io::stdout().lock().write_all(out.stdout.as_bytes()) {
-        eprintln!("crisp: cannot write stdout: {e}");
-        return ExitCode::FAILURE;
+    // A write that fails exits 2, never 1: 1 is `--check`'s verdict on the text,
+    // and a broken pipe or a full disk says nothing about the text. The report
+    // still goes to stderr when only stdout failed.
+    let written = {
+        // Flushed here, or a last line without a newline fails unseen at exit.
+        let mut stdout = std::io::stdout().lock();
+        stdout
+            .write_all(out.stdout.as_bytes())
+            .and_then(|()| stdout.flush())
+    };
+    if let Err(e) = &written {
+        let _ = writeln!(std::io::stderr(), "crisp: cannot write stdout: {e}");
     }
-    if let Err(e) = std::io::stderr().lock().write_all(out.stderr.as_bytes()) {
-        eprintln!("crisp: cannot write stderr: {e}");
-        return ExitCode::FAILURE;
+    // A stderr that cannot be written has nowhere to report itself: the exit
+    // code is the message.
+    let reported = std::io::stderr().lock().write_all(out.stderr.as_bytes());
+    if written.is_err() || reported.is_err() {
+        return ExitCode::from(2);
     }
     ExitCode::from(out.code)
 }

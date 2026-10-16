@@ -7,10 +7,10 @@
 //! leaks code references or a customer's commercial numbers. This checks those,
 //! and never scores prose; the prose budget still applies alongside it.
 //!
-//! The tables below are the program, as in `rules.rs`. `tests/golden.rs` holds
-//! the section names and code-reference rules against crisp's recorded
-//! `__config__.insight`, and `tests/insight.rs` holds every mode against the
-//! script.
+//! The tables below are the program, as in `rules.rs`. `fixtures/golden.json`,
+//! recorded by `tests/golden.rs`, is the contract: it holds the section names
+//! and code-reference rules in `__config__.insight`, and the insight documents
+//! in `__cases__`.
 
 use regex::Regex;
 use std::sync::LazyLock;

@@ -174,6 +174,15 @@
             "text": "synergy"
           },
           {
+            "col": 1,
+            "end_col": 23,
+            "end_line": 4,
+            "kind": "tell",
+            "line": 4,
+            "rule": "phrase:worth-noting",
+            "text": "It’s worth noting that"
+          },
+          {
             "col": 46,
             "end_col": 53,
             "end_line": 4,
@@ -248,6 +257,222 @@
         ]
       }
     },
+    "detell --locate < fixtures/cases/curly-apostrophe.md": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": {
+        "coordinates": "1-based line and column over the input; end_col exclusive",
+        "findings": [
+          {
+            "col": 1,
+            "end_col": 23,
+            "end_line": 1,
+            "kind": "tell",
+            "line": 1,
+            "rule": "phrase:worth-noting",
+            "text": "It’s worth noting that"
+          },
+          {
+            "col": 1,
+            "end_col": 27,
+            "end_line": 2,
+            "kind": "tell",
+            "line": 2,
+            "rule": "phrase:not-just",
+            "text": "It’s not just a tool, it’s"
+          },
+          {
+            "col": 10,
+            "end_col": 14,
+            "end_line": 2,
+            "kind": "tell",
+            "line": 2,
+            "rule": "hedge:filler",
+            "text": "just"
+          },
+          {
+            "col": 1,
+            "end_col": 11,
+            "end_line": 3,
+            "kind": "tell",
+            "line": 3,
+            "rule": "phrase:dive-in",
+            "text": "Let’s dive"
+          },
+          {
+            "col": 1,
+            "end_col": 22,
+            "end_line": 4,
+            "kind": "tell",
+            "line": 4,
+            "rule": "phrase:todays-world",
+            "text": "In today’s fast-paced"
+          },
+          {
+            "col": 1,
+            "end_col": 15,
+            "end_line": 5,
+            "kind": "tell",
+            "line": 5,
+            "rule": "phrase:whether-youre",
+            "text": "Whether you’re"
+          },
+          {
+            "col": 1,
+            "end_col": 14,
+            "end_line": 6,
+            "kind": "tell",
+            "line": 6,
+            "rule": "phrase:we-will",
+            "text": "We’ll explore"
+          },
+          {
+            "col": 1,
+            "end_col": 19,
+            "end_line": 7,
+            "kind": "tell",
+            "line": 7,
+            "rule": "phrase:no-denying",
+            "text": "There’s no denying"
+          },
+          {
+            "col": 1,
+            "end_col": 34,
+            "end_line": 8,
+            "kind": "tell",
+            "line": 8,
+            "rule": "phrase:not-x-its-y",
+            "text": "This isn’t a reporting tool. It’s"
+          },
+          {
+            "col": 1,
+            "end_col": 27,
+            "end_line": 9,
+            "kind": "tell",
+            "line": 9,
+            "rule": "phrase:not-x-its-y",
+            "text": "It isn’t about speed, it’s"
+          },
+          {
+            "col": 1,
+            "end_col": 17,
+            "end_line": 10,
+            "kind": "tell",
+            "line": 10,
+            "rule": "phrase:run-up",
+            "text": "Here’s the thing"
+          },
+          {
+            "col": 1,
+            "end_col": 24,
+            "end_line": 11,
+            "kind": "tell",
+            "line": 11,
+            "rule": "phrase:closer-line",
+            "text": "That’s the whole point."
+          },
+          {
+            "col": 1,
+            "end_col": 18,
+            "end_line": 12,
+            "kind": "tell",
+            "line": 12,
+            "rule": "phrase:borrowed-authority",
+            "text": "It’s widely known"
+          },
+          {
+            "col": 1,
+            "end_col": 16,
+            "end_line": 13,
+            "kind": "tell",
+            "line": 13,
+            "rule": "chat:happy-to",
+            "text": "I’d be happy to"
+          },
+          {
+            "col": 1,
+            "end_col": 24,
+            "end_line": 14,
+            "kind": "tell",
+            "line": 14,
+            "rule": "chat:sycophancy",
+            "text": "You’re absolutely right"
+          },
+          {
+            "col": 1,
+            "end_col": 23,
+            "end_line": 15,
+            "kind": "tell",
+            "line": 15,
+            "rule": "chat:knowledge-limit",
+            "text": "I don’t have real-time"
+          },
+          {
+            "col": 1,
+            "end_col": 23,
+            "end_line": 16,
+            "kind": "tell",
+            "line": 16,
+            "rule": "chat:heres-summary",
+            "text": "Here’s a quick summary"
+          },
+          {
+            "col": 1,
+            "end_col": 30,
+            "end_line": 18,
+            "kind": "tell",
+            "line": 18,
+            "rule": "heading:title-case",
+            "text": "## Driver’s Guide To Charging"
+          }
+        ]
+      }
+    },
+    "detell --locate < fixtures/cases/no-wrong-fix.md": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": {
+        "coordinates": "1-based line and column over the input; end_col exclusive",
+        "findings": [
+          {
+            "col": 73,
+            "end_col": 79,
+            "end_line": 4,
+            "kind": "tell",
+            "line": 4,
+            "rule": "hedge:filler",
+            "text": "really"
+          },
+          {
+            "col": 17,
+            "end_col": 38,
+            "end_line": 16,
+            "kind": "tell",
+            "line": 16,
+            "rule": "phrase:end-of-day",
+            "text": "at the end of the day"
+          },
+          {
+            "col": 1,
+            "end_col": 27,
+            "end_line": 19,
+            "kind": "tell",
+            "line": 19,
+            "rule": "phrase:not-x-its-y",
+            "text": "It isn't about speed, it's"
+          },
+          {
+            "col": 25,
+            "end_col": 45,
+            "end_line": 21,
+            "kind": "tell",
+            "line": 21,
+            "rule": "phrase:ing-tail",
+            "text": ", marking the end of"
+          }
+        ]
+      }
+    },
     "detell --locate fixtures/cases/carriage-returns.md": {
       "exit": 0,
       "stderr": "",
@@ -279,6 +504,11 @@
       "exit": 0,
       "stderr": "── detell report ─────────────────────────────\nFIXED (auto, 7):\n    7  crlf\nFLAGGED (needs a human/voice pass, 2):\n    1  phrase:not-just\n         · Honestly it is fine but it's not just a fix, it's a paradigm shift that w…\n    1  hedge:filler\n         · …it is fine but it's not just a fix, it's a paradigm…\n──────────────────────────────────────────────\n",
       "stdout": "Honestly it is fine but it's not just a fix,\nit's a paradigm shift that we need.\n\nThe values are not received on a regular\nbasis, which happened during the\ncourse of the last quarter and was raised\nby multiple customers.\n"
+    },
+    "detell --report < fixtures/cases/curly-apostrophe.md": {
+      "exit": 0,
+      "stderr": "── detell report ─────────────────────────────\nFIXED (auto, 20):\n   20  curly_single\nFLAGGED (needs a human/voice pass, 18):\n    2  phrase:not-x-its-y\n         · …e's no denying the gap. This isn't a reporting tool. It's a decision engine. It i…\n         · …It's a decision engine. It isn't about speed, it's trust. Here's the thing…\n    1  phrase:not-just\n         · …h noting that it broke. It's not just a tool, it's a platform. Let's dive…\n    1  phrase:dive-in\n         · …tool, it's a platform. Let's dive in. In today's fast-pac…\n    1  phrase:todays-world\n         · …latform. Let's dive in. In today's fast-paced market, speed wins. Whe…\n    1  phrase:worth-noting\n         · It's worth noting that it broke. It's not just…\n    1  phrase:whether-youre\n         · …ced market, speed wins. Whether you're new or not, read on. We…\n    1  phrase:we-will\n         · …re new or not, read on. We'll explore the tariffs. There's no…\n    1  phrase:no-denying\n         · …ll explore the tariffs. There's no denying the gap. This isn't a r…\n    1  phrase:run-up\n         · …bout speed, it's trust. Here's the thing: the meter lies. That's…\n    1  phrase:closer-line\n         · …thing: the meter lies. That's the whole point. It's widely known as be…\n    1  phrase:borrowed-authority\n         · …That's the whole point. It's widely known as best practice. I'd b…\n    1  chat:happy-to\n         · …known as best practice. I'd be happy to help. You're absolutely…\n    1  chat:sycophancy\n         · …. I'd be happy to help. You're absolutely right. I don't have real-time…\n    1  chat:knowledge-limit\n         · …ou're absolutely right. I don't have real-time data. Here's a quick su…\n    1  chat:heres-summary\n         · …'t have real-time data. Here's a quick summary. ## Driver's Guide To C…\n    1  heading:title-case\n         · …ere's a quick summary.  ## Driver's Guide To Charging\n    1  hedge:filler\n         · …that it broke. It's not just a tool, it's a platform…\n──────────────────────────────────────────────\n",
+      "stdout": "It's worth noting that it broke.\nIt's not just a tool, it's a platform.\nLet's dive in.\nIn today's fast-paced market, speed wins.\nWhether you're new or not, read on.\nWe'll explore the tariffs.\nThere's no denying the gap.\nThis isn't a reporting tool. It's a decision engine.\nIt isn't about speed, it's trust.\nHere's the thing: the meter lies.\nThat's the whole point.\nIt's widely known as best practice.\nI'd be happy to help.\nYou're absolutely right.\nI don't have real-time data.\nHere's a quick summary.\n\n## Driver's Guide To Charging\n"
     },
     "detell --report < fixtures/cases/rewrite-edges.txt": {
       "exit": 0,
@@ -1830,21 +2060,28 @@
           "clutter:before": 1,
           "clutter:plan": 1,
           "clutter:purposes": 1,
-          "clutter:result": 2,
           "clutter:revert": 1,
           "clutter:together": 1,
           "padding:fact": 1,
           "padding:note": 1,
-          "padding:ultimately": 1,
           "run_spaces": 3
         },
         "flags": [
+          {
+            "count": 2,
+            "hint": "usually just \"result\"; keep \"end\" in \"front end\", \"dead end\" and \"in the end\"",
+            "rule": "end-result",
+            "samples": [
+              "...ran 3–5–7 tests… Before the end result, “it” reverted. \"we\" combin...",
+              "...reverted. \"we\" combined the End Results for testing and for the pur..."
+            ]
+          },
           {
             "count": 1,
             "hint": "collapse to \"to\" + verb (\"for the purpose of testing\" -> \"to test\")",
             "rule": "for-the-purpose",
             "samples": [
-              "...the Results for testing and for the purposes of audit , , weekly. Rather th..."
+              "...End Results for testing and for the purposes of audit , , weekly. Rather th..."
             ]
           }
         ],
@@ -1853,25 +2090,25 @@
         "long_sentences": [],
         "metrics": {
           "flesch_kincaid_grade": 3.4,
-          "flesch_reading_ease": 85.7,
-          "max_paragraph_words": 33,
-          "max_sentence_words": 13,
-          "mean_sentence_words": 8.2,
+          "flesch_reading_ease": 89.1,
+          "max_paragraph_words": 41,
+          "max_sentence_words": 14,
+          "mean_sentence_words": 10.2,
           "paragraphs": 1,
           "pct_long_sentences": 0.0,
           "pct_long_words": 0.0,
-          "pct_ly_adverbs": 3.0,
+          "pct_ly_adverbs": 2.4,
           "pct_passive_sentences": 0.0,
           "sentences": 4,
-          "words": 33
+          "words": 41
         },
         "over_budget": [],
         "promised_not_unpacked": [],
         "scored": true,
-        "total_fixes": 14,
-        "total_flags": 1
+        "total_fixes": 11,
+        "total_flags": 3
       },
-      "stdout": "In order to ship — fast — we ran 3–5–7 tests… Before the result, “it” reverted.\n\"we\" combined the Results for testing and for the purposes of audit , , weekly. Rather than wait, we planned.\nIt broke.\t \t"
+      "stdout": "In order to ship — fast — we ran 3–5–7 tests… Before the end result, “it” reverted.\n\"we\" combined the End Results for testing and for the purposes of audit , , weekly. Rather than wait, we planned.\nAt the end of the day it broke.\t \t"
     },
     "simplify --locate --spans < fixtures/ai-tells.md": {
       "exit": 0,
@@ -1888,6 +2125,16 @@
             "line": 1,
             "rule": "padding",
             "text": "Certainly"
+          },
+          {
+            "col": 1,
+            "end_col": 25,
+            "end_line": 4,
+            "fix": "T",
+            "kind": "clutter",
+            "line": 4,
+            "rule": "padding:note",
+            "text": "It’s worth noting that t"
           }
         ],
         "metrics": {
@@ -2194,6 +2441,316 @@
         }
       }
     },
+    "simplify --locate < fixtures/cases/curly-apostrophe.md": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": {
+        "coordinates": "1-based line and column over the input; end_col exclusive",
+        "findings": [
+          {
+            "col": 1,
+            "end_col": 25,
+            "end_line": 1,
+            "fix": "I",
+            "kind": "clutter",
+            "line": 1,
+            "rule": "padding:note",
+            "text": "It’s worth noting that i"
+          },
+          {
+            "col": 10,
+            "end_col": 14,
+            "end_line": 2,
+            "hint": "filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")",
+            "kind": "complexity",
+            "line": 2,
+            "rule": "padding",
+            "text": "just"
+          },
+          {
+            "col": 8,
+            "end_col": 18,
+            "end_line": 14,
+            "hint": "filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")",
+            "kind": "complexity",
+            "line": 14,
+            "rule": "padding",
+            "text": "absolutely"
+          }
+        ],
+        "metrics": {
+          "flesch_kincaid_grade": 2.2,
+          "flesch_reading_ease": 88.3,
+          "max_paragraph_words": 87,
+          "max_sentence_words": 8,
+          "mean_sentence_words": 5.1,
+          "paragraphs": 2,
+          "pct_long_sentences": 0.0,
+          "pct_long_words": 5.5,
+          "pct_ly_adverbs": 2.2,
+          "pct_passive_sentences": 0.0,
+          "sentences": 18,
+          "words": 91
+        },
+        "over_budget": [],
+        "scored": true
+      }
+    },
+    "simplify --locate < fixtures/cases/no-wrong-fix.md": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": {
+        "coordinates": "1-based line and column over the input; end_col exclusive",
+        "findings": [
+          {
+            "col": 12,
+            "end_col": 31,
+            "end_line": 1,
+            "hint": "say \"can\" or \"could\"; after a modal or \"to\" say \"be able to\" (\"users will be able to export\", never \"will can\")",
+            "kind": "complexity",
+            "line": 1,
+            "rule": "ability-to",
+            "text": "have the ability to"
+          },
+          {
+            "col": 57,
+            "end_col": 76,
+            "end_line": 1,
+            "hint": "say \"can\" or \"could\"; after a modal or \"to\" say \"be able to\" (\"users will be able to export\", never \"will can\")",
+            "kind": "complexity",
+            "line": 1,
+            "rule": "ability-to",
+            "text": "have the ability to"
+          },
+          {
+            "col": 11,
+            "end_col": 29,
+            "end_line": 2,
+            "hint": "say \"can\" or \"could\"; after a modal or \"to\" say \"be able to\" (\"users will be able to export\", never \"will can\")",
+            "kind": "complexity",
+            "line": 2,
+            "rule": "ability-to",
+            "text": "had the ability to"
+          },
+          {
+            "col": 59,
+            "end_col": 78,
+            "end_line": 2,
+            "hint": "say \"can\" or \"could\"; after a modal or \"to\" say \"be able to\" (\"users will be able to export\", never \"will can\")",
+            "kind": "complexity",
+            "line": 2,
+            "rule": "ability-to",
+            "text": "have the ability to"
+          },
+          {
+            "col": 10,
+            "end_col": 28,
+            "end_line": 3,
+            "hint": "say \"can\" or \"could\"; after a modal or \"to\" say \"be able to\" (\"users will be able to export\", never \"will can\")",
+            "kind": "complexity",
+            "line": 3,
+            "rule": "ability-to",
+            "text": "has the ability to"
+          },
+          {
+            "col": 39,
+            "end_col": 57,
+            "end_line": 3,
+            "hint": "say \"can\" or \"could\"; after a modal or \"to\" say \"be able to\" (\"users will be able to export\", never \"will can\")",
+            "kind": "complexity",
+            "line": 3,
+            "rule": "ability-to",
+            "text": "had the ability to"
+          },
+          {
+            "col": 24,
+            "end_col": 43,
+            "end_line": 4,
+            "hint": "say \"can\" or \"could\"; after a modal or \"to\" say \"be able to\" (\"users will be able to export\", never \"will can\")",
+            "kind": "complexity",
+            "line": 4,
+            "rule": "ability-to",
+            "text": "have the ability to"
+          },
+          {
+            "col": 73,
+            "end_col": 79,
+            "end_line": 4,
+            "hint": "filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")",
+            "kind": "complexity",
+            "line": 4,
+            "rule": "padding",
+            "text": "really"
+          },
+          {
+            "col": 80,
+            "end_col": 99,
+            "end_line": 4,
+            "hint": "say \"can\" or \"could\"; after a modal or \"to\" say \"be able to\" (\"users will be able to export\", never \"will can\")",
+            "kind": "complexity",
+            "line": 4,
+            "rule": "ability-to",
+            "text": "have the ability to"
+          },
+          {
+            "col": 11,
+            "end_col": 31,
+            "end_line": 7,
+            "fix": "for testing",
+            "kind": "clutter",
+            "line": 7,
+            "rule": "clutter:purposes",
+            "text": "for testing purposes"
+          },
+          {
+            "col": 63,
+            "end_col": 76,
+            "end_line": 9,
+            "fix": "planned",
+            "kind": "clutter",
+            "line": 9,
+            "rule": "clutter:plan",
+            "text": "planned ahead"
+          },
+          {
+            "col": 71,
+            "end_col": 86,
+            "end_line": 10,
+            "fix": "merged",
+            "kind": "clutter",
+            "line": 10,
+            "rule": "clutter:together",
+            "text": "merged together"
+          },
+          {
+            "col": 11,
+            "end_col": 22,
+            "end_line": 11,
+            "hint": "usually just \"result\"; keep \"end\" in \"front end\", \"dead end\" and \"in the end\"",
+            "kind": "complexity",
+            "line": 11,
+            "rule": "end-result",
+            "text": "end results"
+          },
+          {
+            "col": 52,
+            "end_col": 63,
+            "end_line": 11,
+            "hint": "usually just \"result\"; keep \"end\" in \"front end\", \"dead end\" and \"in the end\"",
+            "kind": "complexity",
+            "line": 11,
+            "rule": "end-result",
+            "text": "end results"
+          },
+          {
+            "col": 82,
+            "end_col": 92,
+            "end_line": 11,
+            "hint": "usually just \"result\"; keep \"end\" in \"front end\", \"dead end\" and \"in the end\"",
+            "kind": "complexity",
+            "line": 11,
+            "rule": "end-result",
+            "text": "end result"
+          },
+          {
+            "col": 1,
+            "end_col": 16,
+            "end_line": 13,
+            "hint": "buried verb: turn the noun back into a verb (\"the migration of the chargers\" -> \"migrating the chargers\")",
+            "kind": "complexity",
+            "line": 13,
+            "rule": "nominalisation",
+            "text": "The majority of"
+          },
+          {
+            "col": 1,
+            "end_col": 16,
+            "end_line": 13,
+            "hint": "usually \"most\": \"most users\", but \"most of the users\" and \"most of what we sell\"; a margin (\"a majority of 3\") stays",
+            "kind": "complexity",
+            "line": 13,
+            "rule": "majority-of",
+            "text": "The majority of"
+          },
+          {
+            "col": 34,
+            "end_col": 49,
+            "end_line": 13,
+            "hint": "buried verb: turn the noun back into a verb (\"the migration of the chargers\" -> \"migrating the chargers\")",
+            "kind": "complexity",
+            "line": 13,
+            "rule": "nominalisation",
+            "text": "The majority of"
+          },
+          {
+            "col": 34,
+            "end_col": 49,
+            "end_line": 13,
+            "hint": "usually \"most\": \"most users\", but \"most of the users\" and \"most of what we sell\"; a margin (\"a majority of 3\") stays",
+            "kind": "complexity",
+            "line": 13,
+            "rule": "majority-of",
+            "text": "The majority of"
+          },
+          {
+            "col": 1,
+            "end_col": 13,
+            "end_line": 14,
+            "hint": "\"now\" if it means now; leave it when it is a time (\"at this time of year\", \"at this time in 2025\")",
+            "kind": "complexity",
+            "line": 14,
+            "rule": "at-this-time",
+            "text": "At this time"
+          },
+          {
+            "col": 32,
+            "end_col": 44,
+            "end_line": 14,
+            "hint": "\"now\" if it means now; leave it when it is a time (\"at this time of year\", \"at this time in 2025\")",
+            "kind": "complexity",
+            "line": 14,
+            "rule": "at-this-time",
+            "text": "At this time"
+          },
+          {
+            "col": 20,
+            "end_col": 38,
+            "end_line": 15,
+            "hint": "context-dependent clutter: usually \"for\", \"about\", or nothing",
+            "kind": "complexity",
+            "line": 15,
+            "rule": "in-terms-of",
+            "text": "in connection with"
+          },
+          {
+            "col": 33,
+            "end_col": 42,
+            "end_line": 18,
+            "hint": "passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")",
+            "kind": "complexity",
+            "line": 18,
+            "rule": "passive",
+            "text": "is pushed"
+          }
+        ],
+        "metrics": {
+          "flesch_kincaid_grade": 4.4,
+          "flesch_reading_ease": 76.3,
+          "max_paragraph_words": 64,
+          "max_sentence_words": 12,
+          "mean_sentence_words": 7.1,
+          "paragraphs": 5,
+          "pct_long_sentences": 0.0,
+          "pct_long_words": 8.1,
+          "pct_ly_adverbs": 0.5,
+          "pct_passive_sentences": 3.2,
+          "sentences": 31,
+          "words": 221
+        },
+        "over_budget": [],
+        "scored": true
+      }
+    },
     "simplify --report --check --baseline fixtures/cases/facts-source.md fixtures/cases/facts-dropped.md": {
       "exit": 1,
       "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED: nothing\nSCORECARD: skipped, only 22 words (need 30+ to score)\nLENGTH  [SHORT]  34 -> 22 words, cut 35.3%   target >= 40.0%\nFACTS   [CHECK]  5 of 8 kept; missing: \"22 kW\" (line 1), \"Q4 2026\" (line 2), \"£0.45\" (line 3) (report only: restore it, or confirm the cut)\nVERDICT: OVER BUDGET on length\n=============================================\n",
@@ -2221,8 +2778,8 @@
     },
     "simplify --report < fixtures/cases/rewrite-edges.txt": {
       "exit": 0,
-      "stderr": "== simplify report ==========================\nCLUTTER CUT (auto, 14):\n    3  run_spaces\n    2  clutter:result\n    1  clutter:before\n    1  clutter:basis\n    1  clutter:purposes\n    1  clutter:revert\n    1  clutter:plan\n    1  clutter:together\n    1  padding:note\n    1  padding:fact\n    1  padding:ultimately\nFLAGGED (needs the rewrite pass, 1):\n    1  for-the-purpose  -> collapse to \"to\" + verb (\"for the purpose of testing\" -> \"to test\")\n         . ...the Results for testing and for the purposes of audit , , weekly. Rather th...\nSCORECARD  (33 words, 4 sentences, 1 paragraphs):\n  [PASS]  mean_sentence_words        8.2   budget <= 18.0\n  [PASS]  max_sentence_words          13   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       85.7   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       3.4   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words             0.0   budget <= 20.0\n  [PASS]  max_paragraph_words         33   budget <= 90\n  [PASS]  pct_ly_adverbs             3.0   budget <= 4.0\nVERDICT: within budget\n=============================================\n",
-      "stdout": "In order to ship — fast — we ran 3–5–7 tests… Before the result, “it” reverted.\n\"we\" combined the Results for testing and for the purposes of audit , , weekly. Rather than wait, we planned.\nIt broke.\t \t"
+      "stderr": "== simplify report ==========================\nCLUTTER CUT (auto, 11):\n    3  run_spaces\n    1  clutter:before\n    1  clutter:basis\n    1  clutter:purposes\n    1  clutter:revert\n    1  clutter:plan\n    1  clutter:together\n    1  padding:note\n    1  padding:fact\nFLAGGED (needs the rewrite pass, 3):\n    2  end-result  -> usually just \"result\"; keep \"end\" in \"front end\", \"dead end\" and \"in the end\"\n         . ...ran 3–5–7 tests… Before the end result, “it” reverted. \"we\" combin...\n         . ...reverted. \"we\" combined the End Results for testing and for the pur...\n    1  for-the-purpose  -> collapse to \"to\" + verb (\"for the purpose of testing\" -> \"to test\")\n         . ...End Results for testing and for the purposes of audit , , weekly. Rather th...\nSCORECARD  (41 words, 4 sentences, 1 paragraphs):\n  [PASS]  mean_sentence_words       10.2   budget <= 18.0\n  [PASS]  max_sentence_words          14   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       89.1   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       3.4   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words             0.0   budget <= 20.0\n  [PASS]  max_paragraph_words         41   budget <= 90\n  [PASS]  pct_ly_adverbs             2.4   budget <= 4.0\nVERDICT: within budget\n=============================================\n",
+      "stdout": "In order to ship — fast — we ran 3–5–7 tests… Before the end result, “it” reverted.\n\"we\" combined the End Results for testing and for the purposes of audit , , weekly. Rather than wait, we planned.\nAt the end of the day it broke.\t \t"
     },
     "simplify --report fixtures/cases/carriage-returns.md": {
       "exit": 0,
@@ -2233,6 +2790,16 @@
       "exit": 0,
       "stderr": "",
       "stdout": "Honestly it is fine but it's not just a fix,\r\nit's a paradigm shift that we need.\r\r\nThe values are not received regularly, which happened during the last quarter and was raised\rby multiple customers.\r\n"
+    },
+    "simplify < fixtures/cases/curly-apostrophe.md": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "It broke.\nIt’s not just a tool, it’s a platform.\nLet’s dive in.\nIn today’s fast-paced market, speed wins.\nWhether you’re new or not, read on.\nWe’ll explore the tariffs.\nThere’s no denying the gap.\nThis isn’t a reporting tool. It’s a decision engine.\nIt isn’t about speed, it’s trust.\nHere’s the thing: the meter lies.\nThat’s the whole point.\nIt’s widely known as best practice.\nI’d be happy to help.\nYou’re absolutely right.\nI don’t have real-time data.\nHere’s a quick summary.\n\n## Driver’s Guide To Charging\n"
+    },
+    "simplify < fixtures/cases/no-wrong-fix.md": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Users will have the ability to export. Operators should have the ability to override.\nIf we had had the ability to retry, we would. Users don't have the ability to delete.\nThe tool has the ability to retry. We had the ability to stop it.\nUsers will, in future, have the ability to export. Users will then also really have the ability to export.\n\nData is never used for other purposes. Shown for illustrative purposes only.\nWe log it for testing.\n\nThe plane ahead of us landed. The planet ahead was bright. We planned.\nBolt the joints together. The two groups together hold most seats. We merged the lists.\nThe front end results page is slow. Hitting a dead end results in a timeout. The end result was fine.\n\nThe majority of the users agree. The majority of users agree.\nAt this time of year it rains. At this time we have no plans.\nThe fault occurred in connection with the firmware update.\nSessions settle at the end of the day and restart at 6am.\n\nIf it isn't ready by Friday, it is pushed a week. When they aren't charging, they're idle.\nIt isn't about speed, it's trust.\nThe worker updates the row, marking the session as stopped.\nThe release ships Friday, marking the end of the pilot.\n"
     }
   },
   "__config__": {
@@ -2335,7 +2902,6 @@
         "phrase:closer",
         "phrase:game-changer",
         "phrase:navigate",
-        "phrase:unlock-pot",
         "phrase:plays-role",
         "phrase:more-than",
         "phrase:in-a-world",
@@ -2382,18 +2948,13 @@
         "clutter:period",
         "clutter:basis",
         "clutter:regularly",
-        "clutter:most",
         "clutter:few",
         "clutter:enough",
-        "clutter:can",
-        "clutter:could",
         "clutter:in",
-        "clutter:about",
         "clutter:every",
         "clutter:first",
         "clutter:purposes",
         "clutter:currently",
-        "clutter:result",
         "clutter:outcome",
         "clutter:history",
         "clutter:plans",
@@ -2421,6 +2982,10 @@
         "definition",
         "there-is",
         "it-is-that",
+        "ability-to",
+        "majority-of",
+        "at-this-time",
+        "end-result",
         "in-terms-of",
         "for-the-purpose",
         "in-the-process",
@@ -2815,6 +3380,15 @@
           "synergy"
         ],
         [
+          "phrase:worth-noting",
+          "tell",
+          4,
+          1,
+          4,
+          23,
+          "It’s worth noting that"
+        ],
+        [
           "word:vocabulary",
           "tell",
           4,
@@ -2869,6 +3443,15 @@
           1,
           10,
           "Certainly"
+        ],
+        [
+          "padding:note",
+          "clutter",
+          4,
+          1,
+          4,
+          25,
+          "It’s worth noting that t"
         ]
       ]
     },
@@ -3629,15 +4212,6 @@
           "it\nshould be noted that t"
         ],
         [
-          "audience-briefing",
-          "complexity",
-          12,
-          76,
-          13,
-          21,
-          "it\nshould be noted that"
-        ],
-        [
           "passive",
           "complexity",
           13,
@@ -4140,9 +4714,9 @@
       },
       "simplify --check --baseline --insight --json": {
         "compression": {
-          "after": 159,
+          "after": 165,
           "before": 169,
-          "cut_pct": 5.9,
+          "cut_pct": 2.4,
           "explaining": 0.775,
           "explaining_words": 131,
           "growth": 1.5,
@@ -4173,8 +4747,7 @@
           "source": 0
         },
         "fixes": {
-          "padding:note": 1,
-          "padding:ultimately": 1
+          "padding:note": 1
         },
         "flags": [
           {
@@ -4182,8 +4755,8 @@
             "hint": "filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")",
             "rule": "padding",
             "samples": [
-              "...ast the setting.  This is a really very common issue that a lo...",
-              "...setting.  This is a really very common issue that a lot of..."
+              "...e end of the day, this is a really very common issue that a lo...",
+              "...f the day, this is a really very common issue that a lot of..."
             ]
           },
           {
@@ -4223,37 +4796,42 @@
             "words": 26
           }
         ],
-        "long_sentences": [],
+        "long_sentences": [
+          {
+            "text": "At the end of the day, this is a really very common issue that a lot of people have with their heating, and it is something that we all experience.",
+            "words": 30
+          }
+        ],
         "metrics": {
-          "flesch_kincaid_grade": 7.0,
-          "flesch_reading_ease": 73.1,
+          "flesch_kincaid_grade": 7.1,
+          "flesch_reading_ease": 73.7,
           "max_paragraph_words": 49,
           "max_sentence_words": 33,
-          "mean_sentence_words": 15.9,
+          "mean_sentence_words": 16.5,
           "paragraphs": 5,
-          "pct_long_sentences": 20.0,
-          "pct_long_words": 8.2,
+          "pct_long_sentences": 30.0,
+          "pct_long_words": 7.9,
           "pct_ly_adverbs": 0.6,
           "pct_passive_sentences": 10.0,
           "sentences": 10,
-          "words": 159
+          "words": 165
         },
         "over_budget": [],
         "promised_not_unpacked": [],
         "scored": true,
-        "total_fixes": 2,
+        "total_fixes": 1,
         "total_flags": 4
       },
       "simplify --check --baseline --insight --report": {
         "exit": 1,
-        "stderr": "== simplify report ==========================\nCLUTTER CUT (auto, 2):\n    1  padding:note\n    1  padding:ultimately\nFLAGGED (needs the rewrite pass, 4):\n    2  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . ...ast the setting.  This is a really very common issue that a lo...\n         . ...setting.  This is a really very common issue that a lot of...\n    1  passive  -> passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")\n         . ...st of heat minutes after it was paid for.  It works in two steps...\n    1  it-is-that  -> delayed subject: say who does what\n         . ...ave with their heating, and it is something that we all experience.\nSCORECARD  (159 words, 10 sentences, 5 paragraphs):\n  [PASS]  mean_sentence_words       15.9   budget <= 18.0\n  [PASS]  max_sentence_words          33   budget <= 30   (24 without joined sentences)\n  [PASS]  pct_long_sentences        20.0   budget <= 15.0   (0.0 without joined sentences)\n  [PASS]  flesch_reading_ease       73.1   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       7.0   budget <= 12.0\n  [PASS]  pct_passive_sentences     10.0   budget <= 10.0\n  [PASS]  pct_long_words             8.2   budget <= 20.0\n  [PASS]  max_paragraph_words         49   budget <= 90\n  [PASS]  pct_ly_adverbs             0.6   budget <= 4.0\nLENGTH  [PASS]  169 -> 159 words, at most 219\n        77.5% of the source explains (131 words, may grow 1.5x); the rest (38 words) owes a 40.0% cut\nJOINTS  [PASS]  3 in the sentences that survived, 3 in the rewrite (because/so/but/if...)\nLISTS   [PASS]  2 unpacked list(s), every part kept\nJOINED SENTENCES (explanation, every clause within 25 words: excused):\n   33w  The boiler heats water, the water heats the radiator, and only then d...\n   26w  Second, the heat already in the water and the radiator keeps arriving...\nPASSIVE SENTENCES (name the actor):\n       The boiler heats water, the water heats the radiator, and only then d...\nINSIGHT STRUCTURE  [FAIL] (2):\n  [FAIL]  sections           missing template section(s): Context, Insight Description, Significance, Customer Details\n  [FAIL]  significance       found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line\nVERDICT: OVER BUDGET on insight structure\n=============================================\n",
-        "stdout": "# Why the radiator overshoots\n\nA thermostat loop has three parts: a sensor, a controller and a boiler. The\nsensor reads the room, the controller compares it with the setting, and the\nboiler adds heat when the room is cold.\n\nYou might wonder why the room ends up warmer than the setting. The answer is\ndelay. The boiler heats water, the water heats the radiator, and only then does\nthe radiator heat the air, so the sensor learns about each burst of heat\nminutes after it was paid for.\n\nIt works in two steps. First, the controller keeps the boiler on until the\nsensor says the room is warm enough. Second, the heat already in the water and\nthe radiator keeps arriving after the boiler stops, which means the room\ncarries on warming past the setting.\n\nThis is a really very common\nissue that a lot of people have with their heating, and it is something that we\nall experience.\n"
+        "stderr": "== simplify report ==========================\nCLUTTER CUT (auto, 1):\n    1  padding:note\nFLAGGED (needs the rewrite pass, 4):\n    2  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . ...e end of the day, this is a really very common issue that a lo...\n         . ...f the day, this is a really very common issue that a lot of...\n    1  passive  -> passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")\n         . ...st of heat minutes after it was paid for.  It works in two steps...\n    1  it-is-that  -> delayed subject: say who does what\n         . ...ave with their heating, and it is something that we all experience.\nSCORECARD  (165 words, 10 sentences, 5 paragraphs):\n  [PASS]  mean_sentence_words       16.5   budget <= 18.0\n  [PASS]  max_sentence_words          33   budget <= 30   (30 without joined sentences)\n  [PASS]  pct_long_sentences        30.0   budget <= 15.0   (10.0 without joined sentences)\n  [PASS]  flesch_reading_ease       73.7   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       7.1   budget <= 12.0\n  [PASS]  pct_passive_sentences     10.0   budget <= 10.0\n  [PASS]  pct_long_words             7.9   budget <= 20.0\n  [PASS]  max_paragraph_words         49   budget <= 90\n  [PASS]  pct_ly_adverbs             0.6   budget <= 4.0\nLENGTH  [PASS]  169 -> 165 words, at most 219\n        77.5% of the source explains (131 words, may grow 1.5x); the rest (38 words) owes a 40.0% cut\nJOINTS  [PASS]  3 in the sentences that survived, 3 in the rewrite (because/so/but/if...)\nLISTS   [PASS]  2 unpacked list(s), every part kept\nLONGEST SENTENCES (over 25 words, cut or split):\n   30w  At the end of the day, this is a really very common issue that a lot...\nJOINED SENTENCES (explanation, every clause within 25 words: excused):\n   33w  The boiler heats water, the water heats the radiator, and only then d...\n   26w  Second, the heat already in the water and the radiator keeps arriving...\nPASSIVE SENTENCES (name the actor):\n       The boiler heats water, the water heats the radiator, and only then d...\nINSIGHT STRUCTURE  [FAIL] (2):\n  [FAIL]  sections           missing template section(s): Context, Insight Description, Significance, Customer Details\n  [FAIL]  significance       found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line\nVERDICT: OVER BUDGET on insight structure\n=============================================\n",
+        "stdout": "# Why the radiator overshoots\n\nA thermostat loop has three parts: a sensor, a controller and a boiler. The\nsensor reads the room, the controller compares it with the setting, and the\nboiler adds heat when the room is cold.\n\nYou might wonder why the room ends up warmer than the setting. The answer is\ndelay. The boiler heats water, the water heats the radiator, and only then does\nthe radiator heat the air, so the sensor learns about each burst of heat\nminutes after it was paid for.\n\nIt works in two steps. First, the controller keeps the boiler on until the\nsensor says the room is warm enough. Second, the heat already in the water and\nthe radiator keeps arriving after the boiler stops, which means the room\ncarries on warming past the setting.\n\nAt the end of the day, this is a really very common\nissue that a lot of people have with their heating, and it is something that we\nall experience.\n"
       },
       "simplify --check --baseline --json": {
         "compression": {
-          "after": 159,
+          "after": 165,
           "before": 169,
-          "cut_pct": 5.9,
+          "cut_pct": 2.4,
           "explaining": 0.775,
           "explaining_words": 131,
           "growth": 1.5,
@@ -4284,8 +4862,7 @@
           "source": 0
         },
         "fixes": {
-          "padding:note": 1,
-          "padding:ultimately": 1
+          "padding:note": 1
         },
         "flags": [
           {
@@ -4293,8 +4870,8 @@
             "hint": "filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")",
             "rule": "padding",
             "samples": [
-              "...ast the setting.  This is a really very common issue that a lo...",
-              "...setting.  This is a really very common issue that a lot of..."
+              "...e end of the day, this is a really very common issue that a lo...",
+              "...f the day, this is a really very common issue that a lot of..."
             ]
           },
           {
@@ -4325,31 +4902,36 @@
             "words": 26
           }
         ],
-        "long_sentences": [],
+        "long_sentences": [
+          {
+            "text": "At the end of the day, this is a really very common issue that a lot of people have with their heating, and it is something that we all experience.",
+            "words": 30
+          }
+        ],
         "metrics": {
-          "flesch_kincaid_grade": 7.0,
-          "flesch_reading_ease": 73.1,
+          "flesch_kincaid_grade": 7.1,
+          "flesch_reading_ease": 73.7,
           "max_paragraph_words": 49,
           "max_sentence_words": 33,
-          "mean_sentence_words": 15.9,
+          "mean_sentence_words": 16.5,
           "paragraphs": 5,
-          "pct_long_sentences": 20.0,
-          "pct_long_words": 8.2,
+          "pct_long_sentences": 30.0,
+          "pct_long_words": 7.9,
           "pct_ly_adverbs": 0.6,
           "pct_passive_sentences": 10.0,
           "sentences": 10,
-          "words": 159
+          "words": 165
         },
         "over_budget": [],
         "promised_not_unpacked": [],
         "scored": true,
-        "total_fixes": 2,
+        "total_fixes": 1,
         "total_flags": 4
       },
       "simplify --check --baseline --report": {
         "exit": 0,
-        "stderr": "== simplify report ==========================\nCLUTTER CUT (auto, 2):\n    1  padding:note\n    1  padding:ultimately\nFLAGGED (needs the rewrite pass, 4):\n    2  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . ...ast the setting.  This is a really very common issue that a lo...\n         . ...setting.  This is a really very common issue that a lot of...\n    1  passive  -> passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")\n         . ...st of heat minutes after it was paid for.  It works in two steps...\n    1  it-is-that  -> delayed subject: say who does what\n         . ...ave with their heating, and it is something that we all experience.\nSCORECARD  (159 words, 10 sentences, 5 paragraphs):\n  [PASS]  mean_sentence_words       15.9   budget <= 18.0\n  [PASS]  max_sentence_words          33   budget <= 30   (24 without joined sentences)\n  [PASS]  pct_long_sentences        20.0   budget <= 15.0   (0.0 without joined sentences)\n  [PASS]  flesch_reading_ease       73.1   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       7.0   budget <= 12.0\n  [PASS]  pct_passive_sentences     10.0   budget <= 10.0\n  [PASS]  pct_long_words             8.2   budget <= 20.0\n  [PASS]  max_paragraph_words         49   budget <= 90\n  [PASS]  pct_ly_adverbs             0.6   budget <= 4.0\nLENGTH  [PASS]  169 -> 159 words, at most 219\n        77.5% of the source explains (131 words, may grow 1.5x); the rest (38 words) owes a 40.0% cut\nJOINTS  [PASS]  3 in the sentences that survived, 3 in the rewrite (because/so/but/if...)\nLISTS   [PASS]  2 unpacked list(s), every part kept\nJOINED SENTENCES (explanation, every clause within 25 words: excused):\n   33w  The boiler heats water, the water heats the radiator, and only then d...\n   26w  Second, the heat already in the water and the radiator keeps arriving...\nPASSIVE SENTENCES (name the actor):\n       The boiler heats water, the water heats the radiator, and only then d...\nVERDICT: within budget\n=============================================\n",
-        "stdout": "# Why the radiator overshoots\n\nA thermostat loop has three parts: a sensor, a controller and a boiler. The\nsensor reads the room, the controller compares it with the setting, and the\nboiler adds heat when the room is cold.\n\nYou might wonder why the room ends up warmer than the setting. The answer is\ndelay. The boiler heats water, the water heats the radiator, and only then does\nthe radiator heat the air, so the sensor learns about each burst of heat\nminutes after it was paid for.\n\nIt works in two steps. First, the controller keeps the boiler on until the\nsensor says the room is warm enough. Second, the heat already in the water and\nthe radiator keeps arriving after the boiler stops, which means the room\ncarries on warming past the setting.\n\nThis is a really very common\nissue that a lot of people have with their heating, and it is something that we\nall experience.\n"
+        "stderr": "== simplify report ==========================\nCLUTTER CUT (auto, 1):\n    1  padding:note\nFLAGGED (needs the rewrite pass, 4):\n    2  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . ...e end of the day, this is a really very common issue that a lo...\n         . ...f the day, this is a really very common issue that a lot of...\n    1  passive  -> passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")\n         . ...st of heat minutes after it was paid for.  It works in two steps...\n    1  it-is-that  -> delayed subject: say who does what\n         . ...ave with their heating, and it is something that we all experience.\nSCORECARD  (165 words, 10 sentences, 5 paragraphs):\n  [PASS]  mean_sentence_words       16.5   budget <= 18.0\n  [PASS]  max_sentence_words          33   budget <= 30   (30 without joined sentences)\n  [PASS]  pct_long_sentences        30.0   budget <= 15.0   (10.0 without joined sentences)\n  [PASS]  flesch_reading_ease       73.7   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       7.1   budget <= 12.0\n  [PASS]  pct_passive_sentences     10.0   budget <= 10.0\n  [PASS]  pct_long_words             7.9   budget <= 20.0\n  [PASS]  max_paragraph_words         49   budget <= 90\n  [PASS]  pct_ly_adverbs             0.6   budget <= 4.0\nLENGTH  [PASS]  169 -> 165 words, at most 219\n        77.5% of the source explains (131 words, may grow 1.5x); the rest (38 words) owes a 40.0% cut\nJOINTS  [PASS]  3 in the sentences that survived, 3 in the rewrite (because/so/but/if...)\nLISTS   [PASS]  2 unpacked list(s), every part kept\nLONGEST SENTENCES (over 25 words, cut or split):\n   30w  At the end of the day, this is a really very common issue that a lot...\nJOINED SENTENCES (explanation, every clause within 25 words: excused):\n   33w  The boiler heats water, the water heats the radiator, and only then d...\n   26w  Second, the heat already in the water and the radiator keeps arriving...\nPASSIVE SENTENCES (name the actor):\n       The boiler heats water, the water heats the radiator, and only then d...\nVERDICT: within budget\n=============================================\n",
+        "stdout": "# Why the radiator overshoots\n\nA thermostat loop has three parts: a sensor, a controller and a boiler. The\nsensor reads the room, the controller compares it with the setting, and the\nboiler adds heat when the room is cold.\n\nYou might wonder why the room ends up warmer than the setting. The answer is\ndelay. The boiler heats water, the water heats the radiator, and only then does\nthe radiator heat the air, so the sensor learns about each burst of heat\nminutes after it was paid for.\n\nIt works in two steps. First, the controller keeps the boiler on until the\nsensor says the room is warm enough. Second, the heat already in the water and\nthe radiator keeps arriving after the boiler stops, which means the room\ncarries on warming past the setting.\n\nAt the end of the day, this is a really very common\nissue that a lot of people have with their heating, and it is something that we\nall experience.\n"
       }
     },
     "detell": {
@@ -4421,15 +5003,6 @@
           "was paid"
         ],
         [
-          "padding:ultimately",
-          "clutter",
-          17,
-          1,
-          17,
-          25,
-          "At the end of the day, i"
-        ],
-        [
           "padding:note",
           "clutter",
           17,
@@ -4469,8 +5042,7 @@
     },
     "simplify": {
       "fixes": {
-        "padding:note": 1,
-        "padding:ultimately": 1
+        "padding:note": 1
       },
       "flags": {
         "it-is-that": 1,
@@ -4478,18 +5050,18 @@
         "passive": 1
       },
       "metrics": {
-        "flesch_kincaid_grade": 7.0,
-        "flesch_reading_ease": 73.1,
+        "flesch_kincaid_grade": 7.1,
+        "flesch_reading_ease": 73.7,
         "max_paragraph_words": 49,
         "max_sentence_words": 33,
-        "mean_sentence_words": 15.9,
+        "mean_sentence_words": 16.5,
         "paragraphs": 5,
-        "pct_long_sentences": 20.0,
-        "pct_long_words": 8.2,
+        "pct_long_sentences": 30.0,
+        "pct_long_words": 7.9,
         "pct_ly_adverbs": 0.6,
         "pct_passive_sentences": 10.0,
         "sentences": 10,
-        "words": 159
+        "words": 165
       },
       "over_budget": [],
       "scored": true
@@ -6689,9 +7261,9 @@
       },
       "simplify --check --baseline --insight --json": {
         "compression": {
-          "after": 90,
+          "after": 97,
           "before": 122,
-          "cut_pct": 26.2,
+          "cut_pct": 20.5,
           "explaining": 0.0,
           "explaining_words": 0,
           "growth": 1.5,
@@ -6729,13 +7301,11 @@
           "clutter:history": 1,
           "clutter:near": 1,
           "clutter:plan": 1,
-          "clutter:result": 1,
           "clutter:revert": 1,
           "clutter:summary": 1,
           "clutter:together": 1,
           "padding:fact": 1,
-          "padding:note": 2,
-          "padding:ultimately": 1
+          "padding:note": 2
         },
         "flags": [
           {
@@ -6743,7 +7313,7 @@
             "hint": "filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")",
             "rule": "padding",
             "samples": [
-              ".... The result is that we can basically plan for phase two, which i...",
+              "...e end result is that we can basically plan for phase two, which i...",
               "...ntial.  The history here is quite complex. The two teams coll...",
               "...nd the migration script was really just a very simple change t..."
             ]
@@ -6753,7 +7323,15 @@
             "hint": "passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")",
             "rule": "passive",
             "samples": [
-              "...dundancy  The depot rollout was signed off before the deadline. Th..."
+              "...dundancy  The depot rollout was signed off before the deadline. At..."
+            ]
+          },
+          {
+            "count": 1,
+            "hint": "usually just \"result\"; keep \"end\" in \"front end\", \"dead end\" and \"in the end\"",
+            "rule": "end-result",
+            "samples": [
+              "...At the end of the day, the end result is that we can basically pl..."
             ]
           }
         ],
@@ -6770,18 +7348,18 @@
         "joined_sentences": [],
         "long_sentences": [],
         "metrics": {
-          "flesch_kincaid_grade": 7.0,
-          "flesch_reading_ease": 64.8,
-          "max_paragraph_words": 24,
-          "max_sentence_words": 20,
-          "mean_sentence_words": 11.2,
+          "flesch_kincaid_grade": 6.9,
+          "flesch_reading_ease": 67.2,
+          "max_paragraph_words": 30,
+          "max_sentence_words": 21,
+          "mean_sentence_words": 12.1,
           "paragraphs": 5,
           "pct_long_sentences": 0.0,
-          "pct_long_words": 14.4,
-          "pct_ly_adverbs": 4.4,
+          "pct_long_words": 13.4,
+          "pct_ly_adverbs": 4.1,
           "pct_passive_sentences": 12.5,
           "sentences": 8,
-          "words": 90
+          "words": 97
         },
         "over_budget": [
           "pct_passive_sentences",
@@ -6789,19 +7367,19 @@
         ],
         "promised_not_unpacked": [],
         "scored": true,
-        "total_fixes": 15,
-        "total_flags": 10
+        "total_fixes": 13,
+        "total_flags": 11
       },
       "simplify --check --baseline --insight --report": {
         "exit": 1,
-        "stderr": "== simplify report ==========================\nCLUTTER CUT (auto, 15):\n    2  padding:note\n    1  clutter:before\n    1  clutter:result\n    1  clutter:history\n    1  clutter:plan\n    1  clutter:together\n    1  clutter:essential\n    1  clutter:near\n    1  padding:fact\n    1  padding:ultimately\n    1  clutter:revert\n    1  clutter:eliminate\n    1  clutter:bonus\n    1  clutter:summary\nFLAGGED (needs the rewrite pass, 10):\n    9  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . .... The result is that we can basically plan for phase two, which i...\n         . ...ntial.  The history here is quite complex. The two teams coll...\n         . ...nd the migration script was really just a very simple change t...\n    1  passive  -> passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")\n         . ...dundancy  The depot rollout was signed off before the deadline. Th...\nSCORECARD  (90 words, 8 sentences, 5 paragraphs):\n  [PASS]  mean_sentence_words       11.2   budget <= 18.0\n  [PASS]  max_sentence_words          20   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       64.8   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       7.0   budget <= 12.0\n  [OVER]  pct_passive_sentences     12.5   budget <= 10.0\n  [PASS]  pct_long_words            14.4   budget <= 20.0\n  [PASS]  max_paragraph_words         24   budget <= 90\n  [OVER]  pct_ly_adverbs             4.4   budget <= 4.0\nLENGTH  [SHORT]  122 -> 90 words, cut 26.2%   target >= 40.0%\nFACTS   [KEPT]  2 of 2 numbers, dates, quotes and code spans\nPASSIVE SENTENCES (name the actor):\n       The depot rollout was signed off before the deadline.\nINSIGHT STRUCTURE  [FAIL] (2):\n  [FAIL]  sections           missing template section(s): Context, Insight Description, Significance, Customer Details\n  [FAIL]  significance       found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line\nVERDICT: OVER BUDGET on pct_passive_sentences, pct_ly_adverbs, length, insight structure\n=============================================\n",
-        "stdout": "# Padding and redundancy\n\nThe depot rollout was signed off before the\ndeadline. The result is that we can basically plan for phase two, which is essential.\n\nThe history here is quite complex. The two teams collaborated near go-live, and the\nmigration script was really just a very simple change to `tariff_id`.\n\nThe customer said, \"needless to say, it broke\", and it did. As such, we reverted and eliminated the retry loop:\n\n```python\n# padding words inside code must survive: it should be noted that basically\nresult = very_simple(x)\n```\n\nThat said, the bonus is a summary in the console, so obviously the\noperator can see which limit actually applied.\n"
+        "stderr": "== simplify report ==========================\nCLUTTER CUT (auto, 13):\n    2  padding:note\n    1  clutter:before\n    1  clutter:history\n    1  clutter:plan\n    1  clutter:together\n    1  clutter:essential\n    1  clutter:near\n    1  padding:fact\n    1  clutter:revert\n    1  clutter:eliminate\n    1  clutter:bonus\n    1  clutter:summary\nFLAGGED (needs the rewrite pass, 11):\n    9  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . ...e end result is that we can basically plan for phase two, which i...\n         . ...ntial.  The history here is quite complex. The two teams coll...\n         . ...nd the migration script was really just a very simple change t...\n    1  passive  -> passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")\n         . ...dundancy  The depot rollout was signed off before the deadline. At...\n    1  end-result  -> usually just \"result\"; keep \"end\" in \"front end\", \"dead end\" and \"in the end\"\n         . ...At the end of the day, the end result is that we can basically pl...\nSCORECARD  (97 words, 8 sentences, 5 paragraphs):\n  [PASS]  mean_sentence_words       12.1   budget <= 18.0\n  [PASS]  max_sentence_words          21   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       67.2   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       6.9   budget <= 12.0\n  [OVER]  pct_passive_sentences     12.5   budget <= 10.0\n  [PASS]  pct_long_words            13.4   budget <= 20.0\n  [PASS]  max_paragraph_words         30   budget <= 90\n  [OVER]  pct_ly_adverbs             4.1   budget <= 4.0\nLENGTH  [SHORT]  122 -> 97 words, cut 20.5%   target >= 40.0%\nFACTS   [KEPT]  2 of 2 numbers, dates, quotes and code spans\nPASSIVE SENTENCES (name the actor):\n       The depot rollout was signed off before the deadline.\nINSIGHT STRUCTURE  [FAIL] (2):\n  [FAIL]  sections           missing template section(s): Context, Insight Description, Significance, Customer Details\n  [FAIL]  significance       found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line\nVERDICT: OVER BUDGET on pct_passive_sentences, pct_ly_adverbs, length, insight structure\n=============================================\n",
+        "stdout": "# Padding and redundancy\n\nThe depot rollout was signed off before the\ndeadline. At the end of the day, the end result is that we can basically plan for phase two, which is essential.\n\nThe history here is quite complex. The two teams collaborated near go-live, and the\nmigration script was really just a very simple change to `tariff_id`.\n\nThe customer said, \"needless to say, it broke\", and it did. As such, we reverted and eliminated the retry loop:\n\n```python\n# padding words inside code must survive: it should be noted that basically\nresult = very_simple(x)\n```\n\nThat said, the bonus is a summary in the console, so obviously the\noperator can see which limit actually applied.\n"
       },
       "simplify --check --baseline --json": {
         "compression": {
-          "after": 90,
+          "after": 97,
           "before": 122,
-          "cut_pct": 26.2,
+          "cut_pct": 20.5,
           "explaining": 0.0,
           "explaining_words": 0,
           "growth": 1.5,
@@ -6839,13 +7417,11 @@
           "clutter:history": 1,
           "clutter:near": 1,
           "clutter:plan": 1,
-          "clutter:result": 1,
           "clutter:revert": 1,
           "clutter:summary": 1,
           "clutter:together": 1,
           "padding:fact": 1,
-          "padding:note": 2,
-          "padding:ultimately": 1
+          "padding:note": 2
         },
         "flags": [
           {
@@ -6853,7 +7429,7 @@
             "hint": "filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")",
             "rule": "padding",
             "samples": [
-              ".... The result is that we can basically plan for phase two, which i...",
+              "...e end result is that we can basically plan for phase two, which i...",
               "...ntial.  The history here is quite complex. The two teams coll...",
               "...nd the migration script was really just a very simple change t..."
             ]
@@ -6863,7 +7439,15 @@
             "hint": "passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")",
             "rule": "passive",
             "samples": [
-              "...dundancy  The depot rollout was signed off before the deadline. Th..."
+              "...dundancy  The depot rollout was signed off before the deadline. At..."
+            ]
+          },
+          {
+            "count": 1,
+            "hint": "usually just \"result\"; keep \"end\" in \"front end\", \"dead end\" and \"in the end\"",
+            "rule": "end-result",
+            "samples": [
+              "...At the end of the day, the end result is that we can basically pl..."
             ]
           }
         ],
@@ -6871,18 +7455,18 @@
         "joined_sentences": [],
         "long_sentences": [],
         "metrics": {
-          "flesch_kincaid_grade": 7.0,
-          "flesch_reading_ease": 64.8,
-          "max_paragraph_words": 24,
-          "max_sentence_words": 20,
-          "mean_sentence_words": 11.2,
+          "flesch_kincaid_grade": 6.9,
+          "flesch_reading_ease": 67.2,
+          "max_paragraph_words": 30,
+          "max_sentence_words": 21,
+          "mean_sentence_words": 12.1,
           "paragraphs": 5,
           "pct_long_sentences": 0.0,
-          "pct_long_words": 14.4,
-          "pct_ly_adverbs": 4.4,
+          "pct_long_words": 13.4,
+          "pct_ly_adverbs": 4.1,
           "pct_passive_sentences": 12.5,
           "sentences": 8,
-          "words": 90
+          "words": 97
         },
         "over_budget": [
           "pct_passive_sentences",
@@ -6890,13 +7474,13 @@
         ],
         "promised_not_unpacked": [],
         "scored": true,
-        "total_fixes": 15,
-        "total_flags": 10
+        "total_fixes": 13,
+        "total_flags": 11
       },
       "simplify --check --baseline --report": {
         "exit": 1,
-        "stderr": "== simplify report ==========================\nCLUTTER CUT (auto, 15):\n    2  padding:note\n    1  clutter:before\n    1  clutter:result\n    1  clutter:history\n    1  clutter:plan\n    1  clutter:together\n    1  clutter:essential\n    1  clutter:near\n    1  padding:fact\n    1  padding:ultimately\n    1  clutter:revert\n    1  clutter:eliminate\n    1  clutter:bonus\n    1  clutter:summary\nFLAGGED (needs the rewrite pass, 10):\n    9  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . .... The result is that we can basically plan for phase two, which i...\n         . ...ntial.  The history here is quite complex. The two teams coll...\n         . ...nd the migration script was really just a very simple change t...\n    1  passive  -> passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")\n         . ...dundancy  The depot rollout was signed off before the deadline. Th...\nSCORECARD  (90 words, 8 sentences, 5 paragraphs):\n  [PASS]  mean_sentence_words       11.2   budget <= 18.0\n  [PASS]  max_sentence_words          20   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       64.8   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       7.0   budget <= 12.0\n  [OVER]  pct_passive_sentences     12.5   budget <= 10.0\n  [PASS]  pct_long_words            14.4   budget <= 20.0\n  [PASS]  max_paragraph_words         24   budget <= 90\n  [OVER]  pct_ly_adverbs             4.4   budget <= 4.0\nLENGTH  [SHORT]  122 -> 90 words, cut 26.2%   target >= 40.0%\nFACTS   [KEPT]  2 of 2 numbers, dates, quotes and code spans\nPASSIVE SENTENCES (name the actor):\n       The depot rollout was signed off before the deadline.\nVERDICT: OVER BUDGET on pct_passive_sentences, pct_ly_adverbs, length\n=============================================\n",
-        "stdout": "# Padding and redundancy\n\nThe depot rollout was signed off before the\ndeadline. The result is that we can basically plan for phase two, which is essential.\n\nThe history here is quite complex. The two teams collaborated near go-live, and the\nmigration script was really just a very simple change to `tariff_id`.\n\nThe customer said, \"needless to say, it broke\", and it did. As such, we reverted and eliminated the retry loop:\n\n```python\n# padding words inside code must survive: it should be noted that basically\nresult = very_simple(x)\n```\n\nThat said, the bonus is a summary in the console, so obviously the\noperator can see which limit actually applied.\n"
+        "stderr": "== simplify report ==========================\nCLUTTER CUT (auto, 13):\n    2  padding:note\n    1  clutter:before\n    1  clutter:history\n    1  clutter:plan\n    1  clutter:together\n    1  clutter:essential\n    1  clutter:near\n    1  padding:fact\n    1  clutter:revert\n    1  clutter:eliminate\n    1  clutter:bonus\n    1  clutter:summary\nFLAGGED (needs the rewrite pass, 11):\n    9  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . ...e end result is that we can basically plan for phase two, which i...\n         . ...ntial.  The history here is quite complex. The two teams coll...\n         . ...nd the migration script was really just a very simple change t...\n    1  passive  -> passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")\n         . ...dundancy  The depot rollout was signed off before the deadline. At...\n    1  end-result  -> usually just \"result\"; keep \"end\" in \"front end\", \"dead end\" and \"in the end\"\n         . ...At the end of the day, the end result is that we can basically pl...\nSCORECARD  (97 words, 8 sentences, 5 paragraphs):\n  [PASS]  mean_sentence_words       12.1   budget <= 18.0\n  [PASS]  max_sentence_words          21   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       67.2   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       6.9   budget <= 12.0\n  [OVER]  pct_passive_sentences     12.5   budget <= 10.0\n  [PASS]  pct_long_words            13.4   budget <= 20.0\n  [PASS]  max_paragraph_words         30   budget <= 90\n  [OVER]  pct_ly_adverbs             4.1   budget <= 4.0\nLENGTH  [SHORT]  122 -> 97 words, cut 20.5%   target >= 40.0%\nFACTS   [KEPT]  2 of 2 numbers, dates, quotes and code spans\nPASSIVE SENTENCES (name the actor):\n       The depot rollout was signed off before the deadline.\nVERDICT: OVER BUDGET on pct_passive_sentences, pct_ly_adverbs, length\n=============================================\n",
+        "stdout": "# Padding and redundancy\n\nThe depot rollout was signed off before the\ndeadline. At the end of the day, the end result is that we can basically plan for phase two, which is essential.\n\nThe history here is quite complex. The two teams collaborated near go-live, and the\nmigration script was really just a very simple change to `tariff_id`.\n\nThe customer said, \"needless to say, it broke\", and it did. As such, we reverted and eliminated the retry loop:\n\n```python\n# padding words inside code must survive: it should be noted that basically\nresult = very_simple(x)\n```\n\nThat said, the bonus is a summary in the console, so obviously the\noperator can see which limit actually applied.\n"
       }
     },
     "detell": {
@@ -7034,15 +7618,6 @@
           "It should be noted that t"
         ],
         [
-          "audience-briefing",
-          "complexity",
-          3,
-          1,
-          3,
-          24,
-          "It should be noted that"
-        ],
-        [
           "passive",
           "complexity",
           3,
@@ -7070,17 +7645,8 @@
           "prior to"
         ],
         [
-          "padding:ultimately",
-          "clutter",
-          4,
-          11,
-          4,
-          35,
-          "At the end of the day, t"
-        ],
-        [
-          "clutter:result",
-          "clutter",
+          "end-result",
+          "complexity",
           4,
           38,
           4,
@@ -7158,15 +7724,6 @@
           8,
           2,
           "It is worth noting that\nt"
-        ],
-        [
-          "audience-briefing",
-          "complexity",
-          7,
-          58,
-          7,
-          81,
-          "It is worth noting that"
         ],
         [
           "clutter:together",
@@ -7296,31 +7853,30 @@
         "clutter:history": 1,
         "clutter:near": 1,
         "clutter:plan": 1,
-        "clutter:result": 1,
         "clutter:revert": 1,
         "clutter:summary": 1,
         "clutter:together": 1,
         "padding:fact": 1,
-        "padding:note": 2,
-        "padding:ultimately": 1
+        "padding:note": 2
       },
       "flags": {
+        "end-result": 1,
         "padding": 9,
         "passive": 1
       },
       "metrics": {
-        "flesch_kincaid_grade": 7.0,
-        "flesch_reading_ease": 64.8,
-        "max_paragraph_words": 24,
-        "max_sentence_words": 20,
-        "mean_sentence_words": 11.2,
+        "flesch_kincaid_grade": 6.9,
+        "flesch_reading_ease": 67.2,
+        "max_paragraph_words": 30,
+        "max_sentence_words": 21,
+        "mean_sentence_words": 12.1,
         "paragraphs": 5,
         "pct_long_sentences": 0.0,
-        "pct_long_words": 14.4,
-        "pct_ly_adverbs": 4.4,
+        "pct_long_words": 13.4,
+        "pct_ly_adverbs": 4.1,
         "pct_passive_sentences": 12.5,
         "sentences": 8,
-        "words": 90
+        "words": 97
       },
       "over_budget": [
         "pct_passive_sentences",
@@ -7743,7 +8299,7 @@
             "rule": "phrase:ing-tail",
             "samples": [
               "…freshes every 15 minutes, ensuring operators always see th…",
-              "…The release ships Friday, marking the end of the pilot, a…",
+              "…The release ships Friday, marking the end of the pilot, and the cach…",
               "…the cache warms on start, making it easier to scale. You might thi…"
             ]
           },
@@ -7782,7 +8338,7 @@
       },
       "detell --report": {
         "exit": 0,
-        "stderr": "── detell report ─────────────────────────────\nFIXED (auto, 1):\n    1  double_hyphen\nFLAGGED (needs a human/voice pass, 12):\n    4  phrase:run-up\n         · Here's the thing: this isn't a reporting…\n         · …adsheets. Just answers. Honestly? The work is less about…\n         · …d more about judgement. Here's why that matters for the 9–…\n    3  phrase:ing-tail\n         · …freshes every 15 minutes, ensuring operators always see th…\n         · …The release ships Friday, marking the end of the pilot, a…\n         · …the cache warms on start, making it easier to scale. You might thi…\n    2  phrase:not-x-its-y\n         · Here's the thing: this isn't a reporting tool. It's a decision engine. The…\n         · …. Honestly? The work is less about code and more about judgement. Here's why t…\n    1  phrase:no-x-no-y\n         · …s see the latest state. No guesswork. No spreadsheets. Just answers. Honestly?…\n    1  phrase:serves-as\n         · …ision engine. The pilot serves as a template for the wider…\n    1  hedge:filler\n         · …swork. No spreadsheets. Just answers. Honestly? The…\n──────────────────────────────────────────────\n"
+        "stderr": "── detell report ─────────────────────────────\nFIXED (auto, 1):\n    1  double_hyphen\nFLAGGED (needs a human/voice pass, 12):\n    4  phrase:run-up\n         · Here's the thing: this isn't a reporting…\n         · …adsheets. Just answers. Honestly? The work is less about…\n         · …d more about judgement. Here's why that matters for the 9–…\n    3  phrase:ing-tail\n         · …freshes every 15 minutes, ensuring operators always see th…\n         · …The release ships Friday, marking the end of the pilot, and the cach…\n         · …the cache warms on start, making it easier to scale. You might thi…\n    2  phrase:not-x-its-y\n         · Here's the thing: this isn't a reporting tool. It's a decision engine. The…\n         · …. Honestly? The work is less about code and more about judgement. Here's why t…\n    1  phrase:no-x-no-y\n         · …s see the latest state. No guesswork. No spreadsheets. Just answers. Honestly?…\n    1  phrase:serves-as\n         · …ision engine. The pilot serves as a template for the wider…\n    1  hedge:filler\n         · …swork. No spreadsheets. Just answers. Honestly? The…\n──────────────────────────────────────────────\n"
       },
       "simplify --check --baseline --insight --json": {
         "compression": {
@@ -8062,8 +8618,8 @@
           9,
           42,
           9,
-          51,
-          ", marking"
+          62,
+          ", marking the end of"
         ]
       ],
       "simplify": [

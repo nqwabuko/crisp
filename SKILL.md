@@ -128,8 +128,11 @@ Chain the second script. It cuts clutter, flags complexity, and scores:
 - **Filing an insight?** Add `--insight` to that `crisp simplify` call. The report
   gains an `INSIGHT STRUCTURE` block and `--check` fails on a missing section
   or a leaked reference.
-- exit 1 with `--check` = over the complexity budget or under the length target.
+- exit 0 = pass. Exit 1 with `--check` = over the complexity budget, under the
+  length target, or a failed gate (JOINTS, LISTS, `--insight`).
   `--json` to parse it (the `compression` block carries the same numbers).
+- exit 2 = a usage error, unreadable input, or output crisp could not write (a
+  broken pipe, a full disk). It is never a verdict on the text.
 
 ### 2c. Grammar and British spelling (always run)
 
@@ -487,12 +490,16 @@ the next time ink syncs.
 - Hard-wrapped input is handled: phrases that straddle a newline are still
   matched, and wrapped lines are rejoined before scoring so sentence length is
   measured on real sentences.
-- Text under 30 words skips the scorecard (the percentages would be noise) and
-  passes `--check`. The flags still run. A *source* under 30 words skips the
-  LENGTH gate for the same reason.
-- The padding cuts do not know about quotation marks. If the draft quotes
-  someone, check their words survived intact and put back anything the script
-  trimmed inside the quotes.
+- Text under 30 words skips the scorecard (the percentages would be noise). It
+  does not pass `--check` on that alone: the flags still run, LENGTH, JOINTS
+  and LISTS still gate it under `--baseline`, and `--insight` still gates its
+  structure. A *source* under 30 words skips the LENGTH gate for the same
+  reason.
+- Every word rewrite skips double-quoted passages, straight or curly, so a
+  quoted speaker's words are not cut. Not yet sound: single quotes are not
+  protected, and a stray unmatched `"` earlier in the paragraph, or inline code
+  inside the quote, can still expose it. If the draft quotes someone, check
+  their words survived.
 - To extend the tell list, add one line to `src/rules.rs`, rebuild, and
   re-record the contract (the `golden.json` diff is the review). Add both
   spellings, British and American. The rule tables are the program.

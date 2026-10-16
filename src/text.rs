@@ -14,9 +14,9 @@
 //!   long-sentence metrics, the ones that matter most, would lie.
 //!
 //! Rust works in byte offsets and CodeMirror works in UTF-16 code units, so
-//! `Unit` is where that conversion happens, once. Python counts code points,
-//! which is a third answer again; `Unit::CodePoints` exists so the conformance
-//! suite can ask for the oracle's units without the shipped path carrying them.
+//! `Unit` is where that conversion happens, once. Code points are a third
+//! answer again, and `Unit::CodePoints` is the unit the `crisp` binary reports
+//! in its `--locate` output.
 
 use regex::{Captures, Regex};
 use std::sync::LazyLock;
@@ -141,19 +141,6 @@ pub fn quoted_ranges(s: &str) -> Vec<(usize, usize)> {
 /// Does `at` fall inside one of `ranges`?
 pub fn inside(ranges: &[(usize, usize)], at: usize) -> bool {
     ranges.iter().any(|&(a, b)| a < at && at < b)
-}
-
-/// Apply `f` to prose only; fenced blocks and inline code pass through.
-pub fn map_prose(text: &str, f: impl Fn(&str) -> String) -> String {
-    let mut out = String::with_capacity(text.len());
-    for (_, slice, is_code) in segments(text) {
-        if is_code {
-            out.push_str(slice);
-        } else {
-            out.push_str(&f(slice));
-        }
-    }
-    out
 }
 
 /// Code removed, the rest joined by single spaces. Right for counting, wrong

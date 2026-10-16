@@ -1,10 +1,10 @@
-//! What must hold with or without the oracle.
+//! What must hold whatever the contract says.
 //!
-//! `conformance.rs` proves the rules were ported faithfully, and it needs
-//! Python. These checks need nothing, and they are the ones that catch
-//! the failures that hurt: a range that points at the wrong words, a finding
-//! reported inside code, a sentence the editor calls 52 words while the gate
-//! calls it 51.
+//! `golden.rs` holds the engine to its recorded output. These checks need no
+//! recording, and they are the ones that catch the failures that hurt: a range
+//! that points at the wrong words, a finding reported inside code, findings out
+//! of document order, a sentence the editor calls 52 words while the gate calls
+//! it 51, and typography that edits code.
 //!
 //! They are crisp's `verify-locate.py` and `check_spans()` in Rust. `check_spans`
 //! found three silent segmentation bugs in the Python, two of which had already

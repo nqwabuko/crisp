@@ -100,6 +100,11 @@ one value, and no internal code references or customer commercial numbers may
 survive. None of the prose metrics can see those. Opt-in: absent the flag,
 nothing changes.
 
+Exit codes: 0 is a pass. 1 is `--check` over the budget or a failed gate
+(LENGTH, JOINTS, LISTS, `--insight`). 2 is a usage error, unreadable input, or
+output crisp could not write (a broken pipe, a full disk), so a caller can tell
+a broken run from a failed draft.
+
 Full usage, including the agent-facing workflow, is in [SKILL.md](SKILL.md). The
 writing rules behind the judgement calls are in
 [references/simplify.md](references/simplify.md) (Zinsser and Strunk & White,

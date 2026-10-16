@@ -2,7 +2,8 @@
 
 crisp's engine already exists in Rust: ink ported the rule tables, the plumbing
 and the locating to `ink/src-tauri/src/prose/` in August and September 2026, and
-its conformance suite proves it finds exactly what the Python finds. This port
+a conformance suite held it to exactly what the Python found (both retired 14
+Oct 2026, see "Oracle and contract"). This port
 does not write a second one. It lifts that engine out of the editor into this
 repo as a crate with a `crisp` binary, adds what only the CLI needs, and makes
 the binary what the skill calls.
@@ -35,7 +36,8 @@ the binary what the skill calls.
   Arguments are parsed by hand: the flag set is small and fixed, and every
   dependency is something that can break in ten years.
 - `regex`, not `fancy-regex`: linear time, no backtracking blow-ups. The nine
-  lookaround substitutions ink made are already proven by the oracle.
+  lookaround substitutions ink made were proven against the oracle before it
+  retired; `golden.json` now records what they do.
 - Budget: the CLI uses crisp's `BUDGET` and `COMPRESSION_TARGET`, read from the
   `__config__` block of `fixtures/golden.json` by the tests so a tunable cannot
   move silently.
@@ -98,12 +100,12 @@ crisp checks style. It has never checked grammar or spelling. `harper-core`
 - `crisp grammar [--report|-r] [--json] [--locate] [FILE]`: passes the text
   through on stdout unchanged, so it fits the existing pipe, and reports on
   stderr (or JSON on stdout with `--locate`, same shape as the other modes).
-- Python has no grammar, so there's no oracle. Its own tests live in
-  `tests/grammar.rs` with fixtures under `tests/fixtures/grammar/` (outside
-  `fixtures/`, which is the Python golden corpus).
-- crisp's own tell tables list `utilize` and `endeavor` but not `utilise` or
-  `endeavour`, so British slop slips through. Both spellings go in, in the
-  Python and the Rust, and `golden.py --update` records the change.
+- There was never a Python grammar, so there was no oracle. Its own tests live
+  in `tests/grammar.rs` with fixtures under `tests/fixtures/grammar/` (outside
+  `fixtures/`, which is the golden corpus).
+- crisp's own tell tables listed `utilize` and `endeavor` but not `utilise` or
+  `endeavour`, so British slop slipped through. Both spellings went in, and
+  `CRISP_UPDATE_GOLDEN=1` records a change like that.
 
 ### As built (round 2)
 
@@ -153,10 +155,10 @@ Charlie's model is Fedora and RHEL: crisp is upstream, where rules are
 developed, and ink follows it like for like. ink does not depend on this crate,
 so a fresh clone of ink builds with nothing else present.
 
-- ink's `src-tauri/src/prose/upstream/` holds this repo's library files
-  (`lib.rs`, `rules.rs`, `text.rs`, `rewrite.rs`, `report.rs`, `insight.rs`),
-  byte for byte. `grammar.rs` stays out: it sits behind the `grammar` feature,
-  which ink never enables. `main.rs` is the binary and never goes.
+- ink's `src-tauri/src/prose/upstream/` holds this repo's library files, byte
+  for byte: every `src/*.rs` except `main.rs` and `grammar.rs`. `grammar.rs`
+  stays out: it sits behind the `grammar` feature, which ink never enables.
+  `main.rs` is the binary and never goes.
 - Nothing inside that directory is edited in ink. An engine change ink needs
   is made here first, then synced. ink's own code (`guarded`, the Tauri
   commands, its budget) lives beside the copy in `prose/mod.rs`.

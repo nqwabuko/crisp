@@ -8,9 +8,11 @@
 //! or a float.
 
 use super::facts::Survival;
-use super::rewrite::{self, Rewrite};
+use super::rewrite::{self, Flagged, Rewrite};
 use super::rules::{Bound, Budget};
-use super::{COMPRESSION_TARGET, EXPLANATION_GROWTH, LONG_SENTENCE, MIN_WORDS_TO_SCORE, Metrics};
+use super::{
+    COMPRESSION_TARGET, EXPLANATION_GROWTH, Hit, LONG_SENTENCE, MIN_WORDS_TO_SCORE, Metrics,
+};
 use serde_json::{Map, Value, json};
 
 /// The metrics crisp reports as ints. Every other metric is a `round(x, 1)`
@@ -296,35 +298,74 @@ pub fn detell_text(r: &Rewrite) -> String {
             l.push(format!("  {n:>3}  {name}"));
         }
     }
-    if r.flags.is_empty() {
-        l.push("FLAGGED: nothing".into());
-    } else {
-        l.push(format!(
-            "FLAGGED (needs a human/voice pass, {}):",
-            r.total_flags()
-        ));
-        for f in &r.flags {
-            l.push(format!("  {:>3}  {}", f.count, f.rule));
-            for s in &f.samples {
-                l.push(format!("         \u{b7} {s}"));
-            }
-        }
-    }
+    flag_lines(&mut l, &r.flags, "needs a human/voice pass");
     l.push("\u{2500}".repeat(46));
     l.join("\n")
 }
 
-pub fn detell_json(r: &Rewrite) -> Value {
-    let flags: Vec<Value> = r
-        .flags
+/// The FLAGGED block detell and grammar share: each rule's count, then its
+/// samples. `why` names who the flags are for.
+fn flag_lines(l: &mut Vec<String>, flags: &[Flagged], why: &str) {
+    if flags.is_empty() {
+        l.push("FLAGGED: nothing".into());
+        return;
+    }
+    let total: usize = flags.iter().map(|f| f.count).sum();
+    l.push(format!("FLAGGED ({why}, {total}):"));
+    for f in flags {
+        l.push(format!("  {:>3}  {}", f.count, f.rule));
+        for s in &f.samples {
+            l.push(format!("         \u{b7} {s}"));
+        }
+    }
+}
+
+fn flags_json(flags: &[Flagged]) -> Vec<Value> {
+    flags
         .iter()
         .map(|f| json!({"rule": f.rule, "count": f.count, "samples": f.samples}))
-        .collect();
+        .collect()
+}
+
+pub fn detell_json(r: &Rewrite) -> Value {
     json!({
         "fixes": fixes_json(r),
-        "flags": flags,
+        "flags": flags_json(&r.flags),
         "total_fixes": r.fixes.total(),
         "total_flags": r.total_flags(),
+    })
+}
+
+// ── grammar ──────────────────────────────────────────────────────────────────
+
+/// Grammar hits in detell's report shape: one entry per rule, most frequent
+/// first, ties in the order the rules first fire, each sample showing the hit's
+/// one suggestion when it has one. It takes the hits rather than finding them,
+/// so the library does not depend on Harper: the binary calls `grammar_locate`.
+pub fn grammar_flags(text: &str, hits: &[Hit]) -> Vec<Flagged> {
+    let mut flags = Vec::new();
+    for hit in hits {
+        let mut sample = rewrite::sample(text, hit.start, hit.end, 24, "\u{2026}");
+        if let Some(fix) = &hit.fix {
+            sample = format!("{sample}  \u{2192} {fix:?}");
+        }
+        rewrite::fold(&mut flags, hit.rule, None, 1, std::iter::once(sample));
+    }
+    flags.sort_by_key(|f| std::cmp::Reverse(f.count));
+    flags
+}
+
+pub fn grammar_text(flags: &[Flagged]) -> String {
+    let mut l = vec!["\u{2500}\u{2500} grammar report ".to_string() + &"\u{2500}".repeat(28)];
+    flag_lines(&mut l, flags, "British English, needs a human pass");
+    l.push("\u{2500}".repeat(46));
+    l.join("\n")
+}
+
+pub fn grammar_json(flags: &[Flagged]) -> Value {
+    json!({
+        "flags": flags_json(flags),
+        "total_flags": flags.iter().map(|f| f.count).sum::<usize>(),
     })
 }
 
@@ -776,5 +817,96 @@ mod tests {
         );
         let passing = Compression { after: 90, ..c };
         assert!(passing.ok());
+    }
+
+    fn hit(rule: &'static str, text: &str, word: &str, fix: Option<&str>) -> Hit {
+        let start = text.find(word).unwrap();
+        Hit {
+            rule,
+            kind: super::super::Kind::Tell,
+            start,
+            end: start + word.len(),
+            fix: fix.map(String::from),
+            hint: None,
+        }
+    }
+
+    #[test]
+    fn grammar_flags_sort_by_count_and_keep_ties_in_first_fired_order() {
+        let text = "a b c d e";
+        let hits = [
+            hit("one", text, "a", None),
+            hit("two", text, "b", None),
+            hit("three", text, "c", None),
+            hit("two", text, "d", None),
+            hit("two", text, "e", None),
+            hit("three", text, "a", None),
+        ];
+        let flags = grammar_flags(text, &hits);
+        let shape: Vec<_> = flags.iter().map(|f| (f.rule, f.count)).collect();
+        assert_eq!(shape, [("two", 3), ("three", 2), ("one", 1)]);
+        assert!(flags.iter().all(|f| f.hint.is_none()));
+    }
+
+    #[test]
+    fn grammar_samples_stop_at_three_and_show_the_fix() {
+        let text = "x x x x";
+        let hits: Vec<Hit> = text
+            .match_indices('x')
+            .map(|(at, _)| Hit {
+                start: at,
+                end: at + 1,
+                ..hit("rep", text, "x", Some("y"))
+            })
+            .collect();
+        let flags = grammar_flags(text, &hits);
+        assert_eq!(flags[0].count, 4);
+        assert_eq!(flags[0].samples.len(), 3);
+        assert_eq!(flags[0].samples[0], "x x x x  \u{2192} \"y\"");
+    }
+
+    #[test]
+    fn grammar_samples_pad_24_characters_and_mark_the_cut() {
+        let text = format!("{}color{}", "\u{e9}".repeat(30), "\u{e9}".repeat(30));
+        let flags = grammar_flags(&text, &[hit("spell", &text, "color", None)]);
+        let side = "\u{e9}".repeat(24);
+        assert_eq!(
+            flags[0].samples,
+            [format!("\u{2026}{side}color{side}\u{2026}")]
+        );
+    }
+
+    #[test]
+    fn grammar_report_and_json() {
+        assert_eq!(
+            grammar_text(&[]),
+            format!(
+                "\u{2500}\u{2500} grammar report {}\nFLAGGED: nothing\n{}",
+                "\u{2500}".repeat(28),
+                "\u{2500}".repeat(46)
+            )
+        );
+        let text = "She ate a apple.";
+        let flags = grammar_flags(text, &[hit("grammar:AnA", text, "a apple", Some("an"))]);
+        let report = grammar_text(&flags);
+        let lines: Vec<_> = report.lines().collect();
+        assert_eq!(
+            lines[1..3],
+            [
+                "FLAGGED (British English, needs a human pass, 1):",
+                "    1  grammar:AnA",
+            ]
+        );
+        assert_eq!(
+            lines[3],
+            "         \u{b7} She ate a apple.  \u{2192} \"an\""
+        );
+        assert_eq!(
+            grammar_json(&flags),
+            json!({
+                "flags": [{"rule": "grammar:AnA", "count": 1, "samples": [flags[0].samples[0].clone()]}],
+                "total_flags": 1,
+            })
+        );
     }
 }

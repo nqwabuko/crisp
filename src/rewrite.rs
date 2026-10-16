@@ -217,7 +217,8 @@ pub fn simplify(text: &str) -> Rewrite {
 
 // ── shared mechanics ─────────────────────────────────────────────────────────
 
-/// `text::map_prose`, for a rewrite that also counts what it did as it goes.
+/// Applies `f` to the prose of `text::segments` and passes code through, for a
+/// rewrite that also counts what it did as it goes.
 fn map_prose(text: &str, mut f: impl FnMut(&str) -> String) -> String {
     let mut out = String::with_capacity(text.len());
     for (_, slice, is_code) in text::segments(text) {
@@ -302,24 +303,37 @@ fn merge(
         .iter()
         .take(3)
         .map(|&(a, b)| sample(subject, a, b, pad, ellipsis));
+    fold(flags, rule, hint, hits.len(), samples);
+}
+
+/// Add `count` hits of one rule, and their samples, to the running list: the
+/// count accumulates and the samples stop at three. A new rule goes last, so a
+/// stable sort by count leaves ties in the order the rules first fired.
+pub(super) fn fold(
+    flags: &mut Vec<Flagged>,
+    rule: &'static str,
+    hint: Option<&'static str>,
+    count: usize,
+    samples: impl Iterator<Item = String>,
+) {
     match flags.iter_mut().find(|f| f.rule == rule) {
         Some(f) => {
-            f.count += hits.len();
+            f.count += count;
             f.samples.extend(samples);
             f.samples.truncate(3);
         }
         None => flags.push(Flagged {
             rule,
-            count: hits.len(),
+            count,
             hint,
-            samples: samples.collect(),
+            samples: samples.take(3).collect(),
         }),
     }
 }
 
 /// The hit with `pad` characters either side, on one line, marked where it was
 /// cut. Characters, not bytes: crisp's padding counts code points.
-fn sample(text: &str, start: usize, end: usize, pad: usize, ellipsis: &str) -> String {
+pub(super) fn sample(text: &str, start: usize, end: usize, pad: usize, ellipsis: &str) -> String {
     let chars = |s: &str| s.chars().count();
     let total = chars(text);
     let a = chars(&text[..start]).saturating_sub(pad);
@@ -395,8 +409,8 @@ mod tests {
 
     #[test]
     fn redundancy_keeps_the_captured_word() {
-        let out = simplify("We Reverted back the End Results for testing purposes.");
-        assert_eq!(out.text, "We Reverted the Results for testing.");
+        let out = simplify("We Reverted back the Final Outcomes for testing purposes.");
+        assert_eq!(out.text, "We Reverted the Outcomes for testing.");
     }
 
     #[test]
@@ -408,13 +422,13 @@ mod tests {
 
     #[test]
     fn simplify_cleans_up_the_spaces_its_deletions_leave() {
-        let out = simplify("Prior to  the end result, it rained.");
-        assert_eq!(out.text, "Before the result, it rained.");
+        let out = simplify("Prior to  the final outcome, it rained.");
+        assert_eq!(out.text, "Before the outcome, it rained.");
         assert_eq!(
             out.fixes.0,
             [
                 ("clutter:before", 1),
-                ("clutter:result", 1),
+                ("clutter:outcome", 1),
                 ("run_spaces", 1)
             ]
         );

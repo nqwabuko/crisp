@@ -6,15 +6,17 @@
 //!
 //! Order is load-bearing twice over. The FIX pipeline feeds each rule the
 //! previous rule's output, and `locate` reports findings in table order when two
-//! land on the same position, which is what the conformance suite compares
-//! against the Python.
+//! land on the same position, which `fixtures/golden.json` records.
 //!
-//! Rust's `regex` has no lookaround, which is the one place this port cannot be a
-//! transcription. Seven rules used it. Each carries either a `guard` (match the
-//! core, reject afterwards from the surrounding text) or a `Fix::Scan` (a
-//! whole-span rewrite in code), and each is called out where it appears. The
-//! conformance suite is what proves the workarounds are equivalent rather than
-//! merely plausible.
+//! Rust's `regex` has no lookaround. Where a rule needs to see past its match it
+//! carries either a `guard` (match the core, reject afterwards from the
+//! surrounding text) or a `Fix::Scan` (a whole-span rewrite in code), and each is
+//! called out where it appears. `fixtures/golden.json`, recorded by
+//! `tests/golden.rs`, is the only contract: it pins what every rule finds and
+//! rewrites, including the cases it must leave alone.
+//!
+//! An apostrophe in a pattern is written `['\x{2019}]`, straight or curly,
+//! because `locate` reads the raw text, before typography straightens it.
 
 use regex::{Captures, Regex};
 use std::sync::LazyLock;
@@ -334,26 +336,29 @@ pub static DETELL_FLAG: LazyLock<Vec<FlagRule>> = LazyLock::new(|| {
         // Sentence scaffolds ChatGPT reaches for.
         rule(
             "phrase:not-just",
-            re(r"(?i)\bit'?s not just\b[^.\n]*?\bit'?s\b"),
+            re(r"(?i)\bit['\x{2019}]?s not just\b[^.\n]*?\bit['\x{2019}]?s\b"),
         ),
         rule(
             "phrase:not-about",
-            re(r"(?i)\bit'?s not (?:just )?about\b[^.\n]*?\bit'?s about\b"),
+            re(r"(?i)\bit['\x{2019}]?s not (?:just )?about\b[^.\n]*?\bit['\x{2019}]?s about\b"),
         ),
         rule(
             "phrase:not-only",
             re(r"(?i)\bnot only\b[^.\n]*?\bbut also\b"),
         ),
-        rule("phrase:dive-in", re(r"(?i)\blet'?s (?:dive|delve|jump)\b")),
+        rule(
+            "phrase:dive-in",
+            re(r"(?i)\blet['\x{2019}]?s (?:dive|delve|jump)\b"),
+        ),
         rule("phrase:dive-deeper", re(r"(?i)\bdive (?:deeper|into)\b")),
         rule(
             "phrase:todays-world",
-            re(r"(?i)\bin today'?s (?:fast-paced|digital|modern|ever-changing)\b"),
+            re(r"(?i)\bin today['\x{2019}]?s (?:fast-paced|digital|modern|ever-changing)\b"),
         ),
         rule(
             "phrase:worth-noting",
             re(
-                r"(?i)\bit(?:'?s| is) (?:worth|important) (?:noting|to note|to remember|to understand|to highlight|to recognis[ez]e) that\b",
+                r"(?i)\bit(?:['\x{2019}]?s| is) (?:worth|important) (?:noting|to note|to remember|to understand|to highlight|to recognis[ez]e) that\b",
             ),
         ),
         rule("phrase:when-it-comes", re(r"(?i)\bwhen it comes to\b")),
@@ -369,27 +374,26 @@ pub static DETELL_FLAG: LazyLock<Vec<FlagRule>> = LazyLock::new(|| {
         rule("phrase:game-changer", re(r"(?i)\bgame[- ]?changer\b")),
         rule("phrase:navigate", re(r"(?i)\bnavigat(?:e|ing) the\b")),
         rule(
-            "phrase:unlock-pot",
-            re(r"(?i)\bunlock(?:ing)? (?:the )?(?:potential|power)\b"),
-        ),
-        rule(
             "phrase:plays-role",
             re(r"(?i)\bplays? a (?:crucial|key|vital|pivotal|significant|central|major) role\b"),
         ),
         rule("phrase:more-than", re(r"(?i)\bmore than just\b")),
         rule(
             "phrase:in-a-world",
-            re(r"(?i)\bin (?:a|an|today'?s) (?:world|era|age|landscape|climate) where\b"),
+            re(r"(?i)\bin (?:a|an|today['\x{2019}]?s) (?:world|era|age|landscape|climate) where\b"),
         ),
         rule(
             "phrase:this-is-where",
             re(r"(?i)\b(?:this|that) is where\b[^.\n]*?\b(?:comes? in|shines?)\b"),
         ),
-        rule("phrase:whether-youre", re(r"(?i)\bwhether you'?re\b")),
+        rule(
+            "phrase:whether-youre",
+            re(r"(?i)\bwhether you['\x{2019}]?re\b"),
+        ),
         rule(
             "phrase:we-will",
             re(
-                r"(?i)\bwe'?(?:ll|re going to) (?:explore|discuss|cover|walk through|take a look at|dive into)\b",
+                r"(?i)\bwe['\x{2019}]?(?:ll|re going to) (?:explore|discuss|cover|walk through|take a look at|dive into)\b",
             ),
         ),
         rule(
@@ -398,7 +402,7 @@ pub static DETELL_FLAG: LazyLock<Vec<FlagRule>> = LazyLock::new(|| {
         ),
         rule(
             "phrase:no-denying",
-            re(r"(?i)\b(?:make no mistake|there'?s no denying|it goes without saying)\b"),
+            re(r"(?i)\b(?:make no mistake|there['\x{2019}]?s no denying|it goes without saying)\b"),
         ),
         // The staged reframe with no connective: "This isn't X. It's Y.", "It
         // isn't X, it's Y", "less about X, more about Y". Only the forms with
@@ -406,17 +410,20 @@ pub static DETELL_FLAG: LazyLock<Vec<FlagRule>> = LazyLock::new(|| {
         // ordinary English, and the JOINTS gate guards that word. The forms
         // "it's not just/about" own are left to those rules ("it's not" is
         // only matched here before an article), so nothing is flagged twice.
+        // The comma forms need a capitalised subject, so the clause opens the
+        // sentence: "If it isn't ready, it's pushed" is a conditional, and no
+        // "if", "when" or "because" can stand in front of a sentence opener.
         rule(
             "phrase:not-x-its-y",
             re(concat!(
                 r"(?i)\b(?:it|this|that|they|these|those)",
-                r"(?:'s not|'re not| is not| are not| was not| were not| isn'?t| aren'?t| wasn'?t| weren'?t)\b",
-                r"[^.!?\n]{1,80}[.!?]\s+(?:it|this|that|they|these|those)(?:'s|'re| is| are| was| were)\b",
-                r"|\b(?:it|this|that|they)(?: isn'?t| aren'?t| wasn'?t| is not| was not)\b",
-                r"[^.!?\n]{1,60},\s*(?:it|this|that|they)(?:'s|'re| is| are| was)\b",
-                r"|\bit'?s not (?:a|an|the)\b[^.!?\n]{1,60},\s*it'?s\b",
+                r"(?:['\x{2019}]s not|['\x{2019}]re not| is not| are not| was not| were not| isn['\x{2019}]?t| aren['\x{2019}]?t| wasn['\x{2019}]?t| weren['\x{2019}]?t)\b",
+                r"[^.!?\n]{1,80}[.!?]\s+(?:it|this|that|they|these|those)(?:['\x{2019}]s|['\x{2019}]re| is| are| was| were)\b",
+                r"|\b(?-i:It|This|That|They)(?: isn['\x{2019}]?t| aren['\x{2019}]?t| wasn['\x{2019}]?t| is not| was not)\b",
+                r"[^.!?\n]{1,60},\s*(?:it|this|that|they)(?:['\x{2019}]s|['\x{2019}]re| is| are| was)\b",
+                r"|\b(?-i:It)['\x{2019}]?s not (?:a|an|the)\b[^.!?\n]{1,60},\s*it['\x{2019}]?s\b",
                 r"|\bless about\b[^.!?\n]{1,60}\bmore about\b",
-                r"|\b(?:does not|doesn'?t) mean\b[^.!?\n]{1,80}[.!?]\s+it means\b",
+                r"|\b(?:does not|doesn['\x{2019}]?t) mean\b[^.!?\n]{1,80}[.!?]\s+it means\b",
             )),
         ),
         // "No guesswork. No spreadsheets. Just answers.": the slogan run.
@@ -433,8 +440,8 @@ pub static DETELL_FLAG: LazyLock<Vec<FlagRule>> = LazyLock::new(|| {
         rule(
             "phrase:run-up",
             re(concat!(
-                r"(?i)\bhere'?s (?:the thing|the deal|the kicker|the twist|the truth|the reality|why|what you need to know)\b",
-                r"|\blet'?s be (?:honest|clear|real)\b|\bthe (?:truth|reality) is\b",
+                r"(?i)\bhere['\x{2019}]?s (?:the thing|the deal|the kicker|the twist|the truth|the reality|why|what you need to know)\b",
+                r"|\blet['\x{2019}]?s be (?:honest|clear|real)\b|\bthe (?:truth|reality) is\b",
                 r"|(?-i:\b(?:Honestly|Frankly|Seriously)\?|\bLook, )",
             )),
         ),
@@ -444,7 +451,7 @@ pub static DETELL_FLAG: LazyLock<Vec<FlagRule>> = LazyLock::new(|| {
             "phrase:closer-line",
             re(concat!(
                 r"(?i)\b(?:let that sink in|(?:and )?that changes everything",
-                r"|(?:and )?that'?s the (?:whole |real )?point|that'?s the real (?:win|story|lesson)",
+                r"|(?:and )?that['\x{2019}]?s the (?:whole |real )?point|that['\x{2019}]?s the real (?:win|story|lesson)",
                 r"|the rest is history)[.!]",
             )),
         ),
@@ -454,7 +461,7 @@ pub static DETELL_FLAG: LazyLock<Vec<FlagRule>> = LazyLock::new(|| {
             re(concat!(
                 r"(?i)\b(?:experts (?:agree|say|suggest|believe)|studies (?:show|suggest|have shown)",
                 r"|research (?:shows|suggests|has shown)|(?:many|most) experts\b",
-                r"|it(?: is|'?s) widely (?:accepted|known|believed|recogni[sz]ed))\b",
+                r"|it(?: is|['\x{2019}]?s) widely (?:accepted|known|believed|recogni[sz]ed))\b",
             )),
         ),
         // Inflated significance: the milestone that marks itself.
@@ -486,13 +493,17 @@ pub static DETELL_FLAG: LazyLock<Vec<FlagRule>> = LazyLock::new(|| {
         // The -ing rider tacked on after a comma to claim significance:
         // ", highlighting the need", ", ensuring a smooth rollout". Both
         // spellings, because the rider usually arrives in American English.
-        // "showcasing" and "fostering" are vocabulary already.
+        // "showcasing" and "fostering" are vocabulary already. "marking" only
+        // with the moment it claims ("the end of", "a milestone"), because
+        // "marking the first session as stopped" is a worker setting a field.
         rule(
             "phrase:ing-tail",
             re(concat!(
                 r"(?i),\s+(?:highlighting|underscoring|reflecting|ensuring|emphasi[sz]ing|symboli[sz]ing",
-                r"|signall?ing|marking|demonstrating|illustrating|cementing|solidifying|reinforcing",
+                r"|signall?ing|demonstrating|illustrating|cementing|solidifying|reinforcing",
                 r"|contributing to|paving the way|setting the stage",
+                r"|marking (?:a|an|the) (?:\w+ )?(?:(?:end|start|beginning|close|completion|culmination",
+                r"|debut|arrival|return|launch) of|milestone|moment|shift|chapter|turning point|era|first time)",
                 r"|making it (?:easier|harder|possible|ideal|clear))\b",
             )),
         ),
@@ -504,10 +515,10 @@ pub static DETELL_FLAG: LazyLock<Vec<FlagRule>> = LazyLock::new(|| {
         rule("chat:hope-helps", re(r"(?i)\bi hope this helps\b")),
         rule("chat:feel-free", re(r"(?i)\bfeel free to\b")),
         rule("chat:let-me-know", re(r"(?i)\blet me know if\b")),
-        rule("chat:happy-to", re(r"(?i)\bi'?d be happy to\b")),
+        rule("chat:happy-to", re(r"(?i)\bi['\x{2019}]?d be happy to\b")),
         rule(
             "chat:sycophancy",
-            re(r"(?i)\byou'?re (?:absolutely|completely|totally) right\b"),
+            re(r"(?i)\byou['\x{2019}]?re (?:absolutely|completely|totally) right\b"),
         ),
         rule("chat:offer", re(r"(?i)\bwould you like me to\b")),
         rule(
@@ -515,7 +526,7 @@ pub static DETELL_FLAG: LazyLock<Vec<FlagRule>> = LazyLock::new(|| {
             re(concat!(
                 r"(?i)\bas of my (?:last|latest) (?:update|knowledge update|training)\b",
                 r"|\bmy (?:knowledge|training) (?:cutoff|cut-off)\b",
-                r"|\bi (?:don'?t|do not) have (?:access to )?real-time\b",
+                r"|\bi (?:don['\x{2019}]?t|do not) have (?:access to )?real-time\b",
             )),
         ),
         // "as an AI, I..." only. The bare noun phrase is ordinary prose
@@ -526,7 +537,9 @@ pub static DETELL_FLAG: LazyLock<Vec<FlagRule>> = LazyLock::new(|| {
         ),
         rule(
             "chat:heres-summary",
-            re(r"(?i)\bhere'?s (?:a|the) (?:quick )?(?:breakdown|rundown|summary|overview)\b"),
+            re(
+                r"(?i)\bhere['\x{2019}]?s (?:a|the) (?:quick )?(?:breakdown|rundown|summary|overview)\b",
+            ),
         ),
         // Headings: crisp writes sentence case, the British convention, and a
         // heading never needs an emoji. Title Case is three or more
@@ -534,8 +547,8 @@ pub static DETELL_FLAG: LazyLock<Vec<FlagRule>> = LazyLock::new(|| {
         anchored(
             "heading:title-case",
             re(concat!(
-                r"(?m)^#{1,6}[ \t]+[A-Z][\w'-]*",
-                r"(?:[ \t]+(?:(?:a|an|and|as|at|but|by|for|in|of|on|or|the|to|vs|with)[ \t]+)*[A-Z][\w'-]*){2,}",
+                r"(?m)^#{1,6}[ \t]+[A-Z][\w'\x{2019}-]*",
+                r"(?:[ \t]+(?:(?:a|an|and|as|at|but|by|for|in|of|on|or|the|to|vs|with)[ \t]+)*[A-Z][\w'\x{2019}-]*){2,}",
                 r"[ \t]*$",
             )),
         ),
@@ -591,16 +604,14 @@ pub struct ClutterRule {
     pub guard: Option<Guard>,
 }
 
-/// `for\s+(?!the\b|a\b|an\b|these\b|those\b|such\b)([a-z]+)\s+purposes\b`.
-///
-/// "for testing purposes" is clutter with one plain equivalent. "for the
-/// purposes of X" is a different shape, and it is FLAGGED rather than fixed.
-fn not_a_determiner(_haystack: &str, caps: &Captures) -> bool {
-    let word = caps.get(1).map(|g| g.as_str().to_lowercase());
-    !matches!(
-        word.as_deref(),
-        Some("the" | "a" | "an" | "these" | "those" | "such")
-    )
+/// `for X purposes` -> `for X` only when X is a gerund: "for testing purposes"
+/// has one plain equivalent. An adjective cannot lose its noun ("for other
+/// purposes", "for illustrative purposes"), a noun often changes meaning ("for
+/// tax"), and "for the purposes of X" is a different shape, FLAGGED rather than
+/// fixed.
+fn a_gerund(_haystack: &str, caps: &Captures) -> bool {
+    caps.get(1)
+        .is_some_and(|g| g.as_str().to_lowercase().ends_with("ing"))
 }
 
 pub static CLUTTER: LazyLock<Vec<ClutterRule>> = LazyLock::new(|| {
@@ -609,6 +620,12 @@ pub static CLUTTER: LazyLock<Vec<ClutterRule>> = LazyLock::new(|| {
         pat,
         fix,
         guard: None,
+    };
+    let guarded = |name, pat, fix, guard: Guard| ClutterRule {
+        name,
+        pat,
+        fix,
+        guard: Some(guard),
     };
     vec![
         // ── "the fact that" family -> the conjunction it was hiding ──
@@ -649,13 +666,14 @@ pub static CLUTTER: LazyLock<Vec<ClutterRule>> = LazyLock::new(|| {
             ClutterFix::Case("whether"),
         ),
         // ── time ──
+        // "at this time" is not here: "at this time in 2025" and "at this time
+        // of year" are times, not "now", so it is `at-this-time`, a FLAG.
         rule(
             "clutter:now",
             phrase(&[
                 "at this point in time",
                 "at the present time",
                 "at this moment in time",
-                "at this time",
             ]),
             ClutterFix::Case("now"),
         ),
@@ -695,11 +713,9 @@ pub static CLUTTER: LazyLock<Vec<ClutterRule>> = LazyLock::new(|| {
             ClutterFix::Case("regularly"),
         ),
         // ── quantity ──
-        rule(
-            "clutter:most",
-            phrase(&["the majority of", "a majority of"]),
-            ClutterFix::Case("most"),
-        ),
+        // "the majority of" is not here: it is "most" before a bare noun, "most
+        // of" before "the users" or "what we sell", and a margin before "3
+        // votes". No guard held, so it is `majority-of`, a FLAG.
         rule(
             "clutter:few",
             phrase(&["few in number"]),
@@ -711,39 +727,18 @@ pub static CLUTTER: LazyLock<Vec<ClutterRule>> = LazyLock::new(|| {
             ClutterFix::Case("enough"),
         ),
         // ── ability / permission ──
-        rule(
-            "clutter:can",
-            phrase(&[
-                "has the ability to",
-                "have the ability to",
-                "has the capability to",
-                "have the capability to",
-                "is in a position to",
-                "are in a position to",
-            ]),
-            ClutterFix::Case("can"),
-        ),
-        rule(
-            "clutter:could",
-            phrase(&[
-                "had the ability to",
-                "had the capability to",
-                "was in a position to",
-                "were in a position to",
-            ]),
-            ClutterFix::Case("could"),
-        ),
+        // "have the ability to" is not here: it is "can", but "be able to"
+        // after a modal or "to" ("will be able to", never "will can"), and no
+        // guard caught every modal ("cannot", "they'll", "will (from v2.1)").
+        // So it is `ability-to`, a FLAG.
         // ── place / topic ──
         rule(
             "clutter:in",
             phrase(&["in the field of", "in the area of"]),
             ClutterFix::Case("in"),
         ),
-        rule(
-            "clutter:about",
-            phrase(&["in connection with"]),
-            ClutterFix::Case("about"),
-        ),
+        // "in connection with" is not here: it means "about", "during" or
+        // "related to" by context, so it is `in-terms-of`, a FLAG with a hint.
         // ── plain doublets and padding ──
         rule(
             "clutter:every",
@@ -755,12 +750,12 @@ pub static CLUTTER: LazyLock<Vec<ClutterRule>> = LazyLock::new(|| {
             phrase(&["first and foremost"]),
             ClutterFix::Case("first"),
         ),
-        ClutterRule {
-            name: "clutter:purposes",
-            pat: re(r"(?i)\bfor\s+([a-z]+)\s+purposes\b"),
-            fix: ClutterFix::Expand("for $1"),
-            guard: Some(not_a_determiner),
-        },
+        guarded(
+            "clutter:purposes",
+            re(r"(?i)\bfor\s+([a-z]+)\s+purposes\b"),
+            ClutterFix::Expand("for $1"),
+            a_gerund,
+        ),
         rule(
             "clutter:currently",
             phrase(&["as of the current time", "as things currently stand"]),
@@ -769,11 +764,8 @@ pub static CLUTTER: LazyLock<Vec<ClutterRule>> = LazyLock::new(|| {
         // ── redundant modifiers: the qualifier is already in the noun ──
         // Each keeps its capture and drops the word in front of it, so the
         // original casing survives without `cased` being involved.
-        rule(
-            "clutter:result",
-            re(r"(?i)\bend\s+(results?)\b"),
-            ClutterFix::Expand("$1"),
-        ),
+        // "end result" is not here: "front end results" and "in the end results
+        // improved" keep their "end". It is `end-result`, a FLAG.
         rule(
             "clutter:outcome",
             re(r"(?i)\b(?:final|end)\s+(outcomes?)\b"),
@@ -796,7 +788,7 @@ pub static CLUTTER: LazyLock<Vec<ClutterRule>> = LazyLock::new(|| {
         ),
         rule(
             "clutter:plan",
-            re(r"(?i)\b(plan\w*)\s+ahead(?:\s+in\s+advance)?\b"),
+            re(r"(?i)\b(plan|plans|planned|planning)\s+ahead(?:\s+in\s+advance)?\b"),
             ClutterFix::Expand("$1"),
         ),
         rule(
@@ -804,9 +796,14 @@ pub static CLUTTER: LazyLock<Vec<ClutterRule>> = LazyLock::new(|| {
             re(r"(?i)\badvance\s+(planning)\b"),
             ClutterFix::Expand("$1"),
         ),
+        // The verb forms only. "joins" and "groups" are left out because they
+        // are nouns as often ("the two groups together hold 60%").
         rule(
             "clutter:together",
-            re(r"(?i)\b((?:combin|collaborat|merg|join|group)\w*)\s+together\b"),
+            re(concat!(
+                r"(?i)\b(combine[sd]?|combining|collaborate[sd]?|collaborating|merge[sd]?|merging",
+                r"|join|joined|joining|grouped|grouping)\s+together\b",
+            )),
             ClutterFix::Expand("$1"),
         ),
         rule(
@@ -852,9 +849,9 @@ pub static CLUTTER: LazyLock<Vec<ClutterRule>> = LazyLock::new(|| {
             padding(&[
                 "it should be noted that",
                 "it is important to note that",
-                "it'?s important to note that",
+                "it['\u{2019}]?s important to note that",
                 "it is worth noting that",
-                "it'?s worth noting that",
+                "it['\u{2019}]?s worth noting that",
                 "it is worth mentioning that",
                 "it goes without saying that",
             ]),
@@ -870,13 +867,11 @@ pub static CLUTTER: LazyLock<Vec<ClutterRule>> = LazyLock::new(|| {
             ]),
             ClutterFix::Padding,
         ),
+        // "at the end of the day" is not here: in settlement prose it is a
+        // time, so it stays detell's `phrase:end-of-day`, flagged, not cut.
         rule(
             "padding:ultimately",
-            padding(&[
-                "at the end of the day",
-                "when all is said and done",
-                "for all intents and purposes",
-            ]),
+            padding(&["when all is said and done", "for all intents and purposes"]),
             ClutterFix::Padding,
         ),
     ]
@@ -923,7 +918,7 @@ pub static PASSIVE: LazyLock<Regex> = LazyLock::new(|| {
 fn not_mid_word(haystack: &str, caps: &Captures) -> bool {
     let start = caps.get(0).expect("group 0 always exists").start();
     match haystack[..start].chars().next_back() {
-        Some(c) => !(c.is_alphanumeric() || c == '_' || c == '\''),
+        Some(c) => !(c.is_alphanumeric() || c == '_' || c == '\'' || c == '\u{2019}'),
         None => true,
     }
 }
@@ -976,9 +971,7 @@ pub static COMPLEXITY: LazyLock<Vec<ComplexityRule>> = LazyLock::new(|| {
                 "as a reminder",
                 "remember that",
                 "bear in mind that",
-                "it (?:is|'s) worth noting that",
                 "note that",
-                "it should be noted that",
                 "just to be clear",
                 "to be clear",
             ]),
@@ -1024,6 +1017,43 @@ pub static COMPLEXITY: LazyLock<Vec<ComplexityRule>> = LazyLock::new(|| {
             re(r"(?i)\bit\s+(?:is|was)\s+(?:\w+\s+)?that\b"),
             "delayed subject: say who does what",
         ),
+        // Wordy phrases with more than one right answer: FIX rules once, until
+        // their guards kept writing broken English. The rewrite pass decides.
+        rule(
+            "ability-to",
+            phrase(&[
+                "has the ability to",
+                "have the ability to",
+                "had the ability to",
+                "has the capability to",
+                "have the capability to",
+                "had the capability to",
+                "is in a position to",
+                "are in a position to",
+                "was in a position to",
+                "were in a position to",
+            ]),
+            "say \"can\" or \"could\"; after a modal or \"to\" say \"be able to\" \
+             (\"users will be able to export\", never \"will can\")",
+        ),
+        rule(
+            "majority-of",
+            phrase(&["the majority of", "a majority of"]),
+            "usually \"most\": \"most users\", but \"most of the users\" and \
+             \"most of what we sell\"; a margin (\"a majority of 3\") stays",
+        ),
+        rule(
+            "at-this-time",
+            phrase(&["at this time"]),
+            "\"now\" if it means now; leave it when it is a time \
+             (\"at this time of year\", \"at this time in 2025\")",
+        ),
+        rule(
+            "end-result",
+            re(r"(?i)\bend\s+results?\b"),
+            "usually just \"result\"; keep \"end\" in \"front end\", \"dead end\" \
+             and \"in the end\"",
+        ),
         rule(
             "in-terms-of",
             phrase(&[
@@ -1034,6 +1064,7 @@ pub static COMPLEXITY: LazyLock<Vec<ComplexityRule>> = LazyLock::new(|| {
                 "in relation to",
                 "from the perspective of",
                 "in the context of",
+                "in connection with",
             ]),
             "context-dependent clutter: usually \"for\", \"about\", or nothing",
         ),
@@ -1312,13 +1343,18 @@ mod tests {
     }
 
     #[test]
-    fn purposes_guard_rejects_determiners() {
+    fn purposes_guard_keeps_only_a_gerund() {
         let rule = CLUTTER
             .iter()
             .find(|r| r.name == "clutter:purposes")
             .unwrap();
         let guard = rule.guard.unwrap();
-        for (text, want) in [("for testing purposes", true), ("for the purposes", false)] {
+        for (text, want) in [
+            ("for testing purposes", true),
+            ("for the purposes", false),
+            ("for other purposes", false),
+            ("for illustrative purposes", false),
+        ] {
             let caps = rule
                 .pat
                 .captures(text)

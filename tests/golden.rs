@@ -16,6 +16,15 @@ use crisp::rules::{Bound, Budget};
 use crisp::{Finding, Kind, Span, text::Unit};
 use serde_json::Value;
 
+/// `CRISP_UPDATE_GOLDEN=1`: this run re-records the contract.
+///
+/// The per-field tests below then return early. Each is a subset of
+/// `the_engine_records_exactly_the_contract`, so they would only compare the
+/// engine with the file being replaced and fail the documented re-record run.
+fn updating() -> bool {
+    std::env::var("CRISP_UPDATE_GOLDEN").is_ok_and(|v| v == "1")
+}
+
 fn contract() -> Value {
     let path = common::fixtures_dir().join("golden.json");
     let raw = std::fs::read_to_string(&path)
@@ -116,6 +125,9 @@ fn compare(label: &str, ours: &[String], recorded: &[String]) {
 /// reports the same findings in a different order.
 #[test]
 fn the_rule_tables_match_the_recorded_contract() {
+    if updating() {
+        return;
+    }
     let contract = contract();
     let recorded = &contract["__config__"]["rules"];
     let names = |key: &str| -> Vec<String> {
@@ -165,6 +177,9 @@ fn the_rule_tables_match_the_recorded_contract() {
 /// What a document scores must not depend on which engine looked at it.
 #[test]
 fn the_measurement_thresholds_match_the_recorded_contract() {
+    if updating() {
+        return;
+    }
     let contract = contract();
     let config = &contract["__config__"];
     let n = |key: &str| config[key].as_u64().expect("a number") as usize;
@@ -186,6 +201,9 @@ fn the_measurement_thresholds_match_the_recorded_contract() {
 /// visible here.
 #[test]
 fn the_default_budget_matches_the_recorded_contract() {
+    if updating() {
+        return;
+    }
     let contract = contract();
     let recorded: Vec<(String, String, f64)> = contract["__config__"]["budget"]
         .as_object()
@@ -213,6 +231,9 @@ fn the_default_budget_matches_the_recorded_contract() {
 /// recorded lists are the contract, in order: the order is the report's.
 #[test]
 fn the_insight_config_matches_the_recorded_contract() {
+    if updating() {
+        return;
+    }
     let contract = contract();
     let recorded = &contract["__config__"]["insight"];
     let names = |key: &str| -> Vec<String> {
@@ -235,6 +256,9 @@ fn the_insight_config_matches_the_recorded_contract() {
 /// rule change shows up even on documents that are not insights.
 #[test]
 fn the_insight_failures_match_the_recorded_contract() {
+    if updating() {
+        return;
+    }
     let contract = contract();
     let mut failed = 0;
     for (name, text) in fixtures(&contract) {
@@ -247,6 +271,9 @@ fn the_insight_failures_match_the_recorded_contract() {
 
 #[test]
 fn the_findings_match_the_recorded_contract() {
+    if updating() {
+        return;
+    }
     let contract = contract();
     let mut checked = 0;
 
@@ -281,6 +308,9 @@ fn the_findings_match_the_recorded_contract() {
 /// two are 7 sentences and 6, and both are right about their own input.
 #[test]
 fn the_pipeline_tallies_and_metrics_match_the_recorded_contract() {
+    if updating() {
+        return;
+    }
     use crisp::report::Simplified;
     use crisp::rewrite::Rewrite;
 
@@ -332,6 +362,9 @@ fn the_pipeline_tallies_and_metrics_match_the_recorded_contract() {
 
 #[test]
 fn the_positioned_spans_match_the_recorded_contract() {
+    if updating() {
+        return;
+    }
     let contract = contract();
 
     for (name, text) in fixtures(&contract) {
@@ -355,6 +388,9 @@ fn the_positioned_spans_match_the_recorded_contract() {
 
 #[test]
 fn the_typography_rewrite_matches_the_recorded_contract() {
+    if updating() {
+        return;
+    }
     let contract = contract();
 
     for (name, text) in fixtures(&contract) {
@@ -369,9 +405,9 @@ fn the_typography_rewrite_matches_the_recorded_contract() {
 
 /// Everything a consumer can observe, for one fixture, in the contract's shape.
 ///
-/// What `scripts/golden.py` used to record, before the Python retired. The rewrites run as a
-/// pipeline (typography, then clutter, then measure), so the tallies and metrics
-/// describe the end of it; the ranges and spans describe the raw text.
+/// The rewrites run as a pipeline (typography, then clutter, then measure), so
+/// the tallies and metrics describe the end of it; the ranges and spans
+/// describe the raw text.
 fn record(text: &str) -> Value {
     use crisp::report::{Simplified, metrics_json};
     use crisp::rewrite::Rewrite;
@@ -635,6 +671,39 @@ const CASES: &[(&str, bool, &[&str])] = &[
         true,
         &["simplify", "--json"],
     ),
+    // What a rule must leave alone, or rewrite only one way: a modal before
+    // "have the ability to", an adjective before "purposes", words that only
+    // share a stem, "of" a determiner needs, a literal end of day, a
+    // conditional before a comma, a field being set.
+    ("fixtures/cases/no-wrong-fix.md", true, &["simplify"]),
+    (
+        "fixtures/cases/no-wrong-fix.md",
+        true,
+        &["simplify", "--locate"],
+    ),
+    (
+        "fixtures/cases/no-wrong-fix.md",
+        true,
+        &["detell", "--locate"],
+    ),
+    // Curly apostrophes, as pasted: locate reads the raw text, so every rule
+    // with an apostrophe must fire on the curly one too.
+    ("fixtures/cases/curly-apostrophe.md", true, &["simplify"]),
+    (
+        "fixtures/cases/curly-apostrophe.md",
+        true,
+        &["simplify", "--locate"],
+    ),
+    (
+        "fixtures/cases/curly-apostrophe.md",
+        true,
+        &["detell", "--locate"],
+    ),
+    (
+        "fixtures/cases/curly-apostrophe.md",
+        true,
+        &["detell", "--report"],
+    ),
     // Explanation is not padding: a rewrite that cut the joints and the lists
     // fails on them; one that kept them and let the explanation grow passes.
     (
@@ -872,7 +941,7 @@ fn leaf_diff(was: &Value, now: &Value, path: &str, out: &mut Vec<String>) {
 #[test]
 fn the_engine_records_exactly_the_contract() {
     let now = record_all();
-    if std::env::var("CRISP_UPDATE_GOLDEN").is_ok_and(|v| v == "1") {
+    if updating() {
         let path = common::fixtures_dir().join("golden.json");
         let body = serde_json::to_string_pretty(&now).expect("serialises") + "\n";
         std::fs::write(&path, body).expect("golden.json is writable");
