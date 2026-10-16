@@ -68,22 +68,25 @@ fn truncate(s: &str, n: usize) -> String {
 
 /// How much shorter the text got, against the source it came from.
 ///
-/// The cut is owed by padding, not by explanation. The source's paragraphs are
-/// scored (`explain::paragraphs`); when none explains, the rewrite must cut
-/// `COMPRESSION_TARGET` percent, as it always has. When some do, the rewrite may
-/// be at most what is left of the rest after that cut, plus the explanation at
-/// up to `EXPLANATION_GROWTH` times its length: explanation may grow, padding
-/// pays for it, and only the source is scored, so dressing padding up as
-/// explanation in the rewrite changes nothing.
+/// The cut is owed by padding, not by explanation, and each side is held to its
+/// own quota. The source's paragraphs are scored (`explain::paragraphs`), and
+/// each rewrite sentence is traced to the source paragraph it came from
+/// (`explain::explaining_words`). Then the words outside explanation must lose
+/// `COMPRESSION_TARGET` percent of their own count, and the words in
+/// explanation may grow to `EXPLANATION_GROWTH` times their own count. Neither
+/// pays for the other: explanation that did not grow buys padding nothing, and
+/// padding that was cut hard buys explanation no extra room. When the source
+/// explains nothing, the rest is the whole text and this is the plain cut of
+/// `COMPRESSION_TARGET` percent it always was. Only the source is scored, so
+/// dressing padding up as explanation in the rewrite changes nothing.
 #[derive(Clone, Copy, PartialEq, Debug)]
 pub struct Compression {
     pub before: usize,
     pub after: usize,
-    /// The cut owed, as a percentage of the whole source: `COMPRESSION_TARGET`
-    /// on the share that is not explaining.
-    pub target: f64,
-    /// The share of the source's words in explanatory paragraphs, 0 to 1.
-    pub explaining: f64,
+    /// The source's words in explanatory paragraphs.
+    pub explaining_before: usize,
+    /// The rewrite's words in sentences that came from an explanatory paragraph.
+    pub explaining_after: usize,
 }
 
 impl Compression {
@@ -91,21 +94,18 @@ impl Compression {
     /// never disagree about how long a document is.
     pub fn between(source: &str, rewritten: &str) -> Self {
         let words = |t: &str| super::measure(t).get("words").unwrap_or(0.0) as usize;
-        let explaining = super::round1(100.0 * super::explain::explanatory_share(source)) / 100.0;
+        let (explaining_before, explaining_after) =
+            super::explain::explaining_words(source, rewritten);
         Compression {
             before: words(source),
             after: words(rewritten),
-            target: super::round1(COMPRESSION_TARGET * (1.0 - explaining)),
-            explaining,
+            explaining_before,
+            explaining_after,
         }
     }
 
     pub fn cut_pct(&self) -> f64 {
-        if self.before == 0 {
-            return 0.0;
-        }
-        let (b, a) = (self.before as f64, self.after as f64);
-        super::round1(100.0 * (b - a) / b)
+        pct_cut(self.before, self.after)
     }
 
     /// Same guard as the scorecard: on a short note the percentage is noise.
@@ -113,41 +113,55 @@ impl Compression {
         self.before >= MIN_WORDS_TO_SCORE
     }
 
-    /// The source's words in explanatory paragraphs, and in the rest.
-    pub fn split(&self) -> (usize, usize) {
-        let explaining = (self.before as f64 * self.explaining).round() as usize;
-        (explaining, self.before - explaining)
+    /// The words that are not explaining, in the source and in the rewrite.
+    pub fn padding(&self) -> (usize, usize) {
+        (
+            self.before.saturating_sub(self.explaining_before),
+            self.after.saturating_sub(self.explaining_after),
+        )
     }
 
-    /// The longest the rewrite may be when the source explains.
-    pub fn limit(&self) -> usize {
-        let (explaining, rest) = self.split();
-        (rest as f64 * (1.0 - COMPRESSION_TARGET / 100.0) + explaining as f64 * EXPLANATION_GROWTH)
-            .floor() as usize
+    pub fn padding_cut_pct(&self) -> f64 {
+        let (before, after) = self.padding();
+        pct_cut(before, after)
+    }
+
+    /// Padding lost `COMPRESSION_TARGET` percent of its own words. A source that
+    /// is all explanation owes no cut, so long as the rewrite adds no padding.
+    pub fn padding_ok(&self) -> bool {
+        let (before, after) = self.padding();
+        if before == 0 {
+            return after == 0;
+        }
+        self.padding_cut_pct() >= COMPRESSION_TARGET
+    }
+
+    /// The most words the explanation may have in the rewrite.
+    pub fn explanation_limit(&self) -> usize {
+        (self.explaining_before as f64 * EXPLANATION_GROWTH).floor() as usize
+    }
+
+    pub fn explanation_ok(&self) -> bool {
+        self.explaining_after <= self.explanation_limit()
     }
 
     pub fn ok(&self) -> bool {
-        if !self.scored() {
-            return true;
-        }
-        if self.explaining == 0.0 {
-            return self.cut_pct() >= self.target;
-        }
-        self.after <= self.limit()
+        !self.scored() || (self.padding_ok() && self.explanation_ok())
     }
 
     fn json(&self) -> Value {
-        let explains = self.explaining > 0.0;
-        let (explaining, rest) = self.split();
+        let (padding_before, padding_after) = self.padding();
         json!({
             "before": self.before,
             "after": self.after,
             "cut_pct": self.cut_pct(),
-            "target": self.target,
-            "explaining": self.explaining,
-            "explaining_words": explaining,
-            "rest_words": rest,
-            "limit": explains.then(|| self.limit()),
+            "padding_before": padding_before,
+            "padding_after": padding_after,
+            "padding_cut_pct": self.padding_cut_pct(),
+            "padding_target": COMPRESSION_TARGET,
+            "explanation_before": self.explaining_before,
+            "explanation_after": self.explaining_after,
+            "explanation_limit": self.explanation_limit(),
             "growth": EXPLANATION_GROWTH,
             "scored": self.scored(),
             "ok": self.ok(),
@@ -155,15 +169,25 @@ impl Compression {
     }
 }
 
+/// The cut from `before` to `after` words, as a percentage rounded to 0.1.
+fn pct_cut(before: usize, after: usize) -> f64 {
+    if before == 0 {
+        return 0.0;
+    }
+    let (b, a) = (before as f64, after as f64);
+    super::round1(100.0 * (b - a) / b)
+}
+
 // ── explanation ──────────────────────────────────────────────────────────────
 
 /// What a rewrite did to the source's explanation: its joints (cause, contrast
-/// and condition connectives) in the sentences that survived, and its lists.
+/// and condition connectives), and its lists.
 #[derive(Clone, PartialEq, Debug)]
 pub struct Explanation {
     /// Every joint in the source; below `MIN_JOINTS_TO_GATE` it is not gated.
     pub joints_source: usize,
-    /// The joints in source sentences that survive the rewrite.
+    /// The joints the rewrite owes: every one in an explanatory paragraph, and
+    /// those in other source sentences that survive the rewrite.
     pub joints_required: usize,
     /// The joints the rewrite has.
     pub joints_after: usize,
@@ -180,7 +204,7 @@ pub const MIN_JOINTS_TO_GATE: usize = 3;
 
 impl Explanation {
     pub fn between(source: &str, rewritten: &str) -> Self {
-        let (joints_required, joints_after) = super::explain::surviving_joints(source, rewritten);
+        let (joints_required, joints_after) = super::explain::owed_joints(source, rewritten);
         Explanation {
             joints_source: super::explain::joints(source).len(),
             joints_required,
@@ -215,7 +239,7 @@ impl Explanation {
         let mut l = Vec::new();
         if self.joints_gated() {
             l.push(format!(
-                "JOINTS  [{}]  {} in the sentences that survived, {} in the rewrite (because/so/but/if...)",
+                "JOINTS  [{}]  {} owed (explanation, surviving sentences), {} in the rewrite (because/so/but/if...)",
                 if self.joints_ok() { "PASS" } else { "LOST" },
                 self.joints_required,
                 self.joints_after,
@@ -447,33 +471,41 @@ fn length_lines(c: Option<Compression>) -> Vec<String> {
             c.before, c.after
         )];
     }
-    let verdict = match (c.ok(), c.after > c.before) {
-        (true, _) => "PASS",
-        (false, true) => "LONG",
-        (false, false) => "SHORT",
+    let verdict = if c.ok() {
+        "PASS"
+    } else if c.after > c.before || !c.explanation_ok() {
+        "LONG"
+    } else {
+        "SHORT"
     };
-    if c.explaining == 0.0 {
+    if c.explaining_before == 0 {
         return vec![format!(
             "LENGTH  [{verdict}]  {} -> {} words, cut {}%   target >= {}%",
             c.before,
             c.after,
             py_float(c.cut_pct()),
-            py_float(c.target)
+            py_float(COMPRESSION_TARGET)
         )];
     }
-    let (explaining, rest) = c.split();
+    let (padding_before, padding_after) = c.padding();
     vec![
         format!(
-            "LENGTH  [{verdict}]  {} -> {} words, at most {}",
+            "LENGTH  [{verdict}]  {} -> {} words, cut {}%",
             c.before,
             c.after,
-            c.limit()
+            py_float(c.cut_pct())
         ),
         format!(
-            "        {}% of the source explains ({explaining} words, may grow {}x); the rest ({rest} words) owes a {}% cut",
-            py_float(super::round1(100.0 * c.explaining)),
-            py_float(EXPLANATION_GROWTH),
+            "        padding {padding_before} -> {padding_after} words, cut {}%   target >= {}%",
+            py_float(c.padding_cut_pct()),
             py_float(COMPRESSION_TARGET)
+        ),
+        format!(
+            "        explanation {} -> {} words, at most {} ({}x)",
+            c.explaining_before,
+            c.explaining_after,
+            c.explanation_limit(),
+            py_float(EXPLANATION_GROWTH)
         ),
     ]
 }
@@ -726,46 +758,74 @@ mod tests {
     }
 
     #[test]
-    fn padding_pays_for_explanation_and_explanation_may_grow_to_its_cap() {
+    fn padding_and_explanation_each_meet_their_own_quota() {
         let all_padding = Compression {
             before: 100,
             after: 70,
-            target: 40.0,
-            explaining: 0.0,
+            explaining_before: 0,
+            explaining_after: 0,
         };
         assert!(!all_padding.ok());
         // All explanation: no cut owed, growth up to 1.5x.
         let grows = Compression {
             after: 150,
-            target: 0.0,
-            explaining: 1.0,
+            explaining_before: 100,
+            explaining_after: 150,
             ..all_padding
         };
-        assert_eq!(grows.limit(), 150);
+        assert_eq!(grows.explanation_limit(), 150);
         assert!(grows.ok());
-        assert!(
-            !Compression {
-                after: 151,
-                ..grows
-            }
-            .ok()
-        );
+        let over = Compression {
+            after: 151,
+            explaining_after: 151,
+            ..grows
+        };
+        assert!(!over.ok());
         assert_eq!(
-            length_lines(Some(Compression {
-                after: 151,
-                ..grows
-            }))[0],
-            "LENGTH  [LONG]  100 -> 151 words, at most 150"
+            length_lines(Some(over)),
+            [
+                "LENGTH  [LONG]  100 -> 151 words, cut -51.0%",
+                "        padding 0 -> 0 words, cut 0.0%   target >= 40.0%",
+                "        explanation 100 -> 151 words, at most 150 (1.5x)",
+            ]
         );
-        // Half and half: 50 x 0.6 + 50 x 1.5.
-        let mixed = Compression {
-            target: 20.0,
-            explaining: 0.5,
-            after: 105,
+        // Half and half, nothing cut: the explanation's unused growth does not
+        // excuse the padding. The pooled rule passed this (at most 105).
+        let uncut = Compression {
+            after: 100,
+            explaining_before: 50,
+            explaining_after: 50,
             ..all_padding
         };
-        assert_eq!(mixed.limit(), 105);
-        assert!(mixed.ok());
+        assert!(uncut.explanation_ok());
+        assert!(!uncut.padding_ok());
+        assert_eq!(
+            length_lines(Some(uncut))[..2],
+            [
+                "LENGTH  [SHORT]  100 -> 100 words, cut 0.0%",
+                "        padding 50 -> 50 words, cut 0.0%   target >= 40.0%",
+            ]
+        );
+        // Padding cut by 40%, explanation kept: passes.
+        let cut = Compression { after: 80, ..uncut };
+        assert_eq!(cut.padding(), (50, 30));
+        assert!(cut.ok());
+        // Padding cut hard buys the explanation no room past 1.5x.
+        let swapped = Compression {
+            after: 76,
+            explaining_after: 76,
+            ..uncut
+        };
+        assert!(swapped.padding_ok());
+        assert!(!swapped.ok());
+        // A source that is all explanation owes no cut but gains no padding.
+        let added = Compression {
+            after: 110,
+            explaining_after: 100,
+            ..grows
+        };
+        assert!(added.explanation_ok());
+        assert!(!added.ok());
     }
 
     #[test]
@@ -806,8 +866,8 @@ mod tests {
         let c = Compression {
             before: 159,
             after: 114,
-            target: COMPRESSION_TARGET,
-            explaining: 0.0,
+            explaining_before: 0,
+            explaining_after: 0,
         };
         assert_eq!(c.cut_pct(), 28.3);
         assert!(!c.ok());

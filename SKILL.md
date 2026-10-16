@@ -52,7 +52,7 @@ criterion is observable rather than a matter of taste.
 **Shorter is half the job.** Every budget metric is a ratio, so a draft can pass
 all of them and still be twice as long as it needs to be. `--baseline` measures
 the rewrite against the source it came from and fails it if fewer than 40% of the
-words are gone. Treat 40% as the floor, not the target. The way to find it is
+words that are not explaining are gone. Treat 40% as the floor, not the target. The way to find it is
 deleting whole sentences, not shaving words.
 
 **But explanation is not padding.** The 40% is owed by padding and repetition.
@@ -124,13 +124,17 @@ Chain the second script. It cuts clutter, flags complexity, and scores:
   plus your LONGEST SENTENCES and PASSIVE SENTENCES listed verbatim so the
   rewrite is targeted rather than vague.
 - `--baseline` names the source, which is what makes the LENGTH line possible:
-  `122 -> 70 words, cut 42.6%   target >= 40.0%`. Always pass it.
+  `122 -> 70 words, cut 42.6%   target >= 40.0%`. When the source explains, two
+  lines follow it, one per quota: `padding 38 -> 22 words, cut 42.1%   target >=
+  40.0%` and `explanation 131 -> 131 words, at most 196 (1.5x)`. Always pass it.
 - **Filing an insight?** Add `--insight` to that `crisp simplify` call. The report
   gains an `INSIGHT STRUCTURE` block and `--check` fails on a missing section
   or a leaked reference.
 - exit 0 = pass. Exit 1 with `--check` = over the complexity budget, under the
   length target, or a failed gate (JOINTS, LISTS, `--insight`).
-  `--json` to parse it (the `compression` block carries the same numbers).
+  `--json` to parse it (the `compression` block carries the same numbers:
+  `padding_before`, `padding_after`, `padding_cut_pct` against `padding_target`,
+  and `explanation_before`, `explanation_after` against `explanation_limit`).
 - exit 2 = a usage error, unreadable input, or output crisp could not write (a
   broken pipe, a full disk). It is never a verdict on the text.
 
@@ -210,10 +214,19 @@ a passage that explains (a mechanism, a cause, a term the reader has not met):
 - a step-by-step mechanism keeps one sentence per step, in order;
 - a sentence that anticipates the reader's confusion stays.
 An explanatory passage owes the 40% cut nothing, and may come out up to 1.5x
-longer. The gate knows this: it scores each source paragraph, asks 40% only of
-the ones that are not explaining, and fails the run if a joint went missing from
-a sentence that survived (`JOINTS [LOST]`) or an unpacked list lost a part
-(`LISTS [LOST]`). Restoring an explanation that was cut too far (2-6x growth) is
+longer. The gate knows this: it scores each source paragraph, traces each
+rewrite sentence back to the source paragraph it shares most content words
+with (so running padding into an explanatory paragraph does not hide it), and
+holds each side to its own quota. The words that are not explaining
+must lose 40% of their own count, and the explaining words may grow to 1.5x
+their own count; neither pays for the other, so an explanation that did not grow
+excuses no padding, and padding cut hard buys the explanation no extra room
+(`LENGTH [SHORT]` or `[LONG]`, with a `padding` and an `explanation` line under
+it). It fails the run if the rewrite has fewer joints than it owes
+(`JOINTS [LOST]`): every joint in an explanatory paragraph is owed whether or not
+its sentence survived, so deleting the explanation fails, while a joint in any
+other paragraph is owed only if its sentence survived. It also fails if an
+unpacked list lost a part (`LISTS [LOST]`). Restoring an explanation that was cut too far (2-6x growth) is
 writing, not editing: run that rewrite without `--baseline`. A long sentence in
 an explanation that joins short clauses ("..., so ...", "..., which means
 ...") is excused from the sentence budget and listed under `JOINED

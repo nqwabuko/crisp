@@ -14,21 +14,25 @@
 //!
 //! So this module measures, and `report` gates on it:
 //!
-//! - **Joints**: cause, contrast and condition connectives. Every joint in a
-//!   source sentence that survives the rewrite must still be there (counted
-//!   across the rewrite, so splitting a sentence or moving a joint is fine;
-//!   deleting a padding sentence takes its joints with it).
+//! - **Joints**: cause, contrast and condition connectives. Every joint in an
+//!   explanatory paragraph is owed, whether or not its sentence survived, so
+//!   deleting the explanation fails; a joint in any other paragraph is owed only
+//!   if its sentence survives, so deleting a padding sentence takes its joints
+//!   with it. Counted across the rewrite, so splitting a sentence or moving a
+//!   joint is fine.
 //! - **Promised lists**: "has five parts" must be followed by the five. A list
 //!   the source unpacked must keep every one of its parts.
 //! - **Explanatory paragraphs**: dense in joints, definitions, unpackings and
 //!   anticipations ("you might wonder why"). They owe the 40% cut nothing and
-//!   may grow, within `EXPLANATION_GROWTH`; padding pays for them. Scored on the
+//!   may grow, within `EXPLANATION_GROWTH` of their own words; the rest still
+//!   owes its own 40%, and neither quota pays for the other. Scored on the
 //!   source only, so a rewrite cannot dress padding up to dodge the cut.
 //!
 //! The word lists are British English, and code never counts.
 
 use super::text::{self, mask_code};
 use regex::Regex;
+use std::collections::{HashMap, HashSet};
 use std::sync::LazyLock;
 
 /// What a connective links.
@@ -402,19 +406,81 @@ pub fn paragraphs(text: &str) -> Vec<Paragraph> {
         .collect()
 }
 
-/// The share of a source's words that sit in explanatory paragraphs, 0 to 1.
-pub fn explanatory_share(text: &str) -> f64 {
-    let paras = paragraphs(text);
-    let total: usize = paras.iter().map(|p| p.words).sum();
-    if total == 0 {
-        return 0.0;
-    }
-    let explaining: usize = paras
+/// The source's words in explanatory paragraphs, and the rewrite's words in
+/// sentences that came from one, for the length gate's two quotas.
+///
+/// A rewrite sentence kept exactly as a source sentence came from that
+/// sentence's paragraph. Any other came from the source paragraph that shares
+/// the most of its distinct content words, a non-explanatory one on a tie (in
+/// doubt, words owe the cut), and inherits that paragraph's score; a sentence
+/// that shares no content word with any source paragraph came from nowhere
+/// and counts as the rest. Content words are the
+/// ones `owed_joints` uses to decide a sentence survived. The trace is per
+/// sentence, not per paragraph, so running a padding paragraph into an
+/// explanatory one leaves its sentences padding: only a sentence that splices
+/// padding words into explanation's own words moves, and then to whichever
+/// side it shares more with. Only the source is scored, so a rewrite cannot
+/// dress padding up as explanation.
+pub fn explaining_words(source: &str, rewrite: &str) -> (usize, usize) {
+    let words_of = |t: &str| -> HashSet<String> { content(t).into_iter().collect() };
+    let source = paragraphs(source);
+    let source_words: Vec<HashSet<String>> = source
+        .iter()
+        .map(|p| words_of(&text::plain(&p.text)))
+        .collect();
+    let before = source
         .iter()
         .filter(|p| p.explanatory)
         .map(|p| p.words)
         .sum();
-    explaining as f64 / total as f64
+    // A sentence kept as written belongs to the paragraph it was written in,
+    // whatever else shares its words: a recap repeats an explanation's words
+    // and is still a recap.
+    let key = |t: &str| {
+        t.split_whitespace()
+            .collect::<Vec<_>>()
+            .join(" ")
+            .to_lowercase()
+    };
+    let kept: HashMap<String, usize> = source
+        .iter()
+        .enumerate()
+        .flat_map(|(i, p)| {
+            text::split_sentences(&p.text)
+                .into_iter()
+                .map(move |sentence| (key(&sentence), i))
+        })
+        .collect();
+    let explains = |sentence: &String| {
+        if let Some(&i) = kept.get(&key(sentence)) {
+            return source[i].explanatory;
+        }
+        let words = words_of(sentence);
+        let mut best: Option<(usize, usize)> = None;
+        for (i, s) in source_words.iter().enumerate() {
+            let shared = words.intersection(s).count();
+            // On a tie, padding wins: a sentence that could be either owes the cut.
+            let better = best.is_none_or(|(b, most)| {
+                shared > most || (shared == most && source[b].explanatory && !source[i].explanatory)
+            });
+            if shared > 0 && better {
+                best = Some((i, shared));
+            }
+        }
+        best.is_some_and(|(i, _)| source[i].explanatory)
+    };
+    let after = paragraphs(rewrite)
+        .iter()
+        .map(|p| {
+            let explaining: usize = text::split_sentences(&p.text)
+                .iter()
+                .filter(|sentence| explains(sentence))
+                .map(|sentence| text::count_words(sentence))
+                .sum();
+            explaining.min(p.words)
+        })
+        .sum();
+    (before, after)
 }
 
 // ── joined sentences ─────────────────────────────────────────────────────────
@@ -492,7 +558,7 @@ pub fn joined_sentences(
     text: &str,
     source: Option<&str>,
 ) -> std::collections::HashMap<String, usize> {
-    let explained: Option<std::collections::HashSet<String>> = source.map(|src| {
+    let explained: Option<HashSet<String>> = source.map(|src| {
         paragraphs(src)
             .into_iter()
             .filter(|p| p.explanatory)
@@ -619,32 +685,39 @@ fn stem(word: &str) -> String {
 /// late") excused itself: the sentence no longer counted as kept.
 pub const SURVIVES: f64 = 0.5;
 
-/// The joints in the source's sentences that survive the rewrite, and the
-/// joints the rewrite has. The rewrite must have at least as many: a sentence
-/// that was cut takes its joints with it, but a "so" turned into "and" between
-/// two claims that both stayed is a lost joint. Counted across the whole
-/// rewrite, so splitting a sentence, or moving a joint, keeps it.
-pub fn surviving_joints(source: &str, rewrite: &str) -> (usize, usize) {
-    let kept: std::collections::HashSet<String> =
-        content(&text::strip_code(rewrite)).into_iter().collect();
-    let required = text::split_sentences(&text::strip_code(source))
+/// The joints the rewrite owes, and the joints it has. It must have at least as
+/// many. Every joint in a paragraph `paragraphs` scores explanatory is owed,
+/// whether or not its sentence survived: deleting the explanation is the loss
+/// this gate exists to catch. In any other paragraph a joint is owed only when
+/// its sentence survives, so cutting a padding sentence takes its joints with
+/// it, but a "so" turned into "and" between two claims that both stayed is a
+/// lost joint. Counted across the whole rewrite, so splitting a sentence, or
+/// moving a joint, keeps it.
+pub fn owed_joints(source: &str, rewrite: &str) -> (usize, usize) {
+    let kept: HashSet<String> = content(&text::strip_code(rewrite)).into_iter().collect();
+    let survives = |sentence: &String| {
+        let words = content(sentence);
+        !words.is_empty()
+            && words.iter().filter(|w| kept.contains(*w)).count() as f64
+                >= SURVIVES * words.len() as f64
+    };
+    let owed = paragraphs(source)
         .iter()
-        .filter(|sentence| {
-            let words = content(sentence);
-            !words.is_empty()
-                && words.iter().filter(|w| kept.contains(*w)).count() as f64
-                    >= SURVIVES * words.len() as f64
+        .map(|p| {
+            text::split_sentences(&p.text)
+                .iter()
+                .filter(|sentence| p.explanatory || survives(sentence))
+                .map(|sentence| joints(sentence).len())
+                .sum::<usize>()
         })
-        .map(|sentence| joints(sentence).len())
         .sum();
-    (required, joints(rewrite).len())
+    (owed, joints(rewrite).len())
 }
 
 /// Every list the source unpacked, with the parts the rewrite no longer has.
 /// A part is kept if any of its content words is still in the rewrite.
 pub fn lost_parts(source: &str, rewrite: &str) -> Vec<(String, Vec<String>)> {
-    let kept: std::collections::HashSet<String> =
-        content(&text::strip_code(rewrite)).into_iter().collect();
+    let kept: HashSet<String> = content(&text::strip_code(rewrite)).into_iter().collect();
     promises(source)
         .into_iter()
         .filter(|p| p.unpacked)
@@ -676,8 +749,7 @@ pub fn unkept(source: &str, rewrite: &str) -> Vec<Promise> {
         .into_iter()
         .filter(|p| !p.unpacked)
         .filter(|p| {
-            let near: std::collections::HashSet<String> =
-                content(reach(&prose, p.end)).into_iter().collect();
+            let near: HashSet<String> = content(reach(&prose, p.end)).into_iter().collect();
             !listed.iter().any(|l| {
                 l.noun == p.noun
                     && l.count == p.count

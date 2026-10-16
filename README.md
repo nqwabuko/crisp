@@ -74,10 +74,17 @@ it is usually the biggest win available.
 
 The 40% is owed by padding, not by explanation. With `--baseline`, each source
 paragraph is scored on its joints (because, so, but, if...), definitions,
-unpacked lists and anticipations per sentence, less its padding; explanatory
-paragraphs owe no cut and may grow up to 1.5x. Two more lines then gate the
-rewrite: `JOINTS` fails if a joint went missing from a source sentence that
-survived, and `LISTS` fails if "it has three parts" lost one of its parts. The research behind this is in
+unpacked lists and anticipations per sentence, less its padding, and each
+rewrite sentence is traced to the source paragraph it shares most content
+words with, so padding run into an explanatory paragraph is still padding. Each side then meets its own quota: the words that are not
+explaining must lose 40% of their own count, and the explaining words may grow
+to at most 1.5x theirs. Neither pays for the other, and the report shows both
+under the LENGTH line (`padding 38 -> 22 words, cut 42.1%   target >= 40.0%`,
+`explanation 131 -> 131 words, at most 196 (1.5x)`). Two more lines then gate
+the rewrite: `JOINTS` fails if the rewrite has fewer joints than it owes, where
+every joint in an explanatory paragraph is owed even if its sentence was cut
+and a joint elsewhere only if its sentence survived, and `LISTS` fails if "it
+has three parts" lost one of its parts. The research behind this is in
 `references/simplify.md` Part E.
 
 ![A passage with a list, an anticipation and a joint in an explaining paragraph, then a padding paragraph](docs/figures/explanationAnatomy.png)

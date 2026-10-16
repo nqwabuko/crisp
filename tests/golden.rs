@@ -750,6 +750,89 @@ const CASES: &[(&str, bool, &[&str])] = &[
             "fixtures/explanatory.md",
         ],
     ),
+    // Each side meets its own quota: an uncut source fails on its padding,
+    // even with the padding run into an explanatory paragraph, a 40% padding cut with the explanation kept passes, deleted explanation
+    // owes its joints, and explanation past 1.5x is long however hard the
+    // padding was cut.
+    (
+        "fixtures/explanatory.md",
+        false,
+        &[
+            "simplify",
+            "--report",
+            "--check",
+            "--baseline",
+            "fixtures/explanatory.md",
+        ],
+    ),
+    // A recap repeats an explanation's words and is still padding: kept
+    // uncut, against itself, it fails LENGTH.
+    (
+        "fixtures/cases/explanatory-recap.md",
+        false,
+        &[
+            "simplify",
+            "--report",
+            "--check",
+            "--baseline",
+            "fixtures/cases/explanatory-recap.md",
+        ],
+    ),
+    (
+        "fixtures/cases/explanatory-merged.md",
+        false,
+        &[
+            "simplify",
+            "--report",
+            "--check",
+            "--baseline",
+            "fixtures/explanatory.md",
+        ],
+    ),
+    (
+        "fixtures/cases/explanatory-padding-cut.md",
+        false,
+        &[
+            "simplify",
+            "--report",
+            "--check",
+            "--baseline",
+            "fixtures/explanatory.md",
+        ],
+    ),
+    (
+        "fixtures/cases/explanatory-deleted.md",
+        false,
+        &[
+            "simplify",
+            "--report",
+            "--check",
+            "--baseline",
+            "fixtures/explanatory.md",
+        ],
+    ),
+    (
+        "fixtures/cases/explanatory-grown.md",
+        false,
+        &[
+            "simplify",
+            "--report",
+            "--check",
+            "--baseline",
+            "fixtures/explanatory.md",
+        ],
+    ),
+    (
+        "fixtures/cases/explanatory-grown.md",
+        false,
+        &[
+            "simplify",
+            "--json",
+            "--check",
+            "--baseline",
+            "fixtures/explanatory.md",
+        ],
+    ),
     // Fact survival: a rewrite that kept a figure in another form ("six",
     // "18000", "14 October 2026") and dropped three ("22 kW", "Q4 2026",
     // "£0.45"). Reported, never a verdict.

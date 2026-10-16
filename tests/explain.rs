@@ -51,6 +51,70 @@ fn an_explanation_may_grow_within_the_cap() {
 }
 
 #[test]
+fn an_uncut_explanation_heavy_source_still_owes_its_padding_cut() {
+    // Three quarters of the source explains. The pooled rule let its unused
+    // growth pay for the padding, so an uncut rewrite passed; each side now
+    // meets its own quota.
+    let (r, code) = gate("explanatory.md", "explanatory.md");
+    assert!(line(&r, "LENGTH").contains("[SHORT]"), "{r}");
+    assert!(
+        line(&r, "        padding").contains("target >= 40.0%"),
+        "{r}"
+    );
+    assert_eq!(code, 1);
+}
+
+#[test]
+fn padding_run_into_an_explanatory_paragraph_is_still_padding() {
+    // The uncut source with one blank line removed, so the padding paragraph
+    // joins the "two steps" one. Traced per paragraph, its padding counted as
+    // explanation growth and the uncut rewrite passed; traced per sentence, it
+    // is still padding and still owes its cut.
+    let (r, code) = gate("explanatory.md", "cases/explanatory-merged.md");
+    assert!(line(&r, "LENGTH").contains("[SHORT]"), "{r}");
+    assert!(
+        line(&r, "        padding").contains("38 -> 34 words"),
+        "{r}"
+    );
+    assert_eq!(code, 1);
+}
+
+#[test]
+fn cutting_the_padding_by_40_percent_and_keeping_the_explanation_passes() {
+    let (r, code) = gate("explanatory.md", "cases/explanatory-padding-cut.md");
+    assert!(line(&r, "LENGTH").contains("[PASS]"), "{r}");
+    assert!(
+        line(&r, "        padding").contains("38 -> 22 words"),
+        "{r}"
+    );
+    assert!(line(&r, "JOINTS").contains("[PASS]"), "{r}");
+    assert_eq!(code, 0, "{r}");
+}
+
+#[test]
+fn deleting_the_explanation_loses_its_joints() {
+    // Every explanatory sentence cut, the padding kept: the explanation's
+    // joints are owed whether or not their sentences survived.
+    let (r, code) = gate("explanatory.md", "cases/explanatory-deleted.md");
+    assert!(line(&r, "JOINTS").contains("[LOST]"), "{r}");
+    assert!(line(&r, "JOINTS").contains("3 owed"), "{r}");
+    assert_eq!(code, 1);
+}
+
+#[test]
+fn padding_cut_hard_buys_the_explanation_no_room_past_its_cap() {
+    // The padding went, and the explanation grew past 1.5x of its own words.
+    // The whole is under what the pooled rule allowed; the explanation is not.
+    let (r, code) = gate("explanatory.md", "cases/explanatory-grown.md");
+    assert!(line(&r, "LENGTH").contains("[LONG]"), "{r}");
+    assert!(
+        line(&r, "        explanation").contains("at most 196"),
+        "{r}"
+    );
+    assert_eq!(code, 1);
+}
+
+#[test]
 fn splitting_a_long_sentence_keeps_its_joints() {
     let (r, _) = gate("cases/explain/src7.md", "cases/explain/rw7.md");
     assert!(line(&r, "JOINTS").contains("[PASS]"), "{r}");
