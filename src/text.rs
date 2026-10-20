@@ -27,8 +27,18 @@ fn re(pattern: &str) -> Regex {
 
 pub static WORD: LazyLock<Regex> = LazyLock::new(|| re(r"[A-Za-z][A-Za-z'\u{2019}\-]*"));
 
-static FENCE: LazyLock<Regex> = LazyLock::new(|| re(r"(?s)```.*?```|~~~.*?~~~"));
-static INLINE: LazyLock<Regex> = LazyLock::new(|| re(r"`[^`\n]+`"));
+/// Fenced code, and markdown footnote definitions: `[^label]:` at the start of a
+/// line plus any indented continuation lines. A definition is a reference list,
+/// not prose; measured as prose, one chapter's citations scored as a 106-word
+/// sentence.
+static FENCE: LazyLock<Regex> = LazyLock::new(|| {
+    re(r"(?s)```.*?```|~~~.*?~~~|(?m:^\[\^[^\]\n]+\]:[^\n]*(?:\n(?: {4}|\t)[^\n]*)*)")
+});
+
+/// Inline code, and footnote references (`[^label]`). A reference straight after
+/// a full stop hid the sentence boundary (`costs.[^n] Take` counted as one
+/// sentence), and its label is not a word the reader reads.
+static INLINE: LazyLock<Regex> = LazyLock::new(|| re(r"`[^`\n]+`|\[\^[^\]\s]+\]"));
 
 /// Abbreviations that must not end a sentence.
 static ABBREV: LazyLock<Regex> = LazyLock::new(|| {
@@ -87,6 +97,10 @@ static EMPHASIS: LazyLock<Regex> = LazyLock::new(|| re(r"[*_]"));
 
 /// `(offset, slice, is_code)` for the whole document, in order. The slices
 /// concatenate back to `text`, which is what makes every offset below honest.
+///
+/// `is_code` means "not prose": code, and footnotes (see `FENCE`, `INLINE`).
+/// Everything that excludes code from counting, from rules and from spans
+/// excludes footnotes the same way, by the same path.
 pub fn segments(text: &str) -> Vec<(usize, &str, bool)> {
     fn prose<'a>(out: &mut Vec<(usize, &'a str, bool)>, text: &'a str, from: usize, to: usize) {
         let block = &text[from..to];

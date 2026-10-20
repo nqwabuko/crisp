@@ -840,6 +840,74 @@ mod tests {
         assert_eq!(hits[0].start, 0);
     }
 
+    // ── footnotes ────────────────────────────────────────────────────────────
+    //
+    // Found measuring a 20-chapter book: a reference after a full stop glued
+    // two sentences into one (a "72-word sentence"), and the reference lists at
+    // the foot of each chapter were measured as prose (a "106-word sentence").
+
+    #[test]
+    fn footnote_reference_does_not_join_sentences() {
+        let text = "It costs very little.[^ch08-10] Take one busy charger now.";
+        let spans = spans(text, Unit::Utf16);
+        let words: Vec<usize> = spans.sentences.iter().map(|s| s.words).collect();
+        assert_eq!(words, [4, 5], "{spans:?}");
+        assert_eq!(measure(text).get("sentences"), Some(2.0));
+    }
+
+    #[test]
+    fn footnote_reference_is_not_a_word() {
+        assert_eq!(measure("It is done.[^ch08-10]").get("words"), Some(3.0));
+    }
+
+    #[test]
+    fn footnote_definition_is_not_prose() {
+        let prose = "The charger reports a fault. The operator sends a technician.\n";
+        let with_notes = format!(
+            "{prose}\n[^a]: Zapmap, Rapid charging: top ten networks, which lists the \
+             largest rapid networks; IONITY, About IONITY, a joint venture of six makers.\n    \
+             An indented continuation of the same reference, also not prose.\n\
+             [^b]: Another reference.\n"
+        );
+        let (bare, noted) = (measure(prose), measure(&with_notes));
+        assert_eq!(bare.values, noted.values);
+        assert_eq!(
+            spans(prose, Unit::Utf16).paragraphs.len(),
+            spans(&with_notes, Unit::Utf16).paragraphs.len()
+        );
+    }
+
+    #[test]
+    fn footnote_definition_keeps_offsets_true() {
+        let text = "Before.[^a]\n\n[^a]: A reference, prior to the rest.\n\nPrior to after.";
+        let masked = text::mask_code(text);
+        assert_eq!(masked.len(), text.len());
+        assert_eq!(masked.lines().count(), text.lines().count());
+        let hits = simplify_locate(text);
+        let after = text.rfind("Prior to").unwrap();
+        assert_eq!(hits.len(), 1, "{hits:?}");
+        assert_eq!(hits[0].start, after);
+    }
+
+    #[test]
+    fn bracket_text_that_is_not_a_footnote_still_counts() {
+        for (text, words) in [
+            ("See [^] here.", 2.0),
+            ("See [ ^a] here.", 3.0),
+            ("See [the guide](https://example.com) here.", 4.0),
+        ] {
+            assert_eq!(measure(text).get("words"), Some(words), "{text}");
+        }
+    }
+
+    #[test]
+    fn no_findings_inside_a_footnote_definition() {
+        let text = "Prior to the launch it worked.[^a]\n\n[^a]: Prior to the launch, per the report.\n";
+        let hits = simplify_locate(text);
+        assert_eq!(hits.len(), 1, "{hits:?}");
+        assert_eq!(hits[0].start, 0);
+    }
+
     #[test]
     fn clutter_carries_its_fix() {
         let hits = simplify_locate("Prior to the meeting, on a daily basis.");

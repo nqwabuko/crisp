@@ -5807,6 +5807,371 @@
     },
     "spans_consistent": true
   },
+  "footnotes.md": {
+    "cli": {
+      "detell --json": {
+        "fixes": {},
+        "flags": [
+          {
+            "count": 1,
+            "rule": "hedge:filler",
+            "samples": [
+              "…on a cellular link uses very little data. OCPP messa…"
+            ]
+          },
+          {
+            "count": 1,
+            "rule": "phrase:worth-noting",
+            "samples": [
+              "It is worth noting that a thousand chargers at…"
+            ]
+          }
+        ],
+        "total_fixes": 0,
+        "total_flags": 2
+      },
+      "detell --report": {
+        "exit": 0,
+        "stderr": "── detell report ─────────────────────────────\nFIXED: nothing (already clean typography)\nFLAGGED (needs a human/voice pass, 2):\n    1  hedge:filler\n         · …on a cellular link uses very little data. OCPP messa…\n    1  phrase:worth-noting\n         · It is worth noting that a thousand chargers at…\n──────────────────────────────────────────────\n"
+      },
+      "simplify --check --baseline --insight --json": {
+        "compression": {
+          "after": 75,
+          "before": 81,
+          "cut_pct": 7.4,
+          "explanation_after": 0,
+          "explanation_before": 0,
+          "explanation_limit": 0,
+          "growth": 1.5,
+          "ok": false,
+          "padding_after": 75,
+          "padding_before": 81,
+          "padding_cut_pct": 7.4,
+          "padding_target": 40.0,
+          "scored": true
+        },
+        "explanation": {
+          "joints": {
+            "after": 0,
+            "gated": false,
+            "ok": true,
+            "required": 0,
+            "source": 0
+          },
+          "lists": {
+            "lost": [],
+            "ok": true,
+            "promised_not_unpacked_after": [],
+            "promised_not_unpacked_before": 0
+          }
+        },
+        "facts": {
+          "kept": 0,
+          "missing": [],
+          "source": 0
+        },
+        "fixes": {
+          "clutter:before": 1,
+          "padding:note": 1
+        },
+        "flags": [
+          {
+            "count": 1,
+            "hint": "filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")",
+            "rule": "padding",
+            "samples": [
+              "...ger on a cellular link uses very little data. OCPP messages..."
+            ]
+          }
+        ],
+        "insight": [
+          {
+            "check": "sections",
+            "detail": "missing template section(s): Context, Insight Description, Significance, Customer Details"
+          },
+          {
+            "check": "significance",
+            "detail": "found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line"
+          }
+        ],
+        "joined_sentences": [],
+        "long_sentences": [],
+        "metrics": {
+          "flesch_kincaid_grade": 5.9,
+          "flesch_reading_ease": 71.9,
+          "max_paragraph_words": 51,
+          "max_sentence_words": 17,
+          "mean_sentence_words": 10.7,
+          "paragraphs": 3,
+          "pct_long_sentences": 0.0,
+          "pct_long_words": 9.3,
+          "pct_ly_adverbs": 1.3,
+          "pct_passive_sentences": 0.0,
+          "sentences": 7,
+          "words": 75
+        },
+        "over_budget": [],
+        "promised_not_unpacked": [],
+        "scored": true,
+        "total_fixes": 2,
+        "total_flags": 1
+      },
+      "simplify --check --baseline --insight --report": {
+        "exit": 1,
+        "stderr": "== simplify report ==========================\nCLUTTER CUT (auto, 2):\n    1  clutter:before\n    1  padding:note\nFLAGGED (needs the rewrite pass, 1):\n    1  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . ...ger on a cellular link uses very little data. OCPP messages...\nSCORECARD  (75 words, 7 sentences, 3 paragraphs):\n  [PASS]  mean_sentence_words       10.7   budget <= 18.0\n  [PASS]  max_sentence_words          17   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       71.9   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       5.9   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words             9.3   budget <= 20.0\n  [PASS]  max_paragraph_words         51   budget <= 90\n  [PASS]  pct_ly_adverbs             1.3   budget <= 4.0\nLENGTH  [SHORT]  81 -> 75 words, cut 7.4%   target >= 40.0%\nINSIGHT STRUCTURE  [FAIL] (2):\n  [FAIL]  sections           missing template section(s): Context, Insight Description, Significance, Customer Details\n  [FAIL]  significance       found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line\nVERDICT: OVER BUDGET on length, insight structure\n=============================================\n",
+        "stdout": "# Footnotes\n\nA charger on a cellular link uses very little data. OCPP messages are small, and\na heartbeat is about fifty bytes of JSON.[^ft-1] Take a busy charger running\ndozens of sessions a day: it uses tens of megabytes a month.[^ft-2] Before the\nswitch to WebSockets, the same traffic cost noticeably more.\n\nMost operators buy plans from specialist IoT providers.[^ft-3] A thousand chargers at three pounds a month is a real line in the budget.\n\n[^ft-1]: Open Charge Alliance, OCPP 1.6J specification, section 4, on message\n    framing; and the OCA's own notes, prior to the 2.0.1 release, on the reduction\n    in mobile data costs after moving to JSON over WebSockets.\n[^ft-2]: An illustrative estimate, with heartbeats every 60 seconds and meter values every 30 seconds while charging, TLS and TCP overhead included.\n[^ft-3]: 1NCE, product page (accessed October 2026), on ten years of service with 500 MB for a one-off fee.\n"
+      },
+      "simplify --check --baseline --json": {
+        "compression": {
+          "after": 75,
+          "before": 81,
+          "cut_pct": 7.4,
+          "explanation_after": 0,
+          "explanation_before": 0,
+          "explanation_limit": 0,
+          "growth": 1.5,
+          "ok": false,
+          "padding_after": 75,
+          "padding_before": 81,
+          "padding_cut_pct": 7.4,
+          "padding_target": 40.0,
+          "scored": true
+        },
+        "explanation": {
+          "joints": {
+            "after": 0,
+            "gated": false,
+            "ok": true,
+            "required": 0,
+            "source": 0
+          },
+          "lists": {
+            "lost": [],
+            "ok": true,
+            "promised_not_unpacked_after": [],
+            "promised_not_unpacked_before": 0
+          }
+        },
+        "facts": {
+          "kept": 0,
+          "missing": [],
+          "source": 0
+        },
+        "fixes": {
+          "clutter:before": 1,
+          "padding:note": 1
+        },
+        "flags": [
+          {
+            "count": 1,
+            "hint": "filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")",
+            "rule": "padding",
+            "samples": [
+              "...ger on a cellular link uses very little data. OCPP messages..."
+            ]
+          }
+        ],
+        "insight": null,
+        "joined_sentences": [],
+        "long_sentences": [],
+        "metrics": {
+          "flesch_kincaid_grade": 5.9,
+          "flesch_reading_ease": 71.9,
+          "max_paragraph_words": 51,
+          "max_sentence_words": 17,
+          "mean_sentence_words": 10.7,
+          "paragraphs": 3,
+          "pct_long_sentences": 0.0,
+          "pct_long_words": 9.3,
+          "pct_ly_adverbs": 1.3,
+          "pct_passive_sentences": 0.0,
+          "sentences": 7,
+          "words": 75
+        },
+        "over_budget": [],
+        "promised_not_unpacked": [],
+        "scored": true,
+        "total_fixes": 2,
+        "total_flags": 1
+      },
+      "simplify --check --baseline --report": {
+        "exit": 1,
+        "stderr": "== simplify report ==========================\nCLUTTER CUT (auto, 2):\n    1  clutter:before\n    1  padding:note\nFLAGGED (needs the rewrite pass, 1):\n    1  padding  -> filler: delete it. Keep only if load-bearing (\"just\"/\"simply\" meaning \"only\", a real contrast in \"that said\")\n         . ...ger on a cellular link uses very little data. OCPP messages...\nSCORECARD  (75 words, 7 sentences, 3 paragraphs):\n  [PASS]  mean_sentence_words       10.7   budget <= 18.0\n  [PASS]  max_sentence_words          17   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       71.9   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       5.9   budget <= 12.0\n  [PASS]  pct_passive_sentences      0.0   budget <= 10.0\n  [PASS]  pct_long_words             9.3   budget <= 20.0\n  [PASS]  max_paragraph_words         51   budget <= 90\n  [PASS]  pct_ly_adverbs             1.3   budget <= 4.0\nLENGTH  [SHORT]  81 -> 75 words, cut 7.4%   target >= 40.0%\nVERDICT: OVER BUDGET on length\n=============================================\n",
+        "stdout": "# Footnotes\n\nA charger on a cellular link uses very little data. OCPP messages are small, and\na heartbeat is about fifty bytes of JSON.[^ft-1] Take a busy charger running\ndozens of sessions a day: it uses tens of megabytes a month.[^ft-2] Before the\nswitch to WebSockets, the same traffic cost noticeably more.\n\nMost operators buy plans from specialist IoT providers.[^ft-3] A thousand chargers at three pounds a month is a real line in the budget.\n\n[^ft-1]: Open Charge Alliance, OCPP 1.6J specification, section 4, on message\n    framing; and the OCA's own notes, prior to the 2.0.1 release, on the reduction\n    in mobile data costs after moving to JSON over WebSockets.\n[^ft-2]: An illustrative estimate, with heartbeats every 60 seconds and meter values every 30 seconds while charging, TLS and TCP overhead included.\n[^ft-3]: 1NCE, product page (accessed October 2026), on ten years of service with 500 MB for a one-off fee.\n"
+      }
+    },
+    "detell": {
+      "cleaned": "# Footnotes\n\nA charger on a cellular link uses very little data. OCPP messages are small, and\na heartbeat is about fifty bytes of JSON.[^ft-1] Take a busy charger running\ndozens of sessions a day: it uses tens of megabytes a month.[^ft-2] Prior to the\nswitch to WebSockets, the same traffic cost noticeably more.\n\nMost operators buy plans from specialist IoT providers.[^ft-3] It is worth noting\nthat a thousand chargers at three pounds a month is a real line in the budget.\n\n[^ft-1]: Open Charge Alliance, OCPP 1.6J specification, section 4, on message\n    framing; and the OCA's own notes, prior to the 2.0.1 release, on the reduction\n    in mobile data costs after moving to JSON over WebSockets.\n[^ft-2]: An illustrative estimate, with heartbeats every 60 seconds and meter values every 30 seconds while charging, TLS and TCP overhead included.\n[^ft-3]: 1NCE, product page (accessed October 2026), on ten years of service with 500 MB for a one-off fee.\n",
+      "fixes": {},
+      "flags": {
+        "hedge:filler": 1,
+        "phrase:worth-noting": 1
+      }
+    },
+    "insight": [
+      {
+        "check": "sections",
+        "detail": "missing template section(s): Context, Insight Description, Significance, Customer Details"
+      },
+      {
+        "check": "significance",
+        "detail": "found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line"
+      }
+    ],
+    "locate": {
+      "detell": [
+        [
+          "hedge:filler",
+          "tell",
+          3,
+          35,
+          3,
+          39,
+          "very"
+        ],
+        [
+          "phrase:worth-noting",
+          "tell",
+          8,
+          64,
+          9,
+          5,
+          "It is worth noting\nthat"
+        ]
+      ],
+      "simplify": [
+        [
+          "padding",
+          "complexity",
+          3,
+          35,
+          3,
+          39,
+          "very"
+        ],
+        [
+          "clutter:before",
+          "clutter",
+          5,
+          69,
+          5,
+          77,
+          "Prior to"
+        ],
+        [
+          "padding:note",
+          "clutter",
+          8,
+          64,
+          9,
+          7,
+          "It is worth noting\nthat a"
+        ]
+      ]
+    },
+    "simplify": {
+      "fixes": {
+        "clutter:before": 1,
+        "padding:note": 1
+      },
+      "flags": {
+        "padding": 1
+      },
+      "metrics": {
+        "flesch_kincaid_grade": 5.9,
+        "flesch_reading_ease": 71.9,
+        "max_paragraph_words": 51,
+        "max_sentence_words": 17,
+        "mean_sentence_words": 10.7,
+        "paragraphs": 3,
+        "pct_long_sentences": 0.0,
+        "pct_long_words": 9.3,
+        "pct_ly_adverbs": 1.3,
+        "pct_passive_sentences": 0.0,
+        "sentences": 7,
+        "words": 75
+      },
+      "over_budget": [],
+      "scored": true
+    },
+    "spans": {
+      "paragraphs": [
+        {
+          "col": 1,
+          "end_col": 12,
+          "end_line": 1,
+          "line": 1,
+          "words": 1
+        },
+        {
+          "col": 1,
+          "end_col": 61,
+          "end_line": 6,
+          "line": 3,
+          "words": 52
+        },
+        {
+          "col": 1,
+          "end_col": 79,
+          "end_line": 9,
+          "line": 8,
+          "words": 28
+        }
+      ],
+      "sentences": [
+        {
+          "col": 1,
+          "end_col": 12,
+          "end_line": 1,
+          "line": 1,
+          "words": 1
+        },
+        {
+          "col": 1,
+          "end_col": 52,
+          "end_line": 3,
+          "line": 3,
+          "words": 10
+        },
+        {
+          "col": 53,
+          "end_col": 42,
+          "end_line": 4,
+          "line": 3,
+          "words": 13
+        },
+        {
+          "col": 50,
+          "end_col": 61,
+          "end_line": 5,
+          "line": 4,
+          "words": 17
+        },
+        {
+          "col": 69,
+          "end_col": 61,
+          "end_line": 6,
+          "line": 5,
+          "words": 12
+        },
+        {
+          "col": 1,
+          "end_col": 56,
+          "end_line": 8,
+          "line": 8,
+          "words": 8
+        },
+        {
+          "col": 64,
+          "end_col": 79,
+          "end_line": 9,
+          "line": 8,
+          "words": 20
+        }
+      ]
+    },
+    "spans_consistent": true
+  },
   "hard-wrapped.md": {
     "cli": {
       "detell --json": {
