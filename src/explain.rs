@@ -350,7 +350,7 @@ static DEFINITION: LazyLock<Regex> = LazyLock::new(|| {
 });
 static ANTICIPATION: LazyLock<Regex> = LazyLock::new(|| {
     re(
-        r"(?i)\b(?:you (?:might|may|could) (?:wonder|ask|think|expect|have noticed|object)|it'?s tempting to|it is tempting to|at first (?:sight|glance)|the catch is|here'?s (?:the problem|the catch)|you don'?t need .{0,40} yet|which raises the question)|(?:^|[.!?]\s+)(?:so|but) why\b",
+        r"(?i)\b(?:you (?:might|may|could) (?:have noticed|(?:be )?(?:wonder|ask|think|expect|object)(?:ing)?)|it'?s tempting to|it is tempting to|at first (?:sight|glance)|the catch is|here'?s (?:the problem|the catch)|you don'?t need .{0,40} yet|which raises the question)|(?:^|[.!?]\s+)(?:so|but) why\b",
     )
 });
 
@@ -800,6 +800,22 @@ mod tests {
         assert_eq!(kinds("So the gate fails."), [Joint::Cause]);
         assert!(kinds("So far so good, and so many tried.").is_empty());
         assert!(kinds("A so-called fix.").is_empty());
+    }
+
+    #[test]
+    fn you_may_be_wondering_is_an_anticipation() {
+        // The commonest Fleisch phrasing, and the one the pattern missed: a
+        // published book used it eight times and none of them counted.
+        let anticipations = |p: &str| paragraphs(p)[0].anticipations;
+        for p in [
+            "You may be wondering why the charger stops at 80%.",
+            "You might be wondering how amps become kilowatts.",
+            "You could be asking whether the card is checked live.",
+            "You may wonder why it stops.",
+        ] {
+            assert_eq!(anticipations(p), 1, "{p}");
+        }
+        assert_eq!(anticipations("It may be raining, so the wonder is gone."), 0);
     }
 
     #[test]
