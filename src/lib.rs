@@ -878,6 +878,17 @@ mod tests {
     }
 
     #[test]
+    fn indented_footnote_definition_is_not_prose() {
+        // Markdown allows a definition up to three spaces in, as crisp already
+        // allows for headings, quotes and list markers. Four is a code block.
+        let prose = "The charger reports a fault. The operator sends a technician.\n";
+        for indent in ["", " ", "  ", "   "] {
+            let noted = format!("{prose}\n{indent}[^a]: Zapmap, rapid networks; IONITY, a joint venture.\n");
+            assert_eq!(measure(prose).values, measure(&noted).values, "{indent:?}");
+        }
+    }
+
+    #[test]
     fn footnote_definition_keeps_offsets_true() {
         let text = "Before.[^a]\n\n[^a]: A reference, prior to the rest.\n\nPrior to after.";
         let masked = text::mask_code(text);

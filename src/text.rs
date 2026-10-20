@@ -28,11 +28,12 @@ fn re(pattern: &str) -> Regex {
 pub static WORD: LazyLock<Regex> = LazyLock::new(|| re(r"[A-Za-z][A-Za-z'\u{2019}\-]*"));
 
 /// Fenced code, and markdown footnote definitions: `[^label]:` at the start of a
-/// line plus any indented continuation lines. A definition is a reference list,
+/// line (up to three spaces in, as Markdown allows) plus any indented
+/// continuation lines. A definition is a reference list,
 /// not prose; measured as prose, one chapter's citations scored as a 106-word
 /// sentence.
 static FENCE: LazyLock<Regex> = LazyLock::new(|| {
-    re(r"(?s)```.*?```|~~~.*?~~~|(?m:^\[\^[^\]\n]+\]:[^\n]*(?:\n(?: {4}|\t)[^\n]*)*)")
+    re(r"(?s)```.*?```|~~~.*?~~~|(?m:^ {0,3}\[\^[^\]\n]+\]:[^\n]*(?:\n(?: {4}|\t)[^\n]*)*)")
 });
 
 /// Inline code, and footnote references (`[^label]`). A reference straight after
