@@ -343,7 +343,7 @@ fn reach(prose: &str, at: usize) -> &str {
 
 // ── explanatory paragraphs ───────────────────────────────────────────────────
 
-static DEFINITION: LazyLock<Regex> = LazyLock::new(|| {
+pub(crate) static DEFINITION: LazyLock<Regex> = LazyLock::new(|| {
     re(
         r"(?i)\b(?:is called|are called|we call|i call|known as|refers to|is defined as|stands for|in other words|what i mean by|by (?:this|that) i mean|that is,|i\.e\.)",
     )

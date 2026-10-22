@@ -18,6 +18,7 @@
 
 pub mod explain;
 pub mod facts;
+pub mod gaps;
 #[cfg(feature = "grammar")]
 pub mod grammar;
 pub mod insight;
@@ -74,6 +75,11 @@ pub enum Kind {
     /// crisp's tables, and it covers a whole sentence rather than a phrase, which
     /// is why the editor lists it instead of underlining it.
     Length,
+    /// Something the reader needs that is not there yet: an acronym used
+    /// before it is explained. An absence rather than a phrase to change, so
+    /// it carries a hint and never a fix. Reported only by `gaps`, never by
+    /// `review` or the CLI.
+    Gap,
 }
 
 /// A finding before its position has been given a unit.
@@ -778,6 +784,28 @@ pub struct Review {
     pub over_budget: Vec<&'static str>,
 }
 
+/// Explanation gaps, as hits, for the contract: recorded per fixture beside
+/// `simplify_locate` and `detell_locate`.
+pub fn gaps_locate(text: &str) -> Vec<Hit> {
+    gaps::locate(text)
+}
+
+/// What an editor shows when it asks for explanation gaps: the gaps, positioned
+/// like `review`'s findings, and the document's anticipation count.
+#[derive(Clone, PartialEq, Debug, serde::Serialize)]
+pub struct Gaps {
+    pub findings: Vec<Finding>,
+    pub anticipations: usize,
+}
+
+/// Positioned in UTF-16 code units and sorted, like `review`. Separate from
+/// `review` on purpose: a caller that never asks for gaps never runs them.
+pub fn gaps(text: &str) -> Gaps {
+    let mut findings = positioned(text, gaps::locate(text), Unit::Utf16);
+    findings.sort_by_key(|f| (f.from, f.to));
+    Gaps { findings, anticipations: gaps::anticipations(text) }
+}
+
 pub fn review(text: &str, budget: &Budget) -> Review {
     let mut hits = simplify_locate(text);
     hits.extend(detell_locate(text));
@@ -1063,6 +1091,25 @@ The value was cached. Each and every parameter was validated in a timely manner.
                 other => panic!("unknown kind {other:?}"),
             }
         }
+    }
+
+    #[test]
+    fn the_gaps_payload_is_what_the_frontend_declares() {
+        let text = "The charger speaks OCPP. You may be wondering why.";
+        let value = serde_json::to_value(gaps(text)).expect("Gaps serialises");
+        let keys: Vec<&str> = value.as_object().expect("an object").keys().map(String::as_str).collect();
+        assert_eq!(keys, ["anticipations", "findings"]);
+        assert_eq!(value["anticipations"], 1);
+        let f = &value["findings"][0];
+        assert_eq!(f["kind"], "gap");
+        assert_eq!(f["text"], "OCPP");
+        assert!(f.get("hint").is_some() && f.get("fix").is_none(), "a gap carries a hint, never a fix: {f}");
+    }
+
+    #[test]
+    fn review_never_reports_a_gap() {
+        let r = review("The charger speaks OCPP, and the CSMS answers it.", &Budget::default());
+        assert!(r.findings.iter().all(|f| f.kind != Kind::Gap));
     }
 
     #[test]

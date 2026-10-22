@@ -75,6 +75,7 @@ fn ours(f: &Finding) -> String {
         // they are built in `review` and never reach a locate call. If this fires,
         // the two engines are being compared on something only one of them emits.
         Kind::Length => unreachable!("length findings are not part of the ported rules"),
+        Kind::Gap => "gap",
     };
     format!(
         "{} {} L{}C{}-L{}C{} {:?}",
@@ -156,6 +157,9 @@ fn the_rule_tables_match_the_recorded_contract() {
         .map(|r| r.name.to_string())
         .collect();
     assert_eq!(ours, names("simplify_flag"), "simplify FLAG");
+
+    let ours: Vec<String> = crisp::gaps::UNIVERSAL.iter().map(|s| s.to_string()).collect();
+    assert_eq!(ours, names("gaps_universal"), "gaps universal table");
 
     // crisp's FIX table ends with cleanup rules that only tidy after a rewrite,
     // and its own `locate` skips them for that reason. The engine does not run
@@ -282,6 +286,7 @@ fn the_findings_match_the_recorded_contract() {
         for (which, hits) in [
             ("simplify", crisp::simplify_locate(&text)),
             ("detell", crisp::detell_locate(&text)),
+            ("gaps", crisp::gaps_locate(&text)),
         ] {
             let rust: Vec<String> = crisp::positioned(&text, hits, Unit::CodePoints)
                 .iter()
@@ -430,6 +435,7 @@ fn record(text: &str) -> Value {
                     Kind::Complexity => "complexity",
                     Kind::Tell => "tell",
                     Kind::Length => unreachable!("locate never emits a length finding"),
+                    Kind::Gap => "gap",
                 };
                 json!([f.rule, kind, f.line, f.col, f.end_line, f.end_col, f.text])
             })
@@ -464,6 +470,7 @@ fn record(text: &str) -> Value {
         "locate": {
             "detell": rows(crisp::detell_locate(text)),
             "simplify": rows(crisp::simplify_locate(text)),
+            "gaps": rows(crisp::gaps_locate(text)),
         },
         "insight": crisp::insight::check(text),
         "spans": {
@@ -520,6 +527,7 @@ fn record_config() -> Value {
             "detell_flag": crisp::rules::DETELL_FLAG.iter().map(|r| r.name).collect::<Vec<_>>(),
             "simplify_fix": simplify_fix,
             "simplify_flag": crisp::rules::COMPLEXITY.iter().map(|r| r.name).collect::<Vec<_>>(),
+            "gaps_universal": crisp::gaps::UNIVERSAL,
         },
     })
 }

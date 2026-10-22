@@ -3546,6 +3546,39 @@
         "hedge:filler",
         "hedge:the-fact"
       ],
+      "gaps_universal": [
+        "UK",
+        "US",
+        "USA",
+        "EU",
+        "GB",
+        "ID",
+        "PIN",
+        "QR",
+        "SIM",
+        "USB",
+        "URL",
+        "GPS",
+        "LED",
+        "LCD",
+        "TV",
+        "PC",
+        "PDF",
+        "FAQ",
+        "AI",
+        "VAT",
+        "ATM",
+        "AM",
+        "PM",
+        "CEO",
+        "AC",
+        "DC",
+        "MW",
+        "GW",
+        "MWh",
+        "GWh",
+        "TWh"
+      ],
       "simplify_fix": [
         "clutter:because",
         "clutter:although",
@@ -3610,6 +3643,503 @@
       ]
     },
     "same_opening_run": 3
+  },
+  "acronyms.md": {
+    "cli": {
+      "detell --json": {
+        "fixes": {},
+        "flags": [],
+        "total_fixes": 0,
+        "total_flags": 0
+      },
+      "detell --report": {
+        "exit": 0,
+        "stderr": "── detell report ─────────────────────────────\nFIXED: nothing (already clean typography)\nFLAGGED: nothing\n──────────────────────────────────────────────\n"
+      },
+      "simplify --check --baseline --insight --json": {
+        "compression": {
+          "after": 163,
+          "before": 163,
+          "cut_pct": 0.0,
+          "explanation_after": 0,
+          "explanation_before": 0,
+          "explanation_limit": 0,
+          "growth": 1.5,
+          "ok": false,
+          "padding_after": 163,
+          "padding_before": 163,
+          "padding_cut_pct": 0.0,
+          "padding_target": 40.0,
+          "scored": true
+        },
+        "explanation": {
+          "joints": {
+            "after": 2,
+            "gated": false,
+            "ok": true,
+            "required": 2,
+            "source": 2
+          },
+          "lists": {
+            "lost": [],
+            "ok": true,
+            "promised_not_unpacked_after": [],
+            "promised_not_unpacked_before": 0
+          }
+        },
+        "facts": {
+          "kept": 2,
+          "missing": [],
+          "source": 2
+        },
+        "fixes": {},
+        "flags": [
+          {
+            "count": 4,
+            "hint": "passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")",
+            "rule": "passive",
+            "samples": [
+              "...ronyms, and how a first use is explained  Clocks agree because they...",
+              "...In France the roaming hub is known as GIREVE, and it clears se...",
+              "...Open Charge Point Protocol) is spelled out, but by then the reader..."
+            ]
+          }
+        ],
+        "insight": [
+          {
+            "check": "sections",
+            "detail": "missing template section(s): Context, Insight Description, Significance, Customer Details"
+          },
+          {
+            "check": "significance",
+            "detail": "found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line"
+          }
+        ],
+        "joined_sentences": [],
+        "long_sentences": [],
+        "metrics": {
+          "flesch_kincaid_grade": 4.6,
+          "flesch_reading_ease": 82.9,
+          "max_paragraph_words": 25,
+          "max_sentence_words": 20,
+          "mean_sentence_words": 11.6,
+          "paragraphs": 12,
+          "pct_long_sentences": 0.0,
+          "pct_long_words": 6.7,
+          "pct_ly_adverbs": 0.6,
+          "pct_passive_sentences": 28.6,
+          "sentences": 14,
+          "words": 163
+        },
+        "over_budget": [
+          "pct_passive_sentences"
+        ],
+        "promised_not_unpacked": [],
+        "scored": true,
+        "total_fixes": 0,
+        "total_flags": 4
+      },
+      "simplify --check --baseline --insight --report": {
+        "exit": 1,
+        "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED (needs the rewrite pass, 4):\n    4  passive  -> passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")\n         . ...ronyms, and how a first use is explained  Clocks agree because they...\n         . ...In France the roaming hub is known as GIREVE, and it clears se...\n         . ...Open Charge Point Protocol) is spelled out, but by then the reader...\nSCORECARD  (163 words, 14 sentences, 12 paragraphs):\n  [PASS]  mean_sentence_words       11.6   budget <= 18.0\n  [PASS]  max_sentence_words          20   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       82.9   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       4.6   budget <= 12.0\n  [OVER]  pct_passive_sentences     28.6   budget <= 10.0\n  [PASS]  pct_long_words             6.7   budget <= 20.0\n  [PASS]  max_paragraph_words         25   budget <= 90\n  [PASS]  pct_ly_adverbs             0.6   budget <= 4.0\nLENGTH  [SHORT]  163 -> 163 words, cut 0.0%   target >= 40.0%\nFACTS   [KEPT]  2 of 2 numbers, dates, quotes and code spans\nPASSIVE SENTENCES (name the actor):\n       Acronyms, and how a first use is explained\n       In France the roaming hub is known as GIREVE, and it clears sessions.\n       Later, OCPP (Open Charge Point Protocol) is spelled out, but by then...\n       The heading above names MQTT; the body is where it should be explaine...\nINSIGHT STRUCTURE  [FAIL] (2):\n  [FAIL]  sections           missing template section(s): Context, Insight Description, Significance, Customer Details\n  [FAIL]  significance       found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line\nVERDICT: OVER BUDGET on pct_passive_sentences, length, insight structure\n=============================================\n",
+        "stdout": "# Acronyms, and how a first use is explained\n\nClocks agree because they use NTP (Network Time Protocol) to sync.\n\nA battery electric vehicle (BEV) has no engine at all.\n\nThe site needs G99, the DNO's approval process, before it can export.\n\nAn EVSE is the part of a charger that serves one car at a time.\n\nIn France the roaming hub is known as GIREVE, and it clears sessions.\n\nThe charger speaks OCPP to its backend. Later, OCPP (Open Charge Point\nProtocol) is spelled out, but by then the reader has already met it.\n\nHer app, an eMSP, a roaming hub and the CPOs behind them all take a share.\n\n## Why MQTT matters\n\nThe heading above names MQTT; the body is where it should be explained, and\nMQTT is not explained here either.\n\nSee [the specification](https://example.com/ISO15118) for details, and run\n`OCPI` locally. The note is in a footnote.[^ft]\n\nThe UK and the EU use AC and DC chargers, and CitrineOS runs on ISO-15118 v2.0.\n\n[^ft]: OCPI 2.2.1, the Open Charge Point Interface.\n"
+      },
+      "simplify --check --baseline --json": {
+        "compression": {
+          "after": 163,
+          "before": 163,
+          "cut_pct": 0.0,
+          "explanation_after": 0,
+          "explanation_before": 0,
+          "explanation_limit": 0,
+          "growth": 1.5,
+          "ok": false,
+          "padding_after": 163,
+          "padding_before": 163,
+          "padding_cut_pct": 0.0,
+          "padding_target": 40.0,
+          "scored": true
+        },
+        "explanation": {
+          "joints": {
+            "after": 2,
+            "gated": false,
+            "ok": true,
+            "required": 2,
+            "source": 2
+          },
+          "lists": {
+            "lost": [],
+            "ok": true,
+            "promised_not_unpacked_after": [],
+            "promised_not_unpacked_before": 0
+          }
+        },
+        "facts": {
+          "kept": 2,
+          "missing": [],
+          "source": 2
+        },
+        "fixes": {},
+        "flags": [
+          {
+            "count": 4,
+            "hint": "passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")",
+            "rule": "passive",
+            "samples": [
+              "...ronyms, and how a first use is explained  Clocks agree because they...",
+              "...In France the roaming hub is known as GIREVE, and it clears se...",
+              "...Open Charge Point Protocol) is spelled out, but by then the reader..."
+            ]
+          }
+        ],
+        "insight": null,
+        "joined_sentences": [],
+        "long_sentences": [],
+        "metrics": {
+          "flesch_kincaid_grade": 4.6,
+          "flesch_reading_ease": 82.9,
+          "max_paragraph_words": 25,
+          "max_sentence_words": 20,
+          "mean_sentence_words": 11.6,
+          "paragraphs": 12,
+          "pct_long_sentences": 0.0,
+          "pct_long_words": 6.7,
+          "pct_ly_adverbs": 0.6,
+          "pct_passive_sentences": 28.6,
+          "sentences": 14,
+          "words": 163
+        },
+        "over_budget": [
+          "pct_passive_sentences"
+        ],
+        "promised_not_unpacked": [],
+        "scored": true,
+        "total_fixes": 0,
+        "total_flags": 4
+      },
+      "simplify --check --baseline --report": {
+        "exit": 1,
+        "stderr": "== simplify report ==========================\nCLUTTER CUT: nothing (no stock wordy phrases)\nFLAGGED (needs the rewrite pass, 4):\n    4  passive  -> passive voice: name the actor and use an active verb (\"the value was cached\" -> \"the platform caches the value\")\n         . ...ronyms, and how a first use is explained  Clocks agree because they...\n         . ...In France the roaming hub is known as GIREVE, and it clears se...\n         . ...Open Charge Point Protocol) is spelled out, but by then the reader...\nSCORECARD  (163 words, 14 sentences, 12 paragraphs):\n  [PASS]  mean_sentence_words       11.6   budget <= 18.0\n  [PASS]  max_sentence_words          20   budget <= 30\n  [PASS]  pct_long_sentences         0.0   budget <= 15.0\n  [PASS]  flesch_reading_ease       82.9   budget >= 50.0\n  [PASS]  flesch_kincaid_grade       4.6   budget <= 12.0\n  [OVER]  pct_passive_sentences     28.6   budget <= 10.0\n  [PASS]  pct_long_words             6.7   budget <= 20.0\n  [PASS]  max_paragraph_words         25   budget <= 90\n  [PASS]  pct_ly_adverbs             0.6   budget <= 4.0\nLENGTH  [SHORT]  163 -> 163 words, cut 0.0%   target >= 40.0%\nFACTS   [KEPT]  2 of 2 numbers, dates, quotes and code spans\nPASSIVE SENTENCES (name the actor):\n       Acronyms, and how a first use is explained\n       In France the roaming hub is known as GIREVE, and it clears sessions.\n       Later, OCPP (Open Charge Point Protocol) is spelled out, but by then...\n       The heading above names MQTT; the body is where it should be explaine...\nVERDICT: OVER BUDGET on pct_passive_sentences, length\n=============================================\n",
+        "stdout": "# Acronyms, and how a first use is explained\n\nClocks agree because they use NTP (Network Time Protocol) to sync.\n\nA battery electric vehicle (BEV) has no engine at all.\n\nThe site needs G99, the DNO's approval process, before it can export.\n\nAn EVSE is the part of a charger that serves one car at a time.\n\nIn France the roaming hub is known as GIREVE, and it clears sessions.\n\nThe charger speaks OCPP to its backend. Later, OCPP (Open Charge Point\nProtocol) is spelled out, but by then the reader has already met it.\n\nHer app, an eMSP, a roaming hub and the CPOs behind them all take a share.\n\n## Why MQTT matters\n\nThe heading above names MQTT; the body is where it should be explained, and\nMQTT is not explained here either.\n\nSee [the specification](https://example.com/ISO15118) for details, and run\n`OCPI` locally. The note is in a footnote.[^ft]\n\nThe UK and the EU use AC and DC chargers, and CitrineOS runs on ISO-15118 v2.0.\n\n[^ft]: OCPI 2.2.1, the Open Charge Point Interface.\n"
+      }
+    },
+    "detell": {
+      "cleaned": "# Acronyms, and how a first use is explained\n\nClocks agree because they use NTP (Network Time Protocol) to sync.\n\nA battery electric vehicle (BEV) has no engine at all.\n\nThe site needs G99, the DNO's approval process, before it can export.\n\nAn EVSE is the part of a charger that serves one car at a time.\n\nIn France the roaming hub is known as GIREVE, and it clears sessions.\n\nThe charger speaks OCPP to its backend. Later, OCPP (Open Charge Point\nProtocol) is spelled out, but by then the reader has already met it.\n\nHer app, an eMSP, a roaming hub and the CPOs behind them all take a share.\n\n## Why MQTT matters\n\nThe heading above names MQTT; the body is where it should be explained, and\nMQTT is not explained here either.\n\nSee [the specification](https://example.com/ISO15118) for details, and run\n`OCPI` locally. The note is in a footnote.[^ft]\n\nThe UK and the EU use AC and DC chargers, and CitrineOS runs on ISO-15118 v2.0.\n\n[^ft]: OCPI 2.2.1, the Open Charge Point Interface.\n",
+      "fixes": {},
+      "flags": {}
+    },
+    "insight": [
+      {
+        "check": "sections",
+        "detail": "missing template section(s): Context, Insight Description, Significance, Customer Details"
+      },
+      {
+        "check": "significance",
+        "detail": "found 0 significance value(s); keep exactly one of Low / Medium / High / Critical on its own line"
+      }
+    ],
+    "locate": {
+      "detell": [],
+      "gaps": [
+        [
+          "gap:acronym",
+          "gap",
+          7,
+          25,
+          7,
+          28,
+          "DNO"
+        ],
+        [
+          "gap:acronym",
+          "gap",
+          13,
+          20,
+          13,
+          24,
+          "OCPP"
+        ],
+        [
+          "gap:acronym",
+          "gap",
+          16,
+          13,
+          16,
+          17,
+          "eMSP"
+        ],
+        [
+          "gap:acronym",
+          "gap",
+          16,
+          41,
+          16,
+          44,
+          "CPO"
+        ],
+        [
+          "gap:acronym",
+          "gap",
+          20,
+          25,
+          20,
+          29,
+          "MQTT"
+        ]
+      ],
+      "simplify": [
+        [
+          "passive",
+          "complexity",
+          1,
+          33,
+          1,
+          45,
+          "is explained"
+        ],
+        [
+          "passive",
+          "complexity",
+          11,
+          27,
+          11,
+          35,
+          "is known"
+        ],
+        [
+          "passive",
+          "complexity",
+          14,
+          11,
+          14,
+          21,
+          "is spelled"
+        ],
+        [
+          "passive",
+          "complexity",
+          20,
+          59,
+          20,
+          71,
+          "be explained"
+        ]
+      ]
+    },
+    "simplify": {
+      "fixes": {},
+      "flags": {
+        "passive": 4
+      },
+      "metrics": {
+        "flesch_kincaid_grade": 4.6,
+        "flesch_reading_ease": 82.9,
+        "max_paragraph_words": 25,
+        "max_sentence_words": 20,
+        "mean_sentence_words": 11.6,
+        "paragraphs": 12,
+        "pct_long_sentences": 0.0,
+        "pct_long_words": 6.7,
+        "pct_ly_adverbs": 0.6,
+        "pct_passive_sentences": 28.6,
+        "sentences": 14,
+        "words": 163
+      },
+      "over_budget": [
+        "pct_passive_sentences"
+      ],
+      "scored": true
+    },
+    "spans": {
+      "paragraphs": [
+        {
+          "col": 1,
+          "end_col": 45,
+          "end_line": 1,
+          "line": 1,
+          "words": 8
+        },
+        {
+          "col": 1,
+          "end_col": 67,
+          "end_line": 3,
+          "line": 3,
+          "words": 11
+        },
+        {
+          "col": 1,
+          "end_col": 55,
+          "end_line": 5,
+          "line": 5,
+          "words": 10
+        },
+        {
+          "col": 1,
+          "end_col": 70,
+          "end_line": 7,
+          "line": 7,
+          "words": 12
+        },
+        {
+          "col": 1,
+          "end_col": 64,
+          "end_line": 9,
+          "line": 9,
+          "words": 15
+        },
+        {
+          "col": 1,
+          "end_col": 70,
+          "end_line": 11,
+          "line": 11,
+          "words": 13
+        },
+        {
+          "col": 1,
+          "end_col": 69,
+          "end_line": 14,
+          "line": 13,
+          "words": 25
+        },
+        {
+          "col": 1,
+          "end_col": 75,
+          "end_line": 16,
+          "line": 16,
+          "words": 16
+        },
+        {
+          "col": 1,
+          "end_col": 20,
+          "end_line": 18,
+          "line": 18,
+          "words": 3
+        },
+        {
+          "col": 1,
+          "end_col": 35,
+          "end_line": 21,
+          "line": 20,
+          "words": 20
+        },
+        {
+          "col": 1,
+          "end_col": 43,
+          "end_line": 24,
+          "line": 23,
+          "words": 14
+        },
+        {
+          "col": 1,
+          "end_col": 80,
+          "end_line": 26,
+          "line": 26,
+          "words": 16
+        }
+      ],
+      "sentences": [
+        {
+          "col": 1,
+          "end_col": 45,
+          "end_line": 1,
+          "line": 1,
+          "words": 8
+        },
+        {
+          "col": 1,
+          "end_col": 67,
+          "end_line": 3,
+          "line": 3,
+          "words": 11
+        },
+        {
+          "col": 1,
+          "end_col": 55,
+          "end_line": 5,
+          "line": 5,
+          "words": 10
+        },
+        {
+          "col": 1,
+          "end_col": 70,
+          "end_line": 7,
+          "line": 7,
+          "words": 12
+        },
+        {
+          "col": 1,
+          "end_col": 64,
+          "end_line": 9,
+          "line": 9,
+          "words": 15
+        },
+        {
+          "col": 1,
+          "end_col": 70,
+          "end_line": 11,
+          "line": 11,
+          "words": 13
+        },
+        {
+          "col": 1,
+          "end_col": 40,
+          "end_line": 13,
+          "line": 13,
+          "words": 7
+        },
+        {
+          "col": 41,
+          "end_col": 69,
+          "end_line": 14,
+          "line": 13,
+          "words": 18
+        },
+        {
+          "col": 1,
+          "end_col": 75,
+          "end_line": 16,
+          "line": 16,
+          "words": 16
+        },
+        {
+          "col": 1,
+          "end_col": 20,
+          "end_line": 18,
+          "line": 18,
+          "words": 3
+        },
+        {
+          "col": 1,
+          "end_col": 35,
+          "end_line": 21,
+          "line": 20,
+          "words": 20
+        },
+        {
+          "col": 1,
+          "end_col": 16,
+          "end_line": 24,
+          "line": 23,
+          "words": 8
+        },
+        {
+          "col": 17,
+          "end_col": 43,
+          "end_line": 24,
+          "line": 24,
+          "words": 6
+        },
+        {
+          "col": 1,
+          "end_col": 80,
+          "end_line": 26,
+          "line": 26,
+          "words": 16
+        }
+      ]
+    },
+    "spans_consistent": true
   },
   "ai-tells.md": {
     "cli": {
@@ -4050,6 +4580,7 @@
           "I hope this helps"
         ]
       ],
+      "gaps": [],
       "simplify": [
         [
           "padding",
@@ -4614,6 +5145,7 @@
           "holistic"
         ]
       ],
+      "gaps": [],
       "simplify": [
         [
           "abstraction",
@@ -5223,6 +5755,7 @@
           "robust"
         ]
       ],
+      "gaps": [],
       "simplify": [
         [
           "clutter:before",
@@ -5620,6 +6153,7 @@
           "very"
         ]
       ],
+      "gaps": [],
       "simplify": [
         [
           "passive",
@@ -6039,6 +6573,35 @@
           "It is worth noting\nthat"
         ]
       ],
+      "gaps": [
+        [
+          "gap:acronym",
+          "gap",
+          3,
+          53,
+          3,
+          57,
+          "OCPP"
+        ],
+        [
+          "gap:acronym",
+          "gap",
+          4,
+          37,
+          4,
+          41,
+          "JSON"
+        ],
+        [
+          "gap:acronym",
+          "gap",
+          8,
+          42,
+          8,
+          45,
+          "IoT"
+        ]
+      ],
       "simplify": [
         [
           "padding",
@@ -6442,6 +7005,7 @@
           "just"
         ]
       ],
+      "gaps": [],
       "simplify": [
         [
           "padding",
@@ -6747,6 +7311,7 @@
     ],
     "locate": {
       "detell": [],
+      "gaps": [],
       "simplify": []
     },
     "simplify": {
@@ -7051,6 +7616,35 @@
     ],
     "locate": {
       "detell": [],
+      "gaps": [
+        [
+          "gap:acronym",
+          "gap",
+          3,
+          54,
+          3,
+          59,
+          "IFTTT"
+        ],
+        [
+          "gap:acronym",
+          "gap",
+          3,
+          222,
+          3,
+          226,
+          "EVSE"
+        ],
+        [
+          "gap:acronym",
+          "gap",
+          15,
+          238,
+          15,
+          241,
+          "API"
+        ]
+      ],
       "simplify": []
     },
     "simplify": {
@@ -8029,6 +8623,26 @@
           "revolutionary"
         ]
       ],
+      "gaps": [
+        [
+          "gap:acronym",
+          "gap",
+          9,
+          18,
+          9,
+          21,
+          "CPO"
+        ],
+        [
+          "gap:acronym",
+          "gap",
+          9,
+          28,
+          9,
+          32,
+          "eMSP"
+        ]
+      ],
       "simplify": [
         [
           "padding",
@@ -8620,6 +9234,7 @@
           "actually"
         ]
       ],
+      "gaps": [],
       "simplify": [
         [
           "padding:note",
@@ -9167,6 +9782,7 @@
     ],
     "locate": {
       "detell": [],
+      "gaps": [],
       "simplify": []
     },
     "simplify": {
@@ -9643,6 +10259,7 @@
           ", marking the end of"
         ]
       ],
+      "gaps": [],
       "simplify": [
         [
           "padding",
@@ -10207,6 +10824,17 @@
           "Let that sink in."
         ]
       ],
+      "gaps": [
+        [
+          "gap:acronym",
+          "gap",
+          9,
+          27,
+          9,
+          30,
+          "API"
+        ]
+      ],
       "simplify": [
         [
           "padding",
@@ -10567,6 +11195,7 @@
     ],
     "locate": {
       "detell": [],
+      "gaps": [],
       "simplify": []
     },
     "simplify": {
@@ -10836,6 +11465,7 @@
     ],
     "locate": {
       "detell": [],
+      "gaps": [],
       "simplify": [
         [
           "clutter:before",
