@@ -314,17 +314,19 @@ mod tests {
         assert_eq!(anticipations(text), 3);
     }
 
+    /// Inline, not crisp's fixtures folder: ink runs these tests from its own
+    /// crate, where that folder does not exist (`tests/vendorable.rs`).
     #[test]
     fn ranges_slice_to_the_acronym() {
-        let dir = concat!(env!("CARGO_MANIFEST_DIR"), "/fixtures");
-        for entry in std::fs::read_dir(dir).expect("fixtures") {
-            let path = entry.expect("entry").path();
-            if path.extension().is_none_or(|e| e != "md") {
-                continue;
-            }
-            let text = std::fs::read_to_string(&path).expect("reads");
-            for u in first_uses(&text) {
-                assert_eq!(&text[u.start..u.end], u.acronym, "{}", path.display());
+        for text in [
+            "\u{1F600} The **CPOs** and an *eMSP* (e-Mobility Service Provider) agree.",
+            "Caf\u{e9} owners ask about OCPP, then V2G, then G99.\n\n- A list: RFID, NFC and QR.",
+            "> Quoted: the DNO's G99 process.\n\n| Table | OCPI |\n|---|---|",
+        ] {
+            let uses = first_uses(text);
+            assert!(!uses.is_empty(), "{text:?}");
+            for u in uses {
+                assert_eq!(&text[u.start..u.end], u.acronym, "{text:?}");
             }
         }
     }

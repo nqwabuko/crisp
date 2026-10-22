@@ -36,3 +36,31 @@ fn library_files_never_name_the_crate_root() {
         offenders.join("\n")
     );
 }
+
+/// In ink, `CARGO_MANIFEST_DIR` is ink's crate, so a library test that reads a
+/// file through it (crisp's fixtures, say) compiles there and fails at run time.
+/// The integration tests under tests/ are never copied, so they may; the
+/// library files may not. Found when gaps.rs's first range test did exactly
+/// this and ink's suite failed on the sync.
+#[test]
+fn library_files_never_read_paths_from_the_manifest_dir() {
+    let src = Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
+    let mut offenders = Vec::new();
+    for entry in fs::read_dir(&src).unwrap() {
+        let path = entry.unwrap().path();
+        let name = path.file_name().unwrap().to_string_lossy().into_owned();
+        if !name.ends_with(".rs") || name == "main.rs" {
+            continue;
+        }
+        for (i, line) in fs::read_to_string(&path).unwrap().lines().enumerate() {
+            if line.contains("CARGO_MANIFEST_DIR") && !line.trim_start().starts_with("//") {
+                offenders.push(format!("src/{name}:{}: {}", i + 1, line.trim()));
+            }
+        }
+    }
+    assert!(
+        offenders.is_empty(),
+        "test with inline text instead, so ink's copy passes:\n{}",
+        offenders.join("\n")
+    );
+}
