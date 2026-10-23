@@ -22,8 +22,11 @@ network, no state. Build it with `cargo build --release`.
 The library has one more kind that the binary does not report: **gap**, an
 acronym used before it is explained (`src/gaps.rs`). It judges an absence rather
 than a phrase, so it carries a hint, never a rewrite, and it is a fix only when
-a caller hands it a glossary that has the expansion. ink asks for it on its
-own call; `review` and the CLI never run it.
+a caller hands it a glossary that has the expansion. Given the texts of a
+book's earlier entries too, it spaces repeats: an acronym is flagged again only
+once 8 entries have passed since the book last explained or flagged it; given
+none, it judges the document on its own. ink asks for it on its own call;
+`review` and the CLI never run it.
 
 The split that matters is **FIX vs FLAG**. A FIX has exactly one correct plain
 equivalent, so a script applies it. A FLAG changes meaning, so the script only

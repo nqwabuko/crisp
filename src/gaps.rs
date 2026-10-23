@@ -17,13 +17,19 @@
 //! Per document, first use only: the first time an acronym appears it is judged,
 //! explained or not, and every later use is ignored. Code, footnotes, link
 //! targets, inline tags and headings are not prose.
+//!
+//! Across a book, spaced: given the texts of the entries before this one, an
+//! unexplained first use is flagged only if the book has not explained or
+//! flagged that acronym in the last `SPACING` entries. A reader who dips in
+//! still gets told now and then, without every chapter repeating it. Given no
+//! earlier entries, nothing has been met, so the rule is the per-document one.
 
 use super::explain;
 use super::text::{self, mask_code};
 use super::{Hit, Kind};
 use regex::Regex;
 use std::borrow::Cow;
-use std::collections::HashSet;
+use std::collections::{BTreeMap, HashMap, HashSet};
 use std::sync::LazyLock;
 
 fn re(pattern: &str) -> Regex {
@@ -264,20 +270,68 @@ pub fn first_uses(text: &str) -> Vec<FirstUse> {
     out
 }
 
+/// Entries that must pass before an acronym is flagged again (Charlie,
+/// 23 Oct 2026: on the EVC book, 207 flags against 436, at most 3 for any
+/// acronym). A constant, not a setting.
+pub const SPACING: usize = 8;
+
+/// Where the book last had an acronym before this document: the entry it was
+/// in (an index into the `earlier` given), how many entries back that is, and
+/// whether it was flagged there rather than explained.
+#[derive(Clone, Copy, PartialEq, Eq, Debug, serde::Serialize)]
+pub struct Last {
+    pub entry: usize,
+    pub back: usize,
+    pub flagged: bool,
+}
+
+/// Whether a first use at entry `at` is due, given the acronym's last event.
+fn due(last: Option<&(usize, bool)>, at: usize) -> bool {
+    last.is_none_or(|&(entry, _)| at - entry >= SPACING)
+}
+
+/// Each acronym's last event across `earlier`, walked in order, as
+/// `(entry, flagged)`. An event is a first use that was explained, or that was
+/// unexplained and due, so flagged: a flag counts as explained there whether or
+/// not the writer fixes it, so fixing one never moves another. A quiet use,
+/// unexplained inside the window, is not an event. Only first uses count.
+fn events(earlier: &[&str]) -> HashMap<String, (usize, bool)> {
+    let mut last = HashMap::new();
+    for (i, text) in earlier.iter().enumerate() {
+        for u in first_uses(text) {
+            if u.explained.is_some() {
+                last.insert(u.acronym, (i, false));
+            } else if due(last.get(&u.acronym), i) {
+                last.insert(u.acronym, (i, true));
+            }
+        }
+    }
+    last
+}
+
 pub const HINT: &str = "Spell it out, or say what it is, the first time you use it.";
 
-/// The unexplained first uses, as `Kind::Gap` hits.
+/// The unexplained first uses that are due, as `Kind::Gap` hits, and for each
+/// re-flagged acronym where the book last had it. `earlier` is the texts of
+/// the book's entries before this one, in order; empty means a document on its
+/// own, where every unexplained first use is due.
 ///
 /// With a glossary, a gap whose acronym is exactly a headword carries the
 /// expansion as its fix, `CPO (Charge Point Operator)`, which is itself an
 /// explanation, so applying it clears the gap. A plural first use gets the
 /// expansion in its hint instead: its range covers `CPO`, so a bracket
 /// inserted there would land before the `s`.
-pub fn locate(text: &str, glossary: &[Entry]) -> Vec<Hit> {
-    first_uses(text)
+pub fn locate(text: &str, glossary: &[Entry], earlier: &[&str]) -> (Vec<Hit>, BTreeMap<String, Last>) {
+    let book = events(earlier);
+    let at = earlier.len();
+    let mut last = BTreeMap::new();
+    let hits = first_uses(text)
         .into_iter()
-        .filter(|u| u.explained.is_none())
+        .filter(|u| u.explained.is_none() && due(book.get(&u.acronym), at))
         .map(|u| {
+            if let Some(&(entry, flagged)) = book.get(&u.acronym) {
+                last.insert(u.acronym.clone(), Last { entry, back: at - entry, flagged });
+            }
             let entry = glossary.iter().find(|e| e.headword == u.acronym);
             let (fix, hint) = match entry {
                 Some(e) if !u.plural => (Some(format!("{} ({})", u.acronym, e.expansion)), Cow::Borrowed(HINT)),
@@ -286,7 +340,8 @@ pub fn locate(text: &str, glossary: &[Entry]) -> Vec<Hit> {
             };
             Hit { rule: "gap:acronym", kind: Kind::Gap, start: u.start, end: u.end, fix, hint: Some(hint) }
         })
-        .collect()
+        .collect();
+    (hits, last)
 }
 
 /// The document's anticipations ("you may be wondering"), counted the way
@@ -300,7 +355,7 @@ mod tests {
     use super::*;
 
     fn gaps(text: &str) -> Vec<String> {
-        locate(text, &[]).iter().map(|h| text[h.start..h.end].to_string()).collect()
+        locate(text, &[], &[]).0.iter().map(|h| text[h.start..h.end].to_string()).collect()
     }
 
     fn how(text: &str, acronym: &str) -> Option<Explained> {
@@ -348,7 +403,7 @@ mod tests {
     #[test]
     fn only_the_first_use_is_judged() {
         let text = "The charger speaks OCPP.\n\nOCPP (Open Charge Point Protocol) is open.";
-        let hits = locate(text, &[]);
+        let (hits, _) = locate(text, &[], &[]);
         assert_eq!(hits.len(), 1);
         assert_eq!(hits[0].start, text.find("OCPP").unwrap());
     }
@@ -418,15 +473,15 @@ mod tests {
     fn a_headword_gap_carries_its_expansion() {
         let g = glossary(GLOSSARY);
         let text = "Every CPO needs operations managers.";
-        let hits = locate(text, &g);
+        let (hits, _) = locate(text, &g, &[]);
         assert_eq!(hits[0].fix.as_deref(), Some("CPO (Charge Point Operator)"));
         let fixed = format!("{}{}{}", &text[..hits[0].start], hits[0].fix.as_deref().unwrap(), &text[hits[0].end..]);
-        assert!(locate(&fixed, &g).is_empty(), "{fixed}");
+        assert!(locate(&fixed, &g, &[]).0.is_empty(), "{fixed}");
     }
 
     #[test]
     fn a_plural_first_use_gets_a_hint_not_a_fix() {
-        let hits = locate("The CPOs run the network.", &glossary(GLOSSARY));
+        let (hits, _) = locate("The CPOs run the network.", &glossary(GLOSSARY), &[]);
         assert_eq!(hits[0].fix, None);
         assert!(hits[0].hint.as_deref().unwrap().contains("Charge Point Operator"), "{:?}", hits[0].hint);
     }
@@ -443,13 +498,125 @@ mod tests {
     fn no_glossary_changes_nothing_else() {
         let text = "Every CPO fits an RCD. The CPOs agree.";
         let strip = |hits: Vec<Hit>| hits.into_iter().map(|h| (h.start, h.end)).collect::<Vec<_>>();
-        assert_eq!(strip(locate(text, &[])), strip(locate(text, &glossary(GLOSSARY))));
+        assert_eq!(strip(locate(text, &[], &[]).0), strip(locate(text, &glossary(GLOSSARY), &[]).0));
     }
 
     #[test]
     fn anticipations_are_paragraphs_summed() {
         let text = "You may be wondering why. It is simple.\n\nThe catch is cost. You might ask how much.\n";
         assert_eq!(anticipations(text), 3);
+    }
+
+    // ── spacing across a book ────────────────────────────────────────────────
+    //
+    // Inline books: entry texts in order, the current document after them.
+
+    const BARE: &str = "The charger speaks OCPP.";
+    const EXPLAINED: &str = "The charger speaks OCPP (Open Charge Point Protocol).";
+
+    /// `len` entries, empty except where `at` puts a text.
+    fn book(len: usize, at: &[(usize, &'static str)]) -> Vec<&'static str> {
+        let mut b = vec![""; len];
+        for &(i, t) in at {
+            b[i] = t;
+        }
+        b
+    }
+
+    /// Whether a bare OCPP is flagged after `earlier`, and if so its `Last`.
+    fn judged(earlier: &[&str]) -> Option<Option<Last>> {
+        let (hits, last) = locate(BARE, &[], earlier);
+        (!hits.is_empty()).then(|| last.get("OCPP").copied())
+    }
+
+    #[test]
+    fn with_nothing_earlier_the_rule_is_per_document() {
+        for text in [
+            BARE,
+            "Every CPO fits an RCD. The CPOs agree.",
+            "OCPP (Open Charge Point Protocol) is open. So is OCPI.",
+        ] {
+            let (hits, last) = locate(text, &[], &[]);
+            let unexplained: Vec<_> =
+                first_uses(text).into_iter().filter(|u| u.explained.is_none()).map(|u| (u.start, u.end)).collect();
+            assert_eq!(hits.iter().map(|h| (h.start, h.end)).collect::<Vec<_>>(), unexplained, "{text:?}");
+            assert!(last.is_empty(), "{text:?}");
+        }
+    }
+
+    #[test]
+    fn an_explained_acronym_is_quiet_for_8_entries() {
+        assert_eq!(judged(&book(7, &[(0, EXPLAINED)])), None, "7 back: not yet");
+        assert_eq!(
+            judged(&book(8, &[(0, EXPLAINED)])),
+            Some(Some(Last { entry: 0, back: 8, flagged: false })),
+        );
+    }
+
+    #[test]
+    fn a_flag_counts_as_explained_there() {
+        assert_eq!(judged(&book(7, &[(0, BARE)])), None, "flagged at 0, so quiet until 8");
+        assert_eq!(judged(&book(8, &[(0, BARE)])), Some(Some(Last { entry: 0, back: 8, flagged: true })));
+    }
+
+    #[test]
+    fn a_quiet_use_does_not_reset() {
+        assert_eq!(
+            judged(&book(8, &[(0, EXPLAINED), (5, BARE)])),
+            Some(Some(Last { entry: 0, back: 8, flagged: false })),
+            "the bare use at 5 was quiet, so the spacing still runs from 0",
+        );
+    }
+
+    #[test]
+    fn an_explanation_in_the_window_resets() {
+        assert_eq!(judged(&book(8, &[(0, EXPLAINED), (5, EXPLAINED)])), None);
+        assert_eq!(
+            judged(&book(13, &[(0, EXPLAINED), (5, EXPLAINED)])),
+            Some(Some(Last { entry: 5, back: 8, flagged: false })),
+        );
+    }
+
+    #[test]
+    fn only_the_first_use_in_an_entry_counts() {
+        let late = "The charger speaks OCPP.\n\nOCPP (Open Charge Point Protocol) is open.";
+        assert_eq!(
+            judged(&book(8, &[(0, EXPLAINED), (5, late)])),
+            Some(Some(Last { entry: 0, back: 8, flagged: false })),
+            "explained later in entry 5, but its first use was bare and quiet",
+        );
+    }
+
+    #[test]
+    fn fixing_a_flag_moves_no_other_flag() {
+        let uses = [(3, BARE), (8, BARE), (9, BARE), (11, BARE)];
+        let mut flagged = book(12, &uses);
+        flagged[0] = BARE;
+        let mut fixed = flagged.clone();
+        fixed[0] = EXPLAINED;
+        let flags = |b: &[&str]| -> Vec<Vec<(usize, usize)>> {
+            (1..b.len()).map(|n| locate(b[n], &[], &b[..n]).0.iter().map(|h| (h.start, h.end)).collect()).collect()
+        };
+        assert_eq!(flags(&flagged), flags(&fixed));
+        assert_eq!(flags(&flagged)[7], [(19, 23)], "entry 8 is flagged either way");
+    }
+
+    #[test]
+    fn an_empty_entry_still_counts() {
+        let mut prose = book(8, &[(0, EXPLAINED)]);
+        for t in &mut prose[1..] {
+            *t = "Some prose with no acronym in it.";
+        }
+        assert_eq!(judged(&book(8, &[(0, EXPLAINED)])), judged(&prose));
+        assert!(judged(&prose).is_some(), "an empty entry is one entry, as a full one is");
+    }
+
+    #[test]
+    fn a_reflag_still_gets_the_glossary_fix() {
+        let g = glossary("**OCPP**: Open Charge Point Protocol. The protocol.");
+        let (hits, last) = locate(BARE, &g, &book(8, &[(0, BARE)]));
+        assert_eq!(hits[0].fix.as_deref(), Some("OCPP (Open Charge Point Protocol)"));
+        assert!(last.contains_key("OCPP"));
     }
 
     /// Inline, not crisp's fixtures folder: ink runs these tests from its own
