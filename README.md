@@ -19,6 +19,12 @@ network, no state. Build it with `cargo build --release`.
 | `crisp simplify` | Cuts Zinsser's clutter ("prior to" to "before") and pure padding ("it should be noted that", "end result"), flags complexity (passive voice, buried verbs, filler, abstraction), and scores against a readability budget and a length gate. |
 | `crisp grammar` | Flags grammar slips and American spellings, in British English, using [Harper](https://github.com/automattic/harper). Never rewrites. |
 
+The library has one more kind that the binary does not report: **gap**, an
+acronym used before it is explained (`src/gaps.rs`). It judges an absence rather
+than a phrase, so it carries a hint, never a rewrite, and it is a fix only when
+a caller hands it a glossary that has the expansion. ink asks for it on its
+own call; `review` and the CLI never run it.
+
 The split that matters is **FIX vs FLAG**. A FIX has exactly one correct plain
 equivalent, so a script applies it. A FLAG changes meaning, so the script only
 locates it and says why; a human or an agent decides. The scripts never quietly
