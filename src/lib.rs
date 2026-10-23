@@ -787,23 +787,32 @@ pub struct Review {
 /// Explanation gaps, as hits, for the contract: recorded per fixture beside
 /// `simplify_locate` and `detell_locate`.
 pub fn gaps_locate(text: &str) -> Vec<Hit> {
-    gaps::locate(text)
+    gaps::locate(text, &[])
 }
 
 /// What an editor shows when it asks for explanation gaps: the gaps, positioned
-/// like `review`'s findings, and the document's anticipation count.
+/// like `review`'s findings, the document's anticipation count, and the
+/// acronyms its glossary lacks.
 #[derive(Clone, PartialEq, Debug, serde::Serialize)]
 pub struct Gaps {
     pub findings: Vec<Finding>,
     pub anticipations: usize,
+    /// Empty with no glossary: there is nothing to compare against.
+    pub missing: Vec<String>,
 }
 
 /// Positioned in UTF-16 code units and sorted, like `review`. Separate from
 /// `review` on purpose: a caller that never asks for gaps never runs them.
-pub fn gaps(text: &str) -> Gaps {
-    let mut findings = positioned(text, gaps::locate(text), Unit::Utf16);
+/// `glossary` is a glossary's text, which the caller found; crisp reads no file.
+pub fn gaps(text: &str, glossary: Option<&str>) -> Gaps {
+    let entries = glossary.map(gaps::glossary).unwrap_or_default();
+    let mut findings = positioned(text, gaps::locate(text, &entries), Unit::Utf16);
     findings.sort_by_key(|f| (f.from, f.to));
-    Gaps { findings, anticipations: gaps::anticipations(text) }
+    Gaps {
+        findings,
+        anticipations: gaps::anticipations(text),
+        missing: gaps::missing(text, &entries),
+    }
 }
 
 pub fn review(text: &str, budget: &Budget) -> Review {
@@ -1096,14 +1105,19 @@ The value was cached. Each and every parameter was validated in a timely manner.
     #[test]
     fn the_gaps_payload_is_what_the_frontend_declares() {
         let text = "The charger speaks OCPP. You may be wondering why.";
-        let value = serde_json::to_value(gaps(text)).expect("Gaps serialises");
+        let value = serde_json::to_value(gaps(text, None)).expect("Gaps serialises");
         let keys: Vec<&str> = value.as_object().expect("an object").keys().map(String::as_str).collect();
-        assert_eq!(keys, ["anticipations", "findings"]);
+        assert_eq!(keys, ["anticipations", "findings", "missing"]);
         assert_eq!(value["anticipations"], 1);
         let f = &value["findings"][0];
         assert_eq!(f["kind"], "gap");
         assert_eq!(f["text"], "OCPP");
-        assert!(f.get("hint").is_some() && f.get("fix").is_none(), "a gap carries a hint, never a fix: {f}");
+        assert!(f.get("hint").is_some() && f.get("fix").is_none(), "with no glossary, a hint and no fix: {f}");
+
+        // With a glossary that has it, the expansion arrives as the fix.
+        let value = serde_json::to_value(gaps(text, Some("**OCPP**: Open Charge Point Protocol. The protocol.")))
+            .expect("Gaps serialises");
+        assert_eq!(value["findings"][0]["fix"], "OCPP (Open Charge Point Protocol)");
     }
 
     #[test]

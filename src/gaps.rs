@@ -72,6 +72,73 @@ pub struct FirstUse {
     pub start: usize,
     pub end: usize,
     pub explained: Option<Explained>,
+    /// First used as a plural (`CPOs`): the range stops before the `s`.
+    pub plural: bool,
+}
+
+/// One glossary headword and its expansion.
+#[derive(Clone, PartialEq, Debug)]
+pub struct Entry {
+    pub headword: String,
+    pub expansion: String,
+}
+
+static HEADWORD: LazyLock<Regex> = LazyLock::new(|| re(r"(?m)^\*\*([^*\n]+)\*\*:[ \t]*([^\n]*)"));
+
+/// The text up to the first full stop that ends a sentence: one after a
+/// lowercase letter, digit or closing bracket, followed by a space or the end,
+/// and not inside brackets, so "(e.g. Type 2)" does not cut an expansion short.
+fn first_sentence(s: &str) -> &str {
+    let (mut depth, mut prev) = (0i32, ' ');
+    for (i, c) in s.char_indices() {
+        match c {
+            '(' => depth += 1,
+            ')' => depth = (depth - 1).max(0),
+            '.' if depth == 0
+                && (prev.is_ascii_lowercase() || prev.is_ascii_digit() || prev == ')')
+                && s[i + 1..].chars().next().is_none_or(char::is_whitespace) =>
+            {
+                return s[..i].trim();
+            }
+            _ => {}
+        }
+        prev = c;
+    }
+    s.trim()
+}
+
+/// A glossary's entries, from its text: each line opening `**HEADWORD**:` is
+/// one, and its expansion is the first sentence after the colon
+/// (`**CPO**: Charge Point Operator. Owns ...` gives `Charge Point Operator`).
+/// crisp parses glossary text; it never finds or reads a file.
+pub fn glossary(text: &str) -> Vec<Entry> {
+    HEADWORD
+        .captures_iter(text)
+        .map(|c| Entry {
+            headword: c[1].trim().to_string(),
+            expansion: first_sentence(&c[2]).to_string(),
+        })
+        .filter(|e| !e.headword.is_empty() && !e.expansion.is_empty())
+        .collect()
+}
+
+/// Acronyms `text` uses that no headword contains, once each, in order of
+/// first use. A word of a headword counts (`PCI` is there under `PCI DSS`).
+/// Universal abbreviations are never listed. No glossary, nothing to compare
+/// against: empty.
+pub fn missing(text: &str, glossary: &[Entry]) -> Vec<String> {
+    if glossary.is_empty() {
+        return Vec::new();
+    }
+    let words: HashSet<&str> = glossary
+        .iter()
+        .flat_map(|e| TOKEN.find_iter(&e.headword).map(|m| m.as_str()))
+        .collect();
+    first_uses(text)
+        .into_iter()
+        .map(|u| u.acronym)
+        .filter(|a| !words.contains(a.as_str()))
+        .collect()
 }
 
 /// An acronym is letters and digits with at least two capitals (`OCPP`, `eMSP`,
@@ -173,11 +240,11 @@ pub fn first_uses(text: &str) -> Vec<FirstUse> {
                     continue;
                 }
                 let token = m.as_str();
-                let acronym = if SHAPE.is_match(token) {
-                    token
+                let (acronym, plural) = if SHAPE.is_match(token) {
+                    (token, false)
                 } else {
                     match token.strip_suffix('s') {
-                        Some(base) if SHAPE.is_match(base) => base,
+                        Some(base) if SHAPE.is_match(base) => (base, true),
                         _ => continue,
                     }
                 };
@@ -189,6 +256,7 @@ pub fn first_uses(text: &str) -> Vec<FirstUse> {
                     start: sa + m.start(),
                     end: sa + m.start() + acronym.len(),
                     explained: explained(sentence, acronym, m.start()),
+                    plural,
                 });
             }
         }
@@ -199,17 +267,24 @@ pub fn first_uses(text: &str) -> Vec<FirstUse> {
 pub const HINT: &str = "Spell it out, or say what it is, the first time you use it.";
 
 /// The unexplained first uses, as `Kind::Gap` hits.
-pub fn locate(text: &str) -> Vec<Hit> {
+///
+/// With a glossary, a gap whose acronym is exactly a headword carries the
+/// expansion as its fix, `CPO (Charge Point Operator)`, which is itself an
+/// explanation, so applying it clears the gap. A plural first use gets the
+/// expansion in its hint instead: its range covers `CPO`, so a bracket
+/// inserted there would land before the `s`.
+pub fn locate(text: &str, glossary: &[Entry]) -> Vec<Hit> {
     first_uses(text)
         .into_iter()
         .filter(|u| u.explained.is_none())
-        .map(|u| Hit {
-            rule: "gap:acronym",
-            kind: Kind::Gap,
-            start: u.start,
-            end: u.end,
-            fix: None,
-            hint: Some(Cow::Borrowed(HINT)),
+        .map(|u| {
+            let entry = glossary.iter().find(|e| e.headword == u.acronym);
+            let (fix, hint) = match entry {
+                Some(e) if !u.plural => (Some(format!("{} ({})", u.acronym, e.expansion)), Cow::Borrowed(HINT)),
+                Some(e) => (None, Cow::Owned(format!("{HINT} Your glossary has it: {}.", e.expansion))),
+                None => (None, Cow::Borrowed(HINT)),
+            };
+            Hit { rule: "gap:acronym", kind: Kind::Gap, start: u.start, end: u.end, fix, hint: Some(hint) }
         })
         .collect()
 }
@@ -225,7 +300,7 @@ mod tests {
     use super::*;
 
     fn gaps(text: &str) -> Vec<String> {
-        locate(text).iter().map(|h| text[h.start..h.end].to_string()).collect()
+        locate(text, &[]).iter().map(|h| text[h.start..h.end].to_string()).collect()
     }
 
     fn how(text: &str, acronym: &str) -> Option<Explained> {
@@ -273,7 +348,7 @@ mod tests {
     #[test]
     fn only_the_first_use_is_judged() {
         let text = "The charger speaks OCPP.\n\nOCPP (Open Charge Point Protocol) is open.";
-        let hits = locate(text);
+        let hits = locate(text, &[]);
         assert_eq!(hits.len(), 1);
         assert_eq!(hits[0].start, text.find("OCPP").unwrap());
     }
@@ -306,6 +381,69 @@ mod tests {
     #[test]
     fn camel_case_and_compounds_are_not_acronyms() {
         assert!(gaps("CitrineOS and ElaadNL ran ISO-15118 on v2.0 hardware.").is_empty());
+    }
+
+    /// The book's own format, including the awkward ones.
+    const GLOSSARY: &str = "\
+## C
+
+**CPO**: Charge Point Operator. Owns, operates and maintains charging infrastructure.
+
+**Ground lease**: A lease of the land alone. The tenant builds on it.
+
+**IEC 61851**: International standard (published by IEC) for conductive charging. Covers modes.
+
+**PCI DSS**: Payment Card Industry Data Security Standard. Security standards for card data.
+
+**CCS**: Combined Charging System (e.g. CCS2 in Europe). The DC connector.
+";
+
+    #[test]
+    fn glossary_headwords_and_expansions() {
+        let g = glossary(GLOSSARY);
+        let pairs: Vec<(&str, &str)> = g.iter().map(|e| (e.headword.as_str(), e.expansion.as_str())).collect();
+        assert_eq!(
+            pairs,
+            [
+                ("CPO", "Charge Point Operator"),
+                ("Ground lease", "A lease of the land alone"),
+                ("IEC 61851", "International standard (published by IEC) for conductive charging"),
+                ("PCI DSS", "Payment Card Industry Data Security Standard"),
+                ("CCS", "Combined Charging System (e.g. CCS2 in Europe)"),
+            ]
+        );
+    }
+
+    #[test]
+    fn a_headword_gap_carries_its_expansion() {
+        let g = glossary(GLOSSARY);
+        let text = "Every CPO needs operations managers.";
+        let hits = locate(text, &g);
+        assert_eq!(hits[0].fix.as_deref(), Some("CPO (Charge Point Operator)"));
+        let fixed = format!("{}{}{}", &text[..hits[0].start], hits[0].fix.as_deref().unwrap(), &text[hits[0].end..]);
+        assert!(locate(&fixed, &g).is_empty(), "{fixed}");
+    }
+
+    #[test]
+    fn a_plural_first_use_gets_a_hint_not_a_fix() {
+        let hits = locate("The CPOs run the network.", &glossary(GLOSSARY));
+        assert_eq!(hits[0].fix, None);
+        assert!(hits[0].hint.as_deref().unwrap().contains("Charge Point Operator"), "{:?}", hits[0].hint);
+    }
+
+    #[test]
+    fn missing_is_what_no_headword_contains() {
+        let g = glossary(GLOSSARY);
+        let text = "The CPO takes cards under PCI rules, fits an RCD, and the UK requires it.";
+        assert_eq!(missing(text, &g), ["RCD"]);
+        assert!(missing(text, &[]).is_empty());
+    }
+
+    #[test]
+    fn no_glossary_changes_nothing_else() {
+        let text = "Every CPO fits an RCD. The CPOs agree.";
+        let strip = |hits: Vec<Hit>| hits.into_iter().map(|h| (h.start, h.end)).collect::<Vec<_>>();
+        assert_eq!(strip(locate(text, &[])), strip(locate(text, &glossary(GLOSSARY))));
     }
 
     #[test]
