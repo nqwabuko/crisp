@@ -1,26 +1,6 @@
 ---
 name: crisp
-description: >-
-  Turn any draft into clean, AI-tell-free, plain prose in a good-PM voice: strip
-  em dashes and machine fingerprints, cut Zinsser/Strunk-and-White clutter, then
-  tighten to the point (Ben Horowitz "good product manager" cadence, lead with
-  the point, cut fluff). Makes padding SHORTER and keeps explanation whole: a
-  measured length gate requires the rewrite to cut at least 40% of the words that
-  are not explaining (that is the floor, not the target), while explanatory
-  passages keep their because/so joints, named parts and steps, owe no cut and
-  may grow. Three deterministic passes do the mechanical work every run,
-  including a complexity budget (sentence length, Flesch, passive voice) and the
-  length gate that the text must pass; the voice, cutting and simplification
-  rewrite then runs twice, each time in a fresh subagent. Use when the user wants text de-slopped, de-AI'd, "made
-  crisp", simplified, shortened, cut down, made plainer or less complex, or put in
-  the author's/Horowitz's voice, including insights and stories criticised as too
-  complex or too long. Trigger keywords - "crisp", "de-slop", "de-ai", "remove em
-  dashes", "make it clean", "AI clean", "tighten this", "get to the point", "cut
-  the fluff", "horowitz", "good pm voice", "simplify", "simpler", "too complex",
-  "too wordy", "plain english", "readability", "shorter sentences", "hard to
-  read", "zinsser", "strunk", "elements of style", "dumb it down", "shorten",
-  "make it shorter", "cut this down", "trim", "condense", "too long", "half the
-  length", "tl;dr".
+description: "Turn any draft into clean, plain prose in a good-PM voice: strip em dashes and machine fingerprints, cut Zinsser and Strunk-and-White clutter, and lead with the point. Padding gets shorter while explanation stays whole: a measured length gate requires cutting at least 40% of the words that are not explaining, and explanatory passages keep their because/so joints and may grow. Three deterministic passes run every time (including a complexity budget and the length gate), then the voice rewrite runs twice, each in a fresh subagent. Use for prose, not code. Trigger keywords - \"crisp\", \"de-slop\", \"de-ai\", \"remove em dashes\", \"make it clean\", \"tighten this\", \"get to the point\", \"cut the fluff\", \"horowitz\", \"good pm voice\", \"simpler\", \"plain english\", \"too wordy\", \"too complex\", \"readability\", \"zinsser\", \"strunk\", \"shorten\", \"make it shorter\", \"condense\", \"too long\", \"tl;dr\"."
 ---
 
 # crisp
