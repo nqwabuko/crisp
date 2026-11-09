@@ -47,6 +47,31 @@ the first one's output, not its reasoning, so it reads the text the way the real
 reader will: cold. Whatever the first pass talked itself into keeping, the second
 pass has no reason to keep.
 
+## Tiers: pick the cheapest one the text's reader allows
+
+Not every sentence earns two subagents. A full run costs about 80k tokens and a
+few minutes; an MRC line, a register note or a Slack reply does not need that.
+Pick a tier by who reads the text, never by how tired the run is.
+
+| Tier | What runs | Use it for |
+|---|---|---|
+| **L0** | Steps 2, 2b and 2c only, no rewrite. Act on the flags by hand. | Internal notes, register cells, Slack replies, commit messages, anything already short. |
+| **L1** | L0, then Pass steps A and B **once, in the current agent**, then the verify commands. No subagent. | Text going to a customer, and any text L0 leaves over budget. |
+| **L2** | The full workflow below: L0, then two rewrites in two fresh subagents. | When someone asks for crisp by name, insights (`--insight`), and anything published. |
+
+**Floors.** Customer-bound text never goes below L1. An insight never goes below
+L2. A caller may always pick a higher tier than its floor, never a lower one.
+
+**L0 on markdown: report, do not apply.** `crisp detell` swallows the newline
+after a trailing or lone em dash (`**Supersedes**: —` merges with the next line,
+and a table row with ` — ` cells changes shape). On markdown, run L0 with
+`--report` and fix the flagged lines by hand. arch-n-delivery's `dash-hook.py`
+is an always-on L0 of this kind: it reports em dashes in what an agent just
+wrote and never edits the file.
+
+**When invoked as `crisp` with no tier named, run L2.** That is what the person
+asked for.
+
 ## Workflow
 
 **First, one branch.** If the text is an insight being filed to Shortcut, add
